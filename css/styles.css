@@ -205,6 +205,7 @@ p, li, small, figcaption, .section-sub { text-wrap: pretty; }
 .section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 25px; margin-bottom: 31px; }
 .section h2 { font-size: clamp(30px, 4vw, 52px); letter-spacing: -.01em; line-height: 1.25; margin: 9px 0 12px; text-wrap: balance; }
 .section-sub { font-size: 15px; color: var(--muted); max-width: 700px; margin: 0; }
+.lab-areas { display: inline-block; margin-top: 14px; }
 .section-num { color: #7f9373; font-size: 12px; letter-spacing: 2px; font-weight: 900; }
 
 /* 角色姿勢小頭像（Manual、Roadmap 標題旁） */
@@ -360,7 +361,13 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
 /* About Me：跨領域能力地圖 */
 .skillmap { margin-top: 22px; padding: 32px; border-radius: 27px; background: #e9eee3; border: 1px solid #d6dfd0; }
 .skillmap-head h3 { font-size: clamp(22px, 2.6vw, 30px); margin: 6px 0 20px; }
-.skillmap-nodes { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.skillmap-nodes { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+/* 每張卡片的「圖示／標題／經歷／能力」四列互相對齊 */
+@supports (grid-template-rows: subgrid) {
+  .skill-node { display: grid !important; grid-row: span 4; grid-template-rows: subgrid; row-gap: 8px; justify-items: center; align-items: start; }
+  .skill-node > * { align-self: start; }
+  .skill-node .skill-tags { align-self: stretch; margin-top: 0; }
+}
 .skill-node { background: #fffef9; border-radius: 18px; padding: 20px 14px 18px; border-top: 5px solid var(--sage); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; box-shadow: 0 8px 18px #657a5914; transition: transform .2s var(--ease); }
 .skill-node:hover { transform: translateY(-4px); }
 .skill-node.c1 { border-top-color: #edbe9c; }
@@ -370,15 +377,49 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
 .skill-node.c5 { border-top-color: #7d7f65; }
 .skill-icon { font-size: 26px; line-height: 1.2; }
 .skill-node b { font-size: 17px; }
-.skill-node small { color: var(--muted); font-size: 12px; line-height: 1.5; }
+.skill-node small { color: var(--muted); font-size: 13px; line-height: 1.6; }
 .skill-tags { font-size: 13px; font-weight: 650; color: #4b5e47; line-height: 1.75; margin-top: auto; padding-top: 8px; border-top: 1px dashed #dfe5d7; align-self: stretch; }
 .skill-node .ln { display: block; }
 .skillmap-flow { height: 44px; position: relative; }
-.skillmap-flow span { position: absolute; left: 10%; right: 10%; top: 0; height: 22px; border: 2px dashed #a8b99b; border-top: 0; border-radius: 0 0 24px 24px; }
+.skillmap-flow span { position: absolute; left: 18%; right: 18%; top: 0; height: 22px; border: 2px dashed #a8b99b; border-top: 0; border-radius: 0 0 24px 24px; }
 .skillmap-flow span::after { content: '▼'; position: absolute; left: 50%; bottom: -24px; transform: translateX(-50%); color: #8fa383; font-size: 14px; }
 .skillmap-hub { margin: 4px auto 0; max-width: 420px; text-align: center; background: var(--ink); color: #fff; border-radius: 99px; padding: 16px 24px; display: flex; flex-direction: column; }
 .skillmap-hub b { font-size: 20px; }
 .skillmap-hub span { font-size: 13px; opacity: .85; letter-spacing: 1px; }
+
+/* 能力地圖（三段式橫列）：領域｜經歷｜練就的能力 */
+.skill-head, .skill-row { display: grid; grid-template-columns: 200px 1fr 1.5fr; gap: 0 24px; align-items: center; }
+.skill-head { padding: 0 24px 8px; font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #74826d; }
+.skill-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.skill-row { background: #fffef9; border-radius: 18px; padding: 18px 24px; border-left: 6px solid var(--sage); box-shadow: 0 8px 18px #657a5914; transition: transform .2s var(--ease); }
+.skill-row:hover { transform: translateX(4px); }
+.skill-row.c1 { border-left-color: #edbe9c; }
+.skill-row.c2 { border-left-color: #b4b49b; }
+.skill-row.c3 { border-left-color: #ac7b58; }
+.skill-row.c5 { border-left-color: #7d7f65; }
+.sr-domain { display: flex; align-items: center; gap: 12px; }
+.sr-domain b { font-family: var(--font-display); font-size: 19px; }
+.sr-domain .skill-icon { width: 46px; height: 46px; flex: none; display: grid; place-items: center; border-radius: 14px; background: #f3f1e8; font-size: 24px; }
+.sr-exp { color: var(--muted); font-size: 14px; line-height: 1.7; }
+.sr-exp .ln { display: block; }
+.sr-label { display: none; }
+.sr-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.sr-chips .ln { display: inline-block; padding: 4px 12px; border-radius: 99px; background: #eef1e7; color: #4b5e47; font-size: 13px; font-weight: 700; white-space: nowrap; }
+@media (max-width: 820px) {
+  .skill-head { display: none; }
+  .skill-row { grid-template-columns: 1fr; gap: 10px; padding: 18px; }
+  .sr-label { display: block; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #74826d; margin-bottom: 2px; }
+  .sr-exp { padding-top: 10px; border-top: 1px dashed #dfe5d7; }
+}
+
+/* 課堂作品縮圖 */
+.classwork.has-thumb { grid-template-columns: auto 1fr 112px; }
+.cw-thumb { grid-row: span 2; grid-column: 3; width: 112px; aspect-ratio: 4 / 3; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: #f3f1e8; }
+.cw-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+.cw-actions { grid-column: 2; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.cw-actions .cw-link { margin-top: 0; grid-column: auto; }
+.cw-more { min-height: 36px; padding: 6px 14px; font-size: 13px; border-radius: 99px; border: 1px solid #ccd5c3; background: #fff; font-weight: 800; color: #4b5e47; }
+.cw-more:hover { background: #eef1e7; }
 
 /* About Me：工作之外 */
 .hobbies { margin-top: 22px; display: flex; align-items: center; gap: 14px 24px; flex-wrap: wrap; }
@@ -425,6 +466,16 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
 .project p { margin: 6px 0 15px; color: var(--muted); font-size: 14px; }
 .project small { color: #74826d; font-weight: 700; }
 .project-status { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #7a6a55; margin-top: 12px; }
+.classworks { margin-top: 44px; }
+.classworks-title { font-size: clamp(20px, 2.2vw, 26px); margin: 6px 0 16px; }
+.classworks-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.classwork { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; gap: 4px 16px; align-items: start; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 18px 20px; box-shadow: var(--shadow); }
+.cw-date { grid-row: span 2; font-family: var(--font-display); font-weight: 700; font-size: 18px; color: var(--sage-deep); background: #eef1e7; border-radius: 14px; padding: 8px 10px; text-align: center; min-width: 64px; }
+.cw-body { min-width: 0; }
+.cw-unit { color: #74826d; font-weight: 700; font-size: 12px; }
+.classwork h4 { margin: 2px 0 4px; font-size: 17px; font-family: var(--font-display); }
+.classwork p { margin: 0; font-size: 14px; color: var(--muted); }
+.cw-link { grid-column: 2; justify-self: start; margin-top: 8px; min-height: 36px; padding: 6px 14px; font-size: 13px; }
 .project-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; margin-top: auto; padding-top: 14px; }
 .project-link { display: inline-flex; align-items: center; min-height: 40px; padding: 8px 16px; border-radius: 99px; background: var(--sage-deep); color: #fff; font-size: 14px; font-weight: 800; transition: transform .2s var(--ease); }
 .project-link:hover { transform: translateY(-2px); }
@@ -506,6 +557,12 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
 .slide-media { width: clamp(220px, 28vw, 380px); }
 .slide-media .fullbody { height: min(58vh, 540px); width: auto; max-width: 100%; object-fit: contain; margin: 0 auto; filter: drop-shadow(0 14px 14px #6b6a4f22); transform-origin: 50% 100%; animation: mindyIn .7s var(--ease) both, idle 5.5s ease-in-out .7s infinite; }
 .slide-media.wide { width: clamp(280px, 36vw, 480px); }
+.slide-media.wide:has(.slide-minis) { width: clamp(240px, 27vw, 380px); }
+/* 簡報主打作品截圖：完整顯示整張，不裁切；畫面更寬讓字看得清楚 */
+.slide-media.feature-shot { width: clamp(320px, 46vw, 680px); }
+.feature-shot .slide-shot { aspect-ratio: auto; background: #fff !important; padding: 6px; }
+.feature-shot .slide-shot img { height: auto; object-fit: contain; border-radius: 14px; }
+.feature-shot .visual-tag { top: 14px; left: 14px; }
 .slide-shot { position: relative; border-radius: 22px; overflow: hidden; border: 1px solid var(--border); background: #e8eee9; aspect-ratio: 16 / 10; display: flex; align-items: center; justify-content: center; }
 .slide-shot img { width: 100%; height: 100%; object-fit: cover; }
 .slide-shot svg { width: 92%; height: 92%; }
@@ -529,14 +586,14 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
 /* ---------- 3D 游標：平常是米白立體箭頭，指到可點擊的地方變成小花（只在電腦上） ---------- */
 @media (pointer: fine) {
   html {
-    cursor: url("../assets/cursor/cursor-arrow.png") 4 2, auto;
-    cursor: -webkit-image-set(url("../assets/cursor/cursor-arrow.png") 1x, url("../assets/cursor/cursor-arrow@2x.png") 2x) 4 2, auto;
-    cursor: image-set(url("../assets/cursor/cursor-arrow.png") 1x, url("../assets/cursor/cursor-arrow@2x.png") 2x) 4 2, auto;
+    cursor: url("../assets/cursor/cursor-arrow.png") 3 2, auto;
+    cursor: -webkit-image-set(url("../assets/cursor/cursor-arrow.png") 1x, url("../assets/cursor/cursor-arrow@2x.png") 2x) 3 2, auto;
+    cursor: image-set(url("../assets/cursor/cursor-arrow.png") 1x, url("../assets/cursor/cursor-arrow@2x.png") 2x) 3 2, auto;
   }
   a, button, summary, select, label, .chip span, .map-node, [role="button"], .hero-mindy {
-    cursor: url("../assets/cursor/cursor-flower.png") 16 16, pointer;
-    cursor: -webkit-image-set(url("../assets/cursor/cursor-flower.png") 1x, url("../assets/cursor/cursor-flower@2x.png") 2x) 16 16, pointer;
-    cursor: image-set(url("../assets/cursor/cursor-flower.png") 1x, url("../assets/cursor/cursor-flower@2x.png") 2x) 16 16, pointer;
+    cursor: url("../assets/cursor/cursor-flower.png") 10 10, pointer;
+    cursor: -webkit-image-set(url("../assets/cursor/cursor-flower.png") 1x, url("../assets/cursor/cursor-flower@2x.png") 2x) 10 10, pointer;
+    cursor: image-set(url("../assets/cursor/cursor-flower.png") 1x, url("../assets/cursor/cursor-flower@2x.png") 2x) 10 10, pointer;
   }
   input[type="text"], textarea { cursor: text; }
   button:disabled { cursor: not-allowed; }
@@ -607,7 +664,6 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
 @media (max-width: 820px) {
   .hobby-list { grid-template-columns: repeat(3, 1fr); }
   .skillmap-nodes { grid-template-columns: repeat(2, 1fr); }
-  .skill-node.c5 { grid-column: 1 / -1; }
   .cards { grid-template-columns: repeat(2, 1fr); }
   .roadmap { grid-template-columns: 1fr 1fr; }
   .roadmap .card:last-child { grid-column: 1 / -1; }
@@ -649,10 +705,17 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
   .section h2 { font-size: clamp(26px, 7.4vw, 32px); letter-spacing: -.02em; line-height: 1.35; }
   .section-sub { font-size: 14px; }
   .section-head > .pill { display: inline-block; margin-top: 12px; }
+  .lab-areas { margin-top: 12px; }
   .pose-badge { position: absolute; right: 0; top: -6px; width: 64px; height: 64px; border-width: 3px; }
   .section-head:has(.pose-badge) > div:first-child { padding-right: 70px; }
 
-  .cards, .projects, .two, .journey, .roadmap { grid-template-columns: 1fr; }
+  .cards, .projects, .two, .journey, .roadmap, .classworks-list { grid-template-columns: 1fr; }
+  .classwork { padding: 16px; grid-template-columns: 1fr; gap: 8px; }
+  .cw-date { grid-row: auto; justify-self: start; min-width: 0; font-size: 15px; padding: 4px 12px; }
+  .cw-link { grid-column: auto; }
+  .classwork.has-thumb { grid-template-columns: 1fr; }
+  .cw-thumb { grid-row: auto; grid-column: auto; width: 100%; aspect-ratio: 16 / 9; order: -1; }
+  .cw-actions { grid-column: auto; }
   .roadmap .card:last-child { grid-column: auto; }
   .soft { padding: 24px; }
   .philosophy, .skillmap { padding: 24px 18px; border-radius: 22px; }
@@ -661,7 +724,6 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
   .philosophy-steps li + li::before { left: -16px; }
   .philosophy-steps b { font-size: 15px; }
   .skillmap-nodes { grid-template-columns: 1fr; }
-  .skill-node.c5 { grid-column: auto; }
   .card { padding: 22px; }
   .bio-story { font-size: 18px; }
   .invite h3 { font-size: 22px; }

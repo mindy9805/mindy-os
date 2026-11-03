@@ -102,9 +102,30 @@ window.MindyMusic = (function () {
     }
   }
 
+  /* iPhone：網頁音效預設會被「靜音開關」關掉。
+     ① 支援的瀏覽器：把音訊類型設為「媒體播放」（和看影片一樣，靜音模式也會播）
+     ② 舊版 iPhone：同時播放一段無聲音檔，讓系統切換成媒體播放模式 */
+  let keepAlive = null;
+  function silentAudio() {
+    if (keepAlive) return keepAlive;
+    const rate = 8000, n = rate / 2, buf = new ArrayBuffer(44 + n), v = new DataView(buf);
+    const w = (o, str) => { for (let i = 0; i < str.length; i++) v.setUint8(o + i, str.charCodeAt(i)); };
+    w(0, 'RIFF'); v.setUint32(4, 36 + n, true); w(8, 'WAVE'); w(12, 'fmt ');
+    v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+    v.setUint32(24, rate, true); v.setUint32(28, rate, true); v.setUint16(32, 1, true); v.setUint16(34, 8, true);
+    w(36, 'data'); v.setUint32(40, n, true);
+    for (let i = 0; i < n; i++) v.setUint8(44 + i, 128);
+    keepAlive = new Audio(URL.createObjectURL(new Blob([buf], { type: 'audio/wav' })));
+    keepAlive.loop = true;
+    keepAlive.setAttribute('playsinline', '');
+    return keepAlive;
+  }
+
   function play() {
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { /* 不支援就略過 */ }
+    try { const a = silentAudio(); const r = a.play(); if (r && r.catch) r.catch(() => {}); } catch (e) { /* 略過 */ }
     if (!ctx && !setup()) return false;
-    if (ctx.state === 'suspended') ctx.resume();
+    if (ctx.state !== 'running') ctx.resume();
     if (playing) return true;
     playing = true;
     nextTime = ctx.currentTime + 0.1;
@@ -123,7 +144,7 @@ window.MindyMusic = (function () {
     master.gain.cancelScheduledValues(ctx.currentTime);
     master.gain.setValueAtTime(master.gain.value, ctx.currentTime);
     master.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.6);       // 淡出
-    setTimeout(() => { if (!playing && ctx) ctx.suspend(); }, 800);
+    setTimeout(() => { if (!playing && ctx) ctx.suspend(); if (!playing && keepAlive) keepAlive.pause(); }, 800);
   }
 
   return { play, pause, isPlaying: () => playing, supported: !!(window.AudioContext || window.webkitAudioContext) };

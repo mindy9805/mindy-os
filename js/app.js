@@ -230,8 +230,32 @@
     attachImgFallback(box);
   }
 
+  /* 課堂作品清單（js/data.js 的 classWorks） */
+  function renderClassWorks() {
+    const box = $('#classWorks');
+    if (!box) return;
+    box.innerHTML = (DATA.classWorks || []).map(w => {
+      const link = w.link && /^https?:\/\//.test(w.link)
+        ? `<a class="project-link cw-link" href="${esc(w.link)}" target="_blank" rel="noopener noreferrer">開啟作品 ↗</a>` : '';
+      const more = w.project ? `<button type="button" class="cw-more" data-project="${esc(w.project)}">查看作品圖片</button>` : '';
+      return `
+      <li class="classwork${w.thumb ? ' has-thumb' : ''}">
+        <span class="cw-date">${esc(w.date)}</span>
+        <div class="cw-body">
+          <small class="cw-unit">${esc(w.unit)}</small>
+          <h4>${esc(w.title)}</h4>
+          <p>${esc(w.desc)}</p>
+        </div>
+        ${w.thumb ? `<div class="cw-thumb"><img src="${esc(w.thumb)}" alt="" loading="lazy"></div>` : ''}
+        ${link || more ? `<div class="cw-actions">${link}${more}</div>` : ''}
+      </li>`;
+    }).join('');
+    $$('[data-project]', box).forEach(b => b.addEventListener('click', () => openProject(b.dataset.project, b)));
+  }
+
   function initProjects() {
     renderProjects('all');
+    renderClassWorks();
     $$('#filters button').forEach(b => b.addEventListener('click', () => {
       $$('#filters button').forEach(x => { x.classList.remove('active'); x.setAttribute('aria-pressed', 'false'); });
       b.classList.add('active'); b.setAttribute('aria-pressed', 'true');
@@ -516,7 +540,7 @@
       if (s.project) {
         const p = projects.find(x => x.id === s.project) || {};
         const shot = (p.images || [])[0];
-        return `<div class="slide-media wide"><div class="slide-shot" style="background:${esc(colors[p.cat] || '#eee')}">${shot
+        return `<div class="slide-media wide feature-shot"><div class="slide-shot" style="background:${esc(colors[p.cat] || '#eee')}">${shot
           ? `<img src="${esc(shot.src)}" alt="${esc(shot.alt || p.name)}"><span class="visual-tag real">實際作品截圖</span>`
           : `${(DATA.conceptArt || {})[p.cat] || ''}<span class="visual-tag">概念示意｜非實際截圖</span>`}</div></div>`;
       }
