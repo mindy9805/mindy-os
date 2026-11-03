@@ -14,6 +14,8 @@ mindy-os/
 ├── css/styles.css        ← 外觀：顏色、排版、動畫、手機版
 ├── js/data.js            ← ★ 最常修改：作品、簡報、合作情境、彩蛋文字
 ├── js/app.js             ← 互動功能（一般不需要修改）
+├── js/music.js           ← 背景音樂（原創音樂盒旋律，可調音量 VOLUME、速度 BPM）
+├── assets/cursor/        ← 3D 游標圖（箭頭、小花）
 ├── assets/mindy/         ← Mindy 角色圖（去背）
 │   ├── mindy-*.webp          11 種全身姿勢：fullbody、welcome、thinking、exploring、surprise、
 │   │                         thanks、ready、introducing、success、collaborating、presenting
@@ -51,6 +53,8 @@ python3 -m http.server 8080
 | 改合作情境 | `js/data.js` 的 `matches` |
 | 連接合作意願表單 | 照 `docs/表單設定教學.md` 操作，把網址貼到 `js/data.js` 的 `form.endpoint` |
 | 改彩蛋台詞 | `js/data.js` 的 `mindySays`、`plantMessages` |
+| 改「工作之外」興趣台詞 | `js/data.js` 的 `hobbies` |
+| 某個詞被拆成兩行 | 把那個詞加進 `js/app.js` 的 `KEEP_WORDS` |
 | 改各區塊標題、介紹 | `index.html`（每區都有 `<!-- ===== -->` 註解標示） |
 | 改品牌色 | `css/styles.css` 最上方的 `:root` |
 

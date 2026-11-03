@@ -101,28 +101,70 @@
      2. 探索地圖與功能卡片
      ================================================================= */
   function initExplore() {
-    const wrap = $('#moduleCards');
-    if (wrap && DATA.navCards) {
-      wrap.innerHTML = DATA.navCards.map(n =>
-        `<button type="button" class="card nav-card reveal" data-go="${esc(n[3])}"><div class="symbol" aria-hidden="true">${n[0]}</div><h3>${esc(n[1])} ↗</h3><p>${esc(n[2])}</p></button>`
-      ).join('');
-    }
-    $$('[data-go]').forEach(el => el.addEventListener('click', () => goTo(el.dataset.go)));
-
-    // 地圖上的小 Mindy：滑鼠移到（或鍵盤聚焦到）目的地時，走到那個目的地旁邊
     const avatar = $('#mapAvatar'), map = $('#map');
-    if (!avatar || !map) return;
-    $$('.map-node', map).forEach(node => {
-      const walk = () => {
-        if (getComputedStyle(avatar).display === 'none') return; // 手機版不顯示
-        const left = node.offsetLeft + node.offsetWidth / 2 - avatar.offsetWidth / 2;
-        const top = node.offsetTop - avatar.offsetHeight - 6;
-        avatar.style.left = Math.max(8, left) + 'px';
-        avatar.style.top = Math.max(60, top) + 'px';
-      };
-      node.addEventListener('mouseenter', walk);
-      node.addEventListener('focus', walk);
+    const nodes = map ? $$('.map-node', map) : [];
+    const svg = $('#trail'), path = $('#trailPath');
+    const isPhone = () => window.matchMedia('(max-width: 720px)').matches;
+    const avatarShown = () => avatar && getComputedStyle(avatar).display !== 'none';
+
+    // 取得目的地相對於地圖的位置
+    const box = node => {
+      const m = map.getBoundingClientRect(), r = node.getBoundingClientRect();
+      return { left: r.left - m.left, top: r.top - m.top + map.scrollTop, width: r.width, height: r.height };
+    };
+    // 小 Mindy 走到某個目的地旁邊（電腦：目的地上方；手機：目的地旁的空白處）
+    const walkTo = node => {
+      if (!avatarShown()) return;
+      const size = avatar.offsetWidth, b = box(node);
+      let left, top;
+      if (isPhone()) {
+        const onLeft = b.left + b.width / 2 < map.clientWidth / 2;
+        left = onLeft ? b.left + b.width + 14 : b.left - size - 14;
+        top = b.top + b.height / 2 - size / 2;
+      } else {
+        left = b.left + b.width / 2 - size / 2;
+        top = b.top - size - 6;
+      }
+      avatar.style.left = Math.max(6, Math.min(map.clientWidth - size - 6, left)) + 'px';
+      avatar.style.top = Math.max(isPhone() ? 6 : 60, top) + 'px';
+    };
+
+    // 手機版：依目的地的位置，畫一條彎彎曲曲的虛線小徑
+    const drawTrail = () => {
+      if (!svg || !path || !map) return;
+      if (!isPhone()) { svg.style.display = 'none'; return; }
+      svg.style.display = 'block';
+      const pts = nodes.map(n => { const b = box(n); return [b.left + b.width / 2, b.top + b.height / 2]; });
+      let d = `M${pts[0][0]} ${pts[0][1]}`;
+      for (let i = 1; i < pts.length; i++) {
+        const [x0, y0] = pts[i - 1], [x1, y1] = pts[i], my = (y0 + y1) / 2;
+        d += ` C${x0} ${my} ${x1} ${my} ${x1} ${y1}`;
+      }
+      svg.setAttribute('width', map.clientWidth);
+      svg.setAttribute('height', map.scrollHeight);
+      path.setAttribute('d', d);
+    };
+    let current = nodes[0];
+    const layout = () => { drawTrail(); if (current) walkTo(current); };
+
+    // 點擊目的地：Mindy 先走過去，再帶你前往該區塊
+    $$('[data-go]').forEach(el => el.addEventListener('click', () => {
+      if (el.classList.contains('map-node') && avatarShown() && !reduceMotion) {
+        current = el; walkTo(el);
+        setTimeout(() => goTo(el.dataset.go), 620);
+      } else {
+        goTo(el.dataset.go);
+      }
+    }));
+    nodes.forEach(node => {
+      node.addEventListener('mouseenter', () => { current = node; walkTo(node); });
+      node.addEventListener('focus', () => { current = node; walkTo(node); });
     });
+    if (!map) return;
+    layout();
+    let t; window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(layout, 150); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
+    window.addEventListener('load', layout);
   }
 
   /* =================================================================
@@ -130,6 +172,12 @@
      ================================================================= */
   const projects = DATA.projects || [];
   const colors = DATA.categoryColors || {};
+
+  /* 雙語標籤「ENGLISH · 中文」：中文部分包起來，避免被拆成兩行 */
+  function biLabel(label) {
+    const i = String(label).lastIndexOf(' · ');
+    return i < 0 ? esc(label) : esc(label.slice(0, i)) + '<span class="eb-zh">' + esc(label.slice(i)) + '</span>';
+  }
 
   /* 卡片封面：有截圖就顯示第一張；沒有就顯示概念示意圖並標註 */
   function projectCover(p) {
@@ -167,7 +215,7 @@
       <article class="card project">
         <button type="button" class="project-visual" style="background:${esc(colors[p.cat] || '#eee')}" data-project="${esc(p.id)}" aria-label="查看「${esc(p.name)}」專案摘要">${projectCover(p)}</button>
         <div class="project-body">
-          <small>${esc(p.label)}${p.featured ? ' · <span class="featured-flag">★ FEATURED</span>' : ''}</small>
+          <small>${biLabel(p.label)}${p.featured ? ' · <span class="featured-flag">★ FEATURED · 主打作品</span>' : ''}</small>
           <h3>${esc(p.name)}</h3>
           <p>${esc(p.desc)}</p>
           <div class="pills">${(p.tools || []).map(t => `<span class="pill">${esc(t)}</span>`).join('')}</div>
@@ -204,7 +252,7 @@
       ? `<div class="gallery">${imgs.map(im => `<figure><img src="${esc(im.src)}" alt="${esc(im.alt || p.name)}" loading="lazy">${im.caption ? `<figcaption>${esc(im.caption)}</figcaption>` : ''}</figure>`).join('')}</div>`
       : `<div class="gallery-placeholder"><div class="concept" style="background:${esc(colors[p.cat] || '#eee')}">${(DATA.conceptArt || {})[p.cat] || ''}</div>📎 ${esc(p.state)}。上方為概念示意圖，並非作品實際截圖。</div>`;
     $('#modalContent').innerHTML = `
-      <div class="eyebrow">${esc(p.label)}</div>
+      <div class="eyebrow">${biLabel(p.label)}</div>
       <h2 id="modalTitle">${esc(p.name)}</h2>
       <p>${esc(p.detail)}</p>
       <div class="pills">${(p.tools || []).map(t => `<span class="pill">${esc(t)}</span>`).join('')}</div>
@@ -536,6 +584,7 @@
       isOpen = true;
       pres.hidden = false;
       document.body.style.overflow = 'hidden';
+      document.dispatchEvent(new Event('mindy:present')); // 背景音樂在簡報時暫停
       render(1);
       resetTimer(); clearInterval(timerId); timerId = setInterval(tick, 1000);
       $('#next').focus();
@@ -606,33 +655,39 @@
   }
 
   /* =================================================================
-     0. 中文斷行：只在「詞與詞之間」換行，避免把一個詞拆成兩行
+     0. 中文斷行：讓換行落在「意思完整」的地方
      -----------------------------------------------------------------
-     用瀏覽器內建的中文斷詞（Intl.Segmenter），在詞與詞之間加上
-     可換行的位置（<wbr>），並讓瀏覽器只在這些位置換行。
+     規則（由小到大）：
+     ① 詞：用瀏覽器內建的中文斷詞（Intl.Segmenter）＋下方 KEEP_WORDS 詞庫，詞不會被拆開
+     ② 片語：「的、了、們…」黏前一個詞；「與、和、在、讓…」黏後一個詞，行尾不會只剩「與」
+     ③ 子句：以「，、；：」結尾的一段話盡量放在同一行，放不下時整段換到下一行
+     ④ 句子：段落中遇到「。！？」，下一句從新的一行開始
      KEEP_WORDS：瀏覽器斷錯時，在這裡補上「一定要黏在一起」的詞。
      ================================================================= */
   const KEEP_WORDS = [
     '截圖', '豆皮', '豆豆貼', '鍋貼', '勾選', '優化', '鐘敏恩', '跨域', '表單', '日日好日', '痛點',
     '點擊', '社群', '總表', '教保員', '學務', '受眾', '發想', '選填', '再填', '題型', '方格紙',
     '週次', '待補', '這堂課', '小芽', '滿點', '好奇心', '試算表', '粉圓體', '聯絡簿', '彩蛋',
-    '核心理念', '跨領域', '探索者', '說明書', '作業系統'
+    '核心理念', '跨領域', '探索者', '說明書', '作業系統', '目的地', '行程表', '時程表',
+    '延伸能力', '實現想像'
   ];
   function initWordBreak() {
     if (!window.Intl || !Intl.Segmenter) return; // 舊瀏覽器：維持一般換行
     const seg = new Intl.Segmenter('zh-Hant', { granularity: 'word' });
     const dict = new Set(KEEP_WORDS);
     const CJK = /[㐀-鿿豈-﫿]/;
-    const NO_BREAK_BEFORE = /^[，。、；：！？」』）》〉…—～・,.!?;:)\]%]/; // 標點不放在行首
-    const NO_BREAK_AFTER = /[「『（《〈(\[]$/;                          // 開括號不放在行尾
+    const PUNCT = /^[，。、；：！？」』）》〉…—～・,.!?;:)\]%]+$/;     // 不放在行首
+    const OPEN_END = /[「『（《〈(\[]$/;                               // 不放在行尾
+    const CLAUSE_END = /[，、；：。！？]/;
+    const SENTENCE_END = /[。！？]/;
+    const GLUE_PREV = new Set(['的', '了', '著', '們', '裡', '得', '嗎', '呢', '吧', '啊', '中', '上']);
+    const GLUE_NEXT = new Set(['與', '和', '及', '或', '把', '將', '讓', '在', '從', '對', '向', '給', '為', '被', '跟',
+      '一', '很', '更', '最', '也', '都', '還', '就', '才', '只', '我', '你', '他', '她']);
     const SKIP = /^(SCRIPT|STYLE|TEXTAREA|INPUT|SELECT|OPTION|CODE|PRE|TITLE)$/;
+    const NO_SENTENCE_BREAK = 'h1,h2,h3,button,label,legend,.pill,.chip,.eyebrow,.section-num,.slide-extra,.phrase,.ln';
 
-    const processText = node => {
-      const text = node.nodeValue, parent = node.parentNode;
-      if (!parent || text.length < 3 || !CJK.test(text)) return;
-      if (SKIP.test(parent.nodeName) || (parent.closest && parent.closest('svg'))) return;
-      const parts = Array.from(seg.segment(text), s => s.segment);
-      const words = [];
+    const toWords = text => {
+      const parts = Array.from(seg.segment(text), x => x.segment), words = [];
       for (let i = 0; i < parts.length;) {
         let take = 1;
         for (let n = Math.min(4, parts.length - i); n > 1; n--) {
@@ -641,14 +696,61 @@
         words.push(parts.slice(i, i + take).join(''));
         i += take;
       }
-      if (words.length < 2) return;
-      const frag = document.createDocumentFragment();
+      return words;
+    };
+    // 兩個詞之間可不可以換行
+    const canBreak = (prev, w) => !(PUNCT.test(w) || OPEN_END.test(prev) || /\s$/.test(prev) || /^\s/.test(w) ||
+      GLUE_PREV.has(w) || GLUE_NEXT.has(prev));
+
+    const processText = node => {
+      const text = node.nodeValue, parent = node.parentNode;
+      if (!parent || text.length < 3 || !CJK.test(text)) return;
+      if (SKIP.test(parent.nodeName) || (parent.closest && parent.closest('svg'))) return;
+      if (parent.classList && parent.classList.contains('cl')) return; // 已處理過
+      if (parent.closest && parent.closest('.eb-zh, .ln')) return;     // 不可拆開的標籤
+      const words = toWords(text);
+      // 依標點切成子句
+      const clauses = [];
+      let cur = [];
       words.forEach((w, i) => {
-        const prev = words[i - 1];
-        if (i > 0 && !NO_BREAK_BEFORE.test(w) && !NO_BREAK_AFTER.test(prev) && !/\s$/.test(prev) && !/^\s/.test(w)) {
-          frag.appendChild(document.createElement('wbr'));
+        cur.push(w);
+        const next = words[i + 1];
+        if (CLAUSE_END.test(w) && PUNCT.test(w) && !(next && PUNCT.test(next))) { clauses.push(cur); cur = []; }
+      });
+      if (cur.length) clauses.push(cur);
+      // 很短的子句（3 個字以內，例如「現在，」）併入下一個子句，避免自己孤單一行
+      for (let i = 0; i < clauses.length - 1; i++) {
+        const len = clauses[i].join('').replace(/[\s，、；：。！？]/g, '').length;
+        const endsSentence = SENTENCE_END.test(clauses[i].join('').slice(-1));
+        if (len <= 3 && !endsSentence) { clauses[i + 1] = clauses[i].concat(clauses[i + 1]); clauses.splice(i, 1); i--; }
+      }
+      if (words.length < 2 && clauses.length < 2) return;
+
+      const allowSentence = parent.closest && !parent.closest(NO_SENTENCE_BREAK) && !!parent.closest('p, li, figcaption');
+      const frag = document.createDocumentFragment();
+      const appendWords = (target, list) => list.forEach((w, i) => {
+        if (i > 0 && canBreak(list[i - 1], w)) target.appendChild(document.createElement('wbr'));
+        target.appendChild(document.createTextNode(w));
+      });
+      clauses.forEach((c, ci) => {
+        if (ci > 0) {
+          const prevClause = clauses[ci - 1].join('');
+          const hasMore = c.join('').trim().length > 0;
+          if (allowSentence && SENTENCE_END.test(prevClause.slice(-2)) && hasMore && CJK.test(c.join(''))) {
+            const br = document.createElement('br'); br.className = 'sb'; frag.appendChild(br);
+          } else if (!/^\s/.test(c[0])) {
+            frag.appendChild(document.createElement('wbr'));
+          }
         }
-        frag.appendChild(document.createTextNode(w));
+        // 多個子句時：每個子句包成一組，盡量不拆開
+        if (clauses.length > 1 && CJK.test(c.join(''))) {
+          const span = document.createElement('span');
+          span.className = 'cl';
+          appendWords(span, c);
+          frag.appendChild(span);
+        } else {
+          appendWords(frag, c);
+        }
       });
       parent.replaceChild(frag, node);
     };
@@ -662,9 +764,55 @@
     };
     walk(document.body);
     document.documentElement.classList.add('wb'); // 啟用「只在詞間換行」的 CSS
-    // 之後動態產生的內容（作品卡片、合作情境、簡報、提示訊息）也自動處理
+    // 之後動態產生的內容（作品卡片、合作情境、簡報、興趣台詞、提示訊息）也自動處理
     new MutationObserver(muts => muts.forEach(m => m.addedNodes.forEach(walk)))
       .observe(document.body, { childList: true, subtree: true });
+  }
+
+  /* =================================================================
+     8. 工作之外的 Mindy：點興趣卡片，Mindy 說一段話（文字在 js/data.js 的 hobbies）
+     ================================================================= */
+  function initHobbies() {
+    const talk = $('#hobbyTalk'), text = $('#hobbyText');
+    if (!talk) return;
+    const lines = DATA.hobbies || {};
+    let current = null;
+    $$('.hobby-card').forEach(btn => btn.addEventListener('click', () => {
+      const key = btn.dataset.hobby, same = current === key;
+      $$('.hobby-card').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-expanded', 'false'); });
+      if (same) { talk.hidden = true; current = null; return; }
+      current = key;
+      btn.classList.add('active'); btn.setAttribute('aria-expanded', 'true');
+      text.textContent = lines[key] || '';
+      talk.hidden = false;
+      talk.classList.remove('pop'); void talk.offsetWidth; talk.classList.add('pop');
+    }));
+  }
+
+  /* =================================================================
+     9. 背景音樂按鈕（音樂本身在 js/music.js）
+     ================================================================= */
+  function initMusic() {
+    const btn = $('#musicBtn'), M = window.MindyMusic;
+    if (!btn) return;
+    if (!M || !M.supported) { btn.hidden = true; return; }
+    const sync = () => {
+      const on = M.isPlaying(), label = on ? '暫停背景音樂' : '播放背景音樂';
+      btn.setAttribute('aria-pressed', String(on));
+      btn.classList.toggle('on', on);
+      btn.setAttribute('aria-label', label);
+      btn.title = label;
+    };
+    btn.addEventListener('click', () => { if (M.isPlaying()) M.pause(); else M.play(); sync(); });
+    // 進入簡報模式：暫停音樂
+    document.addEventListener('mindy:present', () => { M.pause(); sync(); });
+    // 切換到其他分頁時暫停，回來後繼續
+    let resume = false;
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) { resume = M.isPlaying(); if (resume) M.pause(); }
+      else if (resume) { M.play(); resume = false; }
+      sync();
+    });
   }
 
   /* ---------- 依序啟動所有功能 ---------- */
@@ -675,5 +823,7 @@
   safe('彩蛋', initEasterEggs);
   safe('簡報模式', initPresentation);
   safe('進場動畫', initReveal); // 最後啟動，才能包含動態產生的卡片
+  safe('興趣台詞', initHobbies);
+  safe('背景音樂', initMusic);
   safe('中文斷行', initWordBreak);
 })();

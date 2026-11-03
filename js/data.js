@@ -32,19 +32,6 @@ window.MINDY_DATA = {
   },
 
   /* -------------------------------------------------------------------
-     2) 六大功能卡片（首頁探索地圖下方）
-     格式：[圖示, 標題, 說明, 對應區塊 id]
-     ------------------------------------------------------------------- */
-  navCards: [
-    ['🌿', 'About Me',        '我的故事',       'about'],
-    ['🧪', 'Creative Lab',    'AI 作品實驗室',  'lab'],
-    ['🕰️', 'Version History', '我的更新紀錄',   'history'],
-    ['🧭', 'Roadmap',         '未來探索方向',   'roadmap'],
-    ['📖', 'User Manual',     '合作使用說明書', 'manual'],
-    ['🤝', "Let's Connect",   '一起創造可能',   'connect']
-  ],
-
-  /* -------------------------------------------------------------------
      3) 作品卡片（Creative Lab）
      ★ 如何放入真實截圖：
        (1) 把圖片放進 assets/works/ 資料夾（建議 1600×1000 的 .webp 或 .jpg）
@@ -61,7 +48,7 @@ window.MINDY_DATA = {
     {
       id: 'data',
       cat: 'data',
-      label: 'DATA & AUTOMATION',
+      label: 'DATA & AUTOMATION · 營運與資料',
       name: '營運資料與銷售管理系統',
       desc: '從商品主檔、BOM、銷售紀錄，到可操作的網頁表單。熟悉的試算表工作，原來還能走得更遠。',
       tools: ['Excel', 'Google Sheets', 'Apps Script', 'AI 協作'],
@@ -73,7 +60,7 @@ window.MINDY_DATA = {
     {
       id: 'brand',
       cat: 'brand',
-      label: 'BRAND & BUSINESS',
+      label: 'BRAND & BUSINESS · 品牌與商業',
       name: '豆豆貼｜豆皮鍋貼品牌',
       desc: '從低負擔的品牌主張，延伸到品牌視覺、行銷文案、短影音及商品創意。',
       tools: ['品牌企劃', 'AI 圖像', '短影音腳本', '行銷提案'],
@@ -84,7 +71,7 @@ window.MINDY_DATA = {
     {
       id: 'ux',
       cat: 'ux',
-      label: 'PRODUCT & UI/UX',
+      label: 'PRODUCT & UI/UX · 產品與介面',
       name: '日日好日 Daily Bloom',
       desc: '以晨間儀式與日常覺察為題，整合情緒、感恩、天氣及生活紀錄的產品構想。',
       tools: ['需求規劃', 'UI/UX', '產品原型', 'AI 輔助'],
@@ -95,7 +82,7 @@ window.MINDY_DATA = {
     {
       id: 'experiment',
       cat: 'experiment',
-      label: 'AI EXPERIMENTS',
+      label: 'AI EXPERIMENTS · AI 實驗',
       name: '課堂創作實驗室',
       desc: '探索 Prompt、AI 工作流程、圖像生成、簡報與其他課堂成果。',
       tools: ['Prompt', 'AI Workflow', '視覺生成'],
@@ -106,7 +93,7 @@ window.MINDY_DATA = {
     {
       id: 'homework',
       cat: 'ux',
-      label: 'TOOL & UI/UX',
+      label: 'TOOL & UI/UX · 工具與介面',
       name: '青年AI實戰養成班—回家作業總表',
       desc: '把課程每天的單元與回家作業，整理成一本可以逐項勾選的線上「聯絡簿」，完成一天就蓋上紅色「完成」章。',
       tools: ['Claude', '資訊架構', 'UI/UX', '網頁工具'],
@@ -204,6 +191,16 @@ window.MINDY_DATA = {
   /* -------------------------------------------------------------------
      6) 彩蛋文字（點首頁 Mindy、種小植物時出現）
      ------------------------------------------------------------------- */
+  /* 「工作之外的 Mindy」：點擊興趣卡片時，Mindy 說的話（可自由修改） */
+  hobbies: {
+    food: '看到好吃的，會先拍照，再默默記進腦中的「美食試算表」。評分欄位只有三種：好吃、超好吃、下次還要來。',
+    travel: '出發前，行程排得像專案時程表；到了當地，卻最愛走進計畫外的小巷。好奇心，永遠比行程表快一步。',
+    reading: '書櫃裡「待讀」永遠比「已讀」多。沒關係，好奇心本來就是一份持續更新中的清單。',
+    movie: '看完電影，會忍不住分析角色動機和劇情結構。企劃魂一上身，連片尾彩蛋都不放過。',
+    photo: '相簿裡最多的不是自拍，而是食物、天空和路邊的小花。生活裡的小美好，都想好好收藏。',
+    badminton: '球場上最常喊的一句：「這球我的！」然後和隊友撞在一起。團隊分工，還在持續練習中。'
+  },
+
   mindySays: [
     '嗨！一起開啟更多可能吧！',
     '好奇心：已啟動 ☀',

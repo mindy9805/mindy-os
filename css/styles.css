@@ -82,6 +82,11 @@ h1, h2, h3, .tagline, .philosophy-quote, .skillmap-hub b, .skill-node b, .map-ti
 p, li, small, figcaption, .section-sub { text-wrap: pretty; }
 /* 由 app.js 加上 .wb 後，只在詞與詞之間換行（太長時仍會換行，不會超出畫面） */
 .wb body { word-break: keep-all; overflow-wrap: break-word; }
+/* 子句：一段以「，、；：」結尾的話，盡量完整放在同一行（放不下才在詞與詞之間換行） */
+.wb .cl { display: inline-block; max-width: 100%; text-indent: 0; text-wrap: balance; }
+/* 雙語小標：中文部分不拆開 */
+.eb-zh { white-space: nowrap; }
+.zh-sub { display: block; font-family: var(--font-body); font-size: .72em; font-weight: 600; color: var(--muted); letter-spacing: 0; margin-top: 2px; }
 
 /* 中文斷行：.phrase 是一個「不可拆開的詞組」，換行只會發生在詞組之間 */
 .phrase { display: inline-block; max-width: 100%; } /* 詞組太長時仍會在內部換行，不會超出畫面 */
@@ -104,6 +109,16 @@ p, li, small, figcaption, .section-sub { text-wrap: pretty; }
 .btn.alt:hover { background: #d8e0cb; }
 .btn-sm { min-height: 40px; padding: 8px 16px; font-size: 14px; }
 .btn-label-short { display: none; }
+.music-btn { position: relative; width: 40px; height: 40px; border-radius: 50%; border: 1px solid #d7dccd; background: #fffef9; color: var(--ink); display: grid; place-items: center; padding: 0; transition: background .2s, transform .2s var(--ease); }
+.music-btn:hover { transform: translateY(-2px); background: #f1f4ea; }
+.music-icon { font-size: 18px; line-height: 1; font-weight: 700; }
+.music-bars { display: none; height: 16px; gap: 2px; align-items: flex-end; }
+.music-bars i { width: 3px; height: 100%; border-radius: 2px; background: var(--sage-deep); transform-origin: bottom; animation: eq 1s ease-in-out infinite; }
+.music-bars i:nth-child(2) { animation-delay: -.35s; }
+.music-bars i:nth-child(3) { animation-delay: -.7s; }
+.music-btn.on { background: #e9eee3; border-color: #b9c8ad; }
+.music-btn.on .music-icon { display: none; }
+.music-btn.on .music-bars { display: flex; }
 
 .eyebrow { font-size: 12px; letter-spacing: 3px; color: #73836a; font-weight: 850; text-transform: uppercase; }
 .mini-label { display: inline-block; border: 1px solid #cfd8c7; color: #677867; border-radius: 99px; padding: 4px 13px; font-size: 12px; margin: 0 4px 6px 0; }
@@ -126,7 +141,11 @@ p, li, small, figcaption, .section-sub { text-wrap: pretty; }
 .logo { font-weight: 900; font-size: 23px; letter-spacing: -1px; white-space: nowrap; }
 .logo span { font-size: 11px; color: #6f7c69; letter-spacing: 2px; margin-left: 5px; }
 .links { display: flex; gap: 24px; font-size: 13px; font-weight: 650; color: #5b675c; }
-.links a { padding: 6px 0; border-bottom: 2px solid transparent; transition: color .2s, border-color .2s; }
+.links a { padding: 6px 0; border-bottom: 2px solid transparent; transition: color .2s, border-color .2s; display: inline-grid; justify-items: center; }
+.links a > span { grid-area: 1 / 1; transition: opacity .22s, transform .22s var(--ease); white-space: nowrap; }
+.links a .zh { opacity: 0; transform: translateY(6px); }
+.links a:hover .en, .links a:focus-visible .en { opacity: 0; transform: translateY(-6px); }
+.links a:hover .zh, .links a:focus-visible .zh { opacity: 1; transform: none; }
 .links a:hover, .links a.active { color: #28372b; border-color: var(--sage); }
 .nav-actions { display: flex; align-items: center; gap: 6px; }
 .menu { display: none; width: 44px; height: 44px; border: 0; background: none; border-radius: 12px; padding: 12px 10px; flex-direction: column; justify-content: space-between; }
@@ -157,7 +176,7 @@ p, li, small, figcaption, .section-sub { text-wrap: pretty; }
 .hero-orbit::after { top: 350px; left: 430px; background: #edc29b; }
 
 /* Mindy 本體是一個按鈕（可點擊互動），外觀上看不出按鈕樣式 */
-.hero-mindy { position: relative; border: 0; background: none; padding: 0; border-radius: 40px; animation: breathe 5s ease-in-out infinite; }
+.hero-mindy { position: relative; border: 0; background: none; padding: 0; border-radius: 40px; transform-origin: 50% 100%; animation: idle 5.5s ease-in-out infinite; }
 .hero-mindy img {
   /* 桌機：完整全身去背圖，不裁切 */
   height: 560px; width: auto; aspect-ratio: 785 / 1000; object-fit: contain;
@@ -190,7 +209,8 @@ p, li, small, figcaption, .section-sub { text-wrap: pretty; }
 
 /* 角色姿勢小頭像（Manual、Roadmap 標題旁） */
 .pose-badge { flex: none; width: 120px; height: 120px; border-radius: 50%; overflow: hidden; background: #f3ede1; border: 4px solid #fff; box-shadow: var(--shadow); }
-.pose-badge img { width: 100%; height: 100%; object-fit: cover; }
+.pose-badge img { width: 100%; height: 100%; object-fit: cover; transform-origin: 50% 90%; animation: idleSoft 4.5s ease-in-out infinite; }
+.pose-badge:hover img { animation: wiggle .6s var(--ease); }
 
 .map { background: #e9eee3; border: 1px solid #d6dfd0; border-radius: 32px; position: relative; min-height: 510px; overflow: hidden; box-shadow: var(--shadow); }
 .map::before {
@@ -229,6 +249,7 @@ p, li, small, figcaption, .section-sub { text-wrap: pretty; }
   animation: bob 2.4s ease-in-out infinite;
 }
 .map-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.trail { display: none; }
 
 .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px; }
 .nav-card { cursor: pointer; transition: transform .2s var(--ease), border-color .2s; text-align: left; width: 100%; }
@@ -260,10 +281,10 @@ details p { font-size: 14px; color: var(--muted); margin-bottom: 0; }
 .arrowlink:hover { color: var(--ink); }
 
 .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; list-style: none; padding: 0; margin: 0; }
-.step { position: relative; }
-.step::before { content: ''; height: 1px; position: absolute; top: 24px; left: 30px; right: -15px; background: #aebfa5; }
+.step { position: relative; text-align: center; }
+.step::before { content: ''; height: 1px; position: absolute; top: 24px; left: calc(50% + 32px); right: calc(-50% + 26px); background: #aebfa5; }
 .step:last-child::before { display: none; }
-.step .circle { width: 48px; height: 48px; border-radius: 50%; background: #dfe7d9; display: grid; place-items: center; font-weight: 800; position: relative; }
+.step .circle { width: 48px; height: 48px; margin: 0 auto; border-radius: 50%; background: #dfe7d9; display: grid; place-items: center; font-weight: 800; position: relative; }
 .step .circle.next { background: var(--apricot-soft); border: 1px dashed var(--apricot); }
 .step h3 { font-size: 16px; margin: 16px 0 4px; }
 .step p { font-size: 13px; color: var(--muted); margin: 0; }
@@ -277,7 +298,7 @@ details p { font-size: 14px; color: var(--muted); margin-bottom: 0; }
 .connect-result { display: flex; gap: 16px; align-items: center; background: #eef1e7; border: 1px solid #d9e1d3; border-radius: 20px; padding: 20px; margin-top: 16px; min-height: 120px; }
 .connect-result p { margin: 4px 0 0; font-size: 14px; }
 .connect-avatar { flex: none; width: 64px; height: 64px; border-radius: 50%; overflow: hidden; border: 3px solid #fff; background: #f3ede1; }
-.connect-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.connect-avatar img { width: 100%; height: 100%; object-fit: cover; transform-origin: 50% 90%; animation: idleSoft 4s ease-in-out infinite; }
 .connect-avatar.pop { animation: pop .5s var(--ease); }
 .fineprint { font-size: 12px; }
 /* 合作意願表單 */
@@ -307,7 +328,7 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
 .form-status { margin: 12px 0 0; padding: 10px 14px; border-radius: 12px; font-size: 14px; font-weight: 700; }
 .form-status.error { background: #fbeee8; color: #8f3a22; border: 1px solid #efcbbd; }
 .connect-done { display: flex; align-items: center; gap: 20px; min-height: 320px; outline: none; animation: fadeUp .45s var(--ease) both; }
-.connect-done img { flex: none; height: 240px; width: auto; filter: drop-shadow(0 12px 12px #6b6a4f22); }
+.connect-done img { flex: none; height: 240px; width: auto; filter: drop-shadow(0 12px 12px #6b6a4f22); transform-origin: 50% 100%; animation: mindyIn .6s var(--ease) both, idle 5s ease-in-out .6s infinite; }
 .connect-done h3 { font-size: 24px; margin: 0 0 8px; }
 .connect-done p { margin: 0 0 16px; color: var(--muted); }
 .invite { display: flex; flex-direction: column; justify-content: center; }
@@ -340,7 +361,7 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
 .skillmap { margin-top: 22px; padding: 32px; border-radius: 27px; background: #e9eee3; border: 1px solid #d6dfd0; }
 .skillmap-head h3 { font-size: clamp(22px, 2.6vw, 30px); margin: 6px 0 20px; }
 .skillmap-nodes { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
-.skill-node { background: #fffef9; border-radius: 18px; padding: 18px 16px; border-top: 5px solid var(--sage); display: flex; flex-direction: column; gap: 6px; box-shadow: 0 8px 18px #657a5914; transition: transform .2s var(--ease); }
+.skill-node { background: #fffef9; border-radius: 18px; padding: 20px 14px 18px; border-top: 5px solid var(--sage); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; box-shadow: 0 8px 18px #657a5914; transition: transform .2s var(--ease); }
 .skill-node:hover { transform: translateY(-4px); }
 .skill-node.c1 { border-top-color: #edbe9c; }
 .skill-node.c2 { border-top-color: #b4b49b; }
@@ -350,7 +371,8 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
 .skill-icon { font-size: 26px; line-height: 1.2; }
 .skill-node b { font-size: 17px; }
 .skill-node small { color: var(--muted); font-size: 12px; line-height: 1.5; }
-.skill-tags { font-size: 13px; font-weight: 650; color: #4b5e47; line-height: 1.6; margin-top: auto; padding-top: 6px; border-top: 1px dashed #dfe5d7; }
+.skill-tags { font-size: 13px; font-weight: 650; color: #4b5e47; line-height: 1.75; margin-top: auto; padding-top: 8px; border-top: 1px dashed #dfe5d7; align-self: stretch; }
+.skill-node .ln { display: block; }
 .skillmap-flow { height: 44px; position: relative; }
 .skillmap-flow span { position: absolute; left: 10%; right: 10%; top: 0; height: 22px; border: 2px dashed #a8b99b; border-top: 0; border-radius: 0 0 24px 24px; }
 .skillmap-flow span::after { content: '▼'; position: absolute; left: 50%; bottom: -24px; transform: translateX(-50%); color: #8fa383; font-size: 14px; }
@@ -362,7 +384,15 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
 .hobbies { margin-top: 22px; display: flex; align-items: center; gap: 14px 24px; flex-wrap: wrap; }
 .hobbies { display: block; }
 .hobby-list { list-style: none; padding: 0; margin: 14px 0 0; display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
-.hobby-card { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 18px 8px 16px; border-radius: 20px; background: #fff; border: 1px solid var(--border); font-weight: 750; font-size: 15px; transition: transform .25s var(--ease); }
+.hobby-list li { list-style: none; }
+.hobby-card { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 18px 8px 16px; border-radius: 20px; background: #fff; border: 1px solid var(--border); font-weight: 750; font-size: 15px; color: var(--ink); transition: transform .25s var(--ease), border-color .2s, box-shadow .2s; }
+.hobby-card.active { border-color: var(--hc, #52674d); box-shadow: 0 10px 22px #657a5922; transform: translateY(-4px); }
+.hobby-card.active .hobby-icon { animation: wiggle .6s var(--ease); }
+.hobby-hint { margin: 12px 0 0; font-size: 13px; }
+.hobby-talk { margin-top: 14px; display: flex; align-items: center; gap: 14px; background: #fff; border: 1px solid var(--border); border-radius: 22px; padding: 16px 20px; box-shadow: var(--shadow); max-width: 760px; }
+.hobby-talk.pop { animation: fadeUp .4s var(--ease) both; }
+.hobby-talk img { flex: none; width: 64px; height: 64px; border-radius: 50%; object-fit: cover; background: #f3ede1; border: 3px solid #fff; box-shadow: 0 4px 10px #657a5922; animation: bob 2.6s ease-in-out infinite; }
+.hobby-talk p { margin: 0; font-size: 15px; line-height: 1.75; }
 .hobby-card:hover { transform: translateY(-4px) rotate(-2deg); }
 .hobby-icon { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: var(--hb, #e9eddf); color: var(--hc, #52674d); }
 .hobby-icon svg { width: 36px; height: 36px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
@@ -372,7 +402,7 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
 .hobby-card.h4 { --hb: #f3e3d9; --hc: #ac7b58; }
 .hobby-card.h5 { --hb: #e7ece4; --hc: #4f6a46; }
 .hobby-card.h6 { --hb: #f4ecd9; --hc: #8a7a52; }
-.foot-mindy { display: block; height: 220px; width: auto; margin: 0 auto 10px; filter: drop-shadow(0 12px 12px #6b6a4f1f); }
+.foot-mindy { display: block; height: 220px; width: auto; margin: 0 auto 10px; filter: drop-shadow(0 12px 12px #6b6a4f1f); transform-origin: 50% 100%; animation: idle 6s ease-in-out infinite; }
 .foot-motto { font-weight: 800; color: #7f9373; letter-spacing: 2px; margin: 14px 0 0; }
 
 /* ---------- 07. 作品卡片與作品視窗 ---------- */
@@ -474,7 +504,7 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
 .slide.enter-next .slide-extra li:nth-child(2), .slide.enter-prev .slide-extra li:nth-child(2) { animation-delay: .12s; }
 .slide.enter-next .slide-extra li:nth-child(3), .slide.enter-prev .slide-extra li:nth-child(3) { animation-delay: .24s; }
 .slide-media { width: clamp(220px, 28vw, 380px); }
-.slide-media .fullbody { height: min(58vh, 540px); width: auto; max-width: 100%; object-fit: contain; margin: 0 auto; filter: drop-shadow(0 14px 14px #6b6a4f22); animation: breathe 5s ease-in-out infinite; }
+.slide-media .fullbody { height: min(58vh, 540px); width: auto; max-width: 100%; object-fit: contain; margin: 0 auto; filter: drop-shadow(0 14px 14px #6b6a4f22); transform-origin: 50% 100%; animation: mindyIn .7s var(--ease) both, idle 5.5s ease-in-out .7s infinite; }
 .slide-media.wide { width: clamp(280px, 36vw, 480px); }
 .slide-shot { position: relative; border-radius: 22px; overflow: hidden; border: 1px solid var(--border); background: #e8eee9; aspect-ratio: 16 / 10; display: flex; align-items: center; justify-content: center; }
 .slide-shot img { width: 100%; height: 100%; object-fit: cover; }
@@ -496,8 +526,30 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
 .present .slide-dots button[aria-current="true"] { background: var(--sage-deep); color: #fff; }
 .slide-count { display: none; font-weight: 750; font-variant-numeric: tabular-nums; }
 
+/* ---------- 3D 游標：平常是米白立體箭頭，指到可點擊的地方變成小花（只在電腦上） ---------- */
+@media (pointer: fine) {
+  html {
+    cursor: url("../assets/cursor/cursor-arrow.png") 4 2, auto;
+    cursor: -webkit-image-set(url("../assets/cursor/cursor-arrow.png") 1x, url("../assets/cursor/cursor-arrow@2x.png") 2x) 4 2, auto;
+    cursor: image-set(url("../assets/cursor/cursor-arrow.png") 1x, url("../assets/cursor/cursor-arrow@2x.png") 2x) 4 2, auto;
+  }
+  a, button, summary, select, label, .chip span, .map-node, [role="button"], .hero-mindy {
+    cursor: url("../assets/cursor/cursor-flower.png") 16 16, pointer;
+    cursor: -webkit-image-set(url("../assets/cursor/cursor-flower.png") 1x, url("../assets/cursor/cursor-flower@2x.png") 2x) 16 16, pointer;
+    cursor: image-set(url("../assets/cursor/cursor-flower.png") 1x, url("../assets/cursor/cursor-flower@2x.png") 2x) 16 16, pointer;
+  }
+  input[type="text"], textarea { cursor: text; }
+  button:disabled { cursor: not-allowed; }
+}
+
 /* ---------- 10. 動畫 ---------- */
 @keyframes orbit { to { transform: rotate(342deg); } }
+/* 角色待機：輕輕上下浮動並微微左右擺動（以腳底為中心，自然不僵硬） */
+@keyframes idle { 0%, 100% { transform: translateY(0) rotate(-.8deg); } 50% { transform: translateY(-7px) rotate(.8deg); } }
+@keyframes idleSoft { 0%, 100% { transform: translateY(0) rotate(-1.5deg); } 50% { transform: translateY(-3px) rotate(1.5deg); } }
+@keyframes mindyIn { from { opacity: 0; transform: translateY(24px) scale(.94); } to { opacity: 1; transform: none; } }
+@keyframes wiggle { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-8deg); } 60% { transform: rotate(6deg); } }
+@keyframes eq { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
 @keyframes breathe { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 @keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 @keyframes bob { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-5px) rotate(2deg); } }
@@ -526,7 +578,9 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
     background: var(--paper); flex-direction: column; gap: 0; padding: 8px 24px 16px;
     box-shadow: 0 10px 18px #0001; font-size: 16px;
   }
-  .links.open a { padding: 12px 4px; border-bottom: 1px solid #ebe7dd; }
+  .links.open a { padding: 12px 4px; border-bottom: 1px solid #ebe7dd; display: flex; justify-content: flex-start; gap: 10px; align-items: baseline; }
+  .links.open a > span { grid-area: auto; opacity: 1; transform: none; }
+  .links.open a .zh { color: var(--muted); font-size: 14px; font-weight: 500; }
   .hero { grid-template-columns: 1fr 1fr; min-height: 0; }
   .hero-art { height: 480px; }
   .hero-mindy img { height: 450px; }
@@ -617,11 +671,18 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
   .map { min-height: 0; padding: 20px 16px 16px; border-radius: 24px; }
   .map-title { position: relative; top: auto; left: auto; margin: 0 4px 14px; }
   .map-title strong { font-size: 19px; }
-  .map-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; position: relative; z-index: 2; }
-  .map-node { position: static; flex-direction: column; align-items: flex-start; gap: 6px; padding: 14px; min-height: 92px; }
+  /* 直式蜿蜒小徑：目的地左右交錯，中間由虛線小路連接，小 Mindy 會沿路走 */
+  .map { padding-bottom: 22px; }
+  .map-list { display: flex; flex-direction: column; gap: 26px; position: relative; z-index: 3; padding: 6px 0 4px; }
+  .map-node { position: relative; left: auto !important; top: auto !important; width: 62%; padding: 12px 14px; gap: 10px; }
+  .map-node:nth-child(odd) { align-self: flex-start; }
+  .map-node:nth-child(even) { align-self: flex-end; }
+  .map-node:hover, .map-node:focus-visible { transform: translateY(-3px); }
   .map-node b { font-size: 14px; line-height: 1.3; }
   .map-node small { display: block; }
-  .map-avatar, .path { display: none; }
+  .path { display: none; }
+  .trail { position: absolute; left: 0; top: 0; z-index: 1; pointer-events: none; overflow: visible; }
+  .map-avatar { display: block; width: 56px; height: 56px; z-index: 4; }
 
   .steps { grid-template-columns: 1fr 1fr; }
   .filter { flex-wrap: nowrap; overflow-x: auto; margin-inline: -18px; padding: 2px 18px 8px; scrollbar-width: none; }
@@ -635,6 +696,9 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
   .foot { padding-bottom: 96px; }
   .connect-avatar { width: 52px; height: 52px; }
   .connect-done { flex-direction: column; text-align: center; min-height: 0; }
+  .hobby-talk { padding: 14px 16px; gap: 12px; }
+  .hobby-talk img { width: 52px; height: 52px; }
+  .hobby-talk p { font-size: 14px; }
   .connect-done img { height: 200px; }
   .chip span { font-size: 13px; padding: 8px 12px; }
   .peek { width: 90px; }
