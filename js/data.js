@@ -17,11 +17,18 @@ window.MINDY_DATA = {
      如果之後有新的角色圖，放進 assets/mindy/ 後改這裡的檔名即可。
      ------------------------------------------------------------------- */
   images: {
-    fullbody:  'assets/mindy/mindy-fullbody.webp', // 全身站姿（桌機首頁）
-    welcome:   'assets/mindy/pose-welcome.webp',   // 揮手打招呼（手機首頁、簡報第 1 頁）
-    thinking:  'assets/mindy/pose-thinking.webp',  // 托腮思考
-    exploring: 'assets/mindy/pose-exploring.webp', // 拿地圖探索
-    surprise:  'assets/mindy/pose-surprise.webp'   // 驚喜摀嘴
+    fullbody:      'assets/mindy/mindy-fullbody.webp',      // 01 全身站姿（桌機首頁）
+    welcome:       'assets/mindy/mindy-welcome.webp',       // 02 揮手打招呼（簡報第 1 頁）
+    thinking:      'assets/mindy/mindy-thinking.webp',      // 03 托腮思考（簡報第 3 頁）
+    exploring:     'assets/mindy/mindy-exploring.webp',     // 04 拿地圖探索
+    surprise:      'assets/mindy/mindy-surprise.webp',      // 05 驚喜
+    thanks:        'assets/mindy/mindy-thanks.webp',        // 06 謝謝（頁尾、簡報第 8 頁）
+    ready:         'assets/mindy/mindy-ready.webp',         // 07 出發（簡報第 7 頁）
+    introducing:   'assets/mindy/mindy-introducing.webp',   // 08 介紹（簡報第 2 頁）
+    success:       'assets/mindy/mindy-success.webp',       // 09 比讚
+    collaborating: 'assets/mindy/mindy-collaborating.webp', // 10 邀請合作（簡報第 6 頁）
+    presenting:    'assets/mindy/mindy-presenting.webp'     // 11 簡報說明
+    /* 頭像（臉部特寫）在 assets/mindy/avatar-*.webp，用在地圖、標題旁小圓圈與彩蛋 */
   },
 
   /* -------------------------------------------------------------------
@@ -30,10 +37,10 @@ window.MINDY_DATA = {
      ------------------------------------------------------------------- */
   navCards: [
     ['🌿', 'About Me',        '我的故事',       'about'],
-    ['📖', 'User Manual',     '合作使用說明書', 'manual'],
     ['🧪', 'Creative Lab',    'AI 作品實驗室',  'lab'],
     ['🕰️', 'Version History', '我的更新紀錄',   'history'],
     ['🧭', 'Roadmap',         '未來探索方向',   'roadmap'],
+    ['📖', 'User Manual',     '合作使用說明書', 'manual'],
     ['🤝', "Let's Connect",   '一起創造可能',   'connect']
   ],
 
@@ -47,6 +54,7 @@ window.MINDY_DATA = {
            ],
        (3) 第一張圖會成為卡片封面，全部圖片會出現在「查看專案摘要」視窗中。
        (4) images 留空 [] 時，會自動顯示「概念示意圖」，並清楚標示不是實際截圖。
+       (5) 作品有線上版本時，填 link（網址），卡片會出現「開啟作品」按鈕。
      cat 可用值：data（營運與資料）、brand（品牌創作）、ux（產品與 UI/UX）、experiment（AI 實驗）
      ------------------------------------------------------------------- */
   projects: [
@@ -94,6 +102,22 @@ window.MINDY_DATA = {
       detail: '課程期間透過不同題型及實作，練習把想法描述清楚、檢查生成結果、反覆修改與優化。',
       state: '其他作品待放入',
       images: []
+    },
+    {
+      id: 'homework',
+      cat: 'ux',
+      label: 'TOOL & UI/UX',
+      name: '青年AI實戰養成班—回家作業總表',
+      desc: '把課程每天的單元與回家作業，整理成一本可以逐項勾選的線上「聯絡簿」，完成一天就蓋上紅色「完成」章。',
+      tools: ['Claude', '資訊架構', 'UI/UX', '網頁工具'],
+      detail: '為了掌握課程進度而做的工具。以台灣學校的聯絡簿為設計靈感：方格紙底、每天一列、完成時蓋上紅色印章。依週次整理各單元主題與每天的回家作業，功能包含：今天的作業、整體與每週完成進度、待補作業提醒、子項目勾選、重要日期倒數（個人發表、Launch Day、成果發表），以及實作提醒事項；擁有者也能直接在頁面上新增或編輯課程日。手機與電腦都能使用。',
+      state: '已上線，可開啟使用',
+      link: 'https://claude.ai/artifact/LZqKm48Dttu6euUq5r65gX',
+      images: [
+        { src: 'assets/works/homework-tracker-01.webp', alt: '回家作業總表的週次聯絡簿畫面：每天一列，有分類標籤、作業與子項目勾選框，今天以黃色標示', caption: '週次聯絡簿：每天一列，分類標籤、子項目勾選，今天以黃色標示。' },
+        { src: 'assets/works/homework-tracker-02.webp', alt: '回家作業總表首頁：完成進度、待補作業、重要日期倒數與今天的作業', caption: '首頁總覽：完成進度、重要日期倒數與今天的作業。（截圖為新裝置尚未勾選的初始畫面，數字不代表實際進度）' },
+        { src: 'assets/works/homework-tracker-03.webp', alt: '回家作業總表的手機版畫面', caption: '手機版畫面。' }
+      ]
     }
   ],
 
@@ -109,8 +133,27 @@ window.MINDY_DATA = {
   },
 
   /* -------------------------------------------------------------------
-     4) 合作互動（Let's Connect）：依專長顯示的預設合作情境
+     4) 合作互動（Let's Connect）
      ------------------------------------------------------------------- */
+
+  /* ★ 表單收件網址：依 docs/表單設定教學.md 建立 Google Apps Script 後，
+       把「網頁應用程式網址」（結尾是 /exec）貼在下方引號中。
+       留空時，網站會提示「表單尚未啟用」，不會假裝送出成功。 */
+  form: {
+    endpoint: ''
+  },
+
+  /* 專長代碼 → 送到試算表的文字 */
+  skillLabels: {
+    design: 'UI/UX 與視覺設計',
+    code: '程式與系統開發',
+    marketing: '品牌與行銷',
+    data: '資料分析',
+    planning: '企劃與專案管理',
+    other: '其他領域'
+  },
+
+  /* 依專長顯示的預設合作情境 */
   matches: {
     design:    ['一起打造更友善的使用體驗', '你擅長視覺與介面，我喜歡觀察需求、企劃與流程整合。或許可以一起探索 Daily Bloom。'],
     code:      ['讓想法變成可使用的產品', '從需求、資料與流程出發，與程式開發專長互補，一起讓原型更加完整。'],
@@ -133,13 +176,13 @@ window.MINDY_DATA = {
        完整逐字稿在 docs/發表文字稿.md；這裡的 note 是「重點提示版」。
        ⚠ 簡報中按 N 顯示的講稿會出現在投影畫面上，觀眾也看得到。 */
     { k: 'WELCOME · 01', t: 'Hello, I’m Mindy.', d: '一位持續更新中的跨領域探索者。歡迎來到 MINDY OS。',
-      extra: ['好奇心持續更新', '善於企劃與協作', '用 AI 創造更多可能'], img: 'welcome', sec: 40,
+      extra: ['好奇心持續更新', '善於企劃與協作', '用 AI 創造更多可能'], img: 'welcome', sec: 35,
       note: '自我介紹（鐘敏恩／Mindy）→ 不只是簡報，邀請大家探索 MINDY OS → 這堂課是我最新的一次「版本更新」。' },
-    { k: 'ABOUT ME · 02', t: '不同的經歷，相同的好奇心。', d: '教育、學校行政、門市營運——看似不同的工作，讓我練習理解需求、規劃流程與整合團隊。',
-      extra: ['需求觀察', '企劃執行', '跨域整合'], img: 'fullbody', sec: 50,
-      note: '背景不在資訊領域 → 教育、學校行政、門市營運 → 共同點：每天面對「人」和「流程」→ 這是我學 AI 的基礎。' },
+    { k: 'ABOUT ME · 02', t: '不同的經歷，相同的好奇心。', d: '幼兒教育、學校行政、門市營運、品牌企劃、AI 應用。核心理念：把一個問題釐清，找到方法，再把它落地執行。',
+      extra: ['釐清問題', '尋找方法', '落地執行'], img: 'introducing', sec: 60,
+      note: '五個領域（含新加坡幼教 2 年）→ 共同點：面對「人」和「流程」→ 核心理念：釐清、方法、落地 → 興趣：美食、旅遊、閱讀、電影、攝影、羽球。' },
     { k: 'VERSION HISTORY · 03', t: '從使用 AI，到整合 AI。', d: '以前用 AI 查資料、寫文字；現在開始結合 Prompt、試算表、資料架構和網頁原型。',
-      extra: ['AI as a Tool', '→ 反覆試驗與修正', 'AI as a Partner'], img: 'exploring', sec: 60,
+      extra: ['AI as a Tool', '→ 反覆試驗與修正', 'AI as a Partner'], img: 'thinking', sec: 60,
       note: '1.0 既有能力 → 2.0 AI 當助理 → 3.0 串起 Prompt、試算表、資料架構、網頁原型 → 關鍵：從單一任務到整體流程，AI 從工具變夥伴。' },
     { k: 'FEATURED PROJECT · 04', t: '當試算表不再只是試算表。', d: '我最有成就感的作品，是將熟悉的營運資料管理，延伸成可以操作的銷售輸入網頁。',
       extra: ['商品與原物料主檔', '銷售紀錄與資料統計', '網頁表單操作'], project: 'data', sec: 80,
@@ -148,14 +191,14 @@ window.MINDY_DATA = {
       extra: ['豆豆貼｜品牌設計', 'Daily Bloom｜UI/UX', 'AI 課堂創作'], gallery: ['brand', 'ux', 'experiment'], sec: 60,
       note: '豆豆貼：低負擔品牌主張 → 視覺、文案、短影音 ／ Daily Bloom：情緒、感恩、生活紀錄 ／ 課堂 AI 實驗 → 不一定最完整，但都是練習的過程。' },
     { k: 'USER MANUAL · 06', t: '如何與 Mindy 合作？', d: '喜歡先釐清目標，也重視直接而尊重的交流、責任感與工作品質。',
-      extra: ['先對齊目標', '尊重不同觀點', '一起把想法落地'], img: 'thinking', sec: 50,
+      extra: ['先對齊目標', '尊重不同觀點', '一起把想法落地'], img: 'collaborating', sec: 50,
       note: '看完作品，這是我的使用說明書 → 四個核心功能 → 合作偏好：對齊目標、直接而尊重、分工清楚 → 更新中：排序優化、思考時間（停下來 = 系統運算中）。' },
     { k: 'ROADMAP · 07', t: '下一個版本，正在路上。', d: '持續學習 AI 應用、產品規劃與 UI/UX，期待找到不同專長的夥伴，一起探索更多可能。',
-      extra: ['AI 整合', '產品與使用者體驗', '跨域共同創造'], img: 'exploring', sec: 40,
+      extra: ['AI 整合', '產品與使用者體驗', '跨域共同創造'], img: 'ready', sec: 35,
       note: 'NOW 深化 AI 工作流程 → NEXT 探索 PM／UI/UX → FUTURE 和不同專長的夥伴一起創造。' },
-    { k: 'LET’S CONNECT · 08', t: '一起創造更多可能。', d: 'AI 不光是解決問題的工具，也可以創造更多可能。帶著過去的經驗出發，讓 AI 成為延伸能力與實現想像的橋樑。',
-      extra: ['互相學習', '交換想法', '歡迎交流！'], img: 'surprise', sec: 40,
-      note: '這個網站也是和 AI 一起完成的，會後歡迎用手機打開找彩蛋 → 結語：AI 不光是解決問題的工具，也可以創造更多可能……請多多指教，歡迎交流！' }
+    { k: 'LET’S CONNECT · 08', t: '整合工具，解決痛點。', d: 'AI 不光是解決問題的工具，也可以創造更多可能。帶著過去的經驗出發，讓 AI 成為延伸能力與實現想像的橋樑。',
+      extra: ['互相學習', '交換想法', '歡迎交流！'], img: 'thanks', qr: 'assets/qr-connect.svg', sec: 40,
+      note: '這個網站也是和 AI 一起完成的 → 請大家掃 QR code 留下名字與專長 → 結語：整合工具，解決痛點。AI 不光是解決問題的工具，也可以創造更多可能……請多多指教，歡迎交流！' }
   ],
 
   /* -------------------------------------------------------------------

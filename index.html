@@ -9,10 +9,14 @@
   <!-- 分享到社群時顯示的資訊 -->
   <meta property="og:title" content="MINDY OS — Explore More Possibilities">
   <meta property="og:description" content="AI 不光是解決問題的工具，也可以創造更多可能。">
-  <meta property="og:image" content="assets/mindy/pose-welcome.webp">
+  <meta property="og:image" content="assets/mindy/mindy-welcome.webp">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
   <link rel="preload" as="image" href="assets/mindy/mindy-fullbody.webp" media="(min-width: 721px)">
-  <link rel="preload" as="image" href="assets/mindy/pose-welcome.webp" media="(max-width: 720px)">
+  <link rel="preload" as="image" href="assets/mindy/mindy-welcome-half.webp" media="(max-width: 720px)">
+  <!-- 簡報字體備援：Google Fonts 的粉圓體（只有簡報模式會用到，且只下載需要的字） -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&display=swap">
   <link rel="stylesheet" href="css/styles.css">
   <!-- 先標記「JavaScript 可用」，讓進場動畫只在 JS 正常時啟用（JS 失敗時內容仍完整顯示） -->
   <script>document.documentElement.classList.add('js');</script>
@@ -26,10 +30,10 @@
     <a class="logo" href="#welcome" id="logo">MINDY OS <span id="logoVersion">v1.0 BETA</span></a>
     <nav class="links" id="links" aria-label="主要導覽">
       <a href="#about">About</a>
-      <a href="#manual">Manual</a>
       <a href="#lab">Creative Lab</a>
       <a href="#history">Updates</a>
       <a href="#roadmap">Roadmap</a>
+      <a href="#manual">Manual</a>
       <a href="#connect">Connect</a>
     </nav>
     <div class="nav-actions">
@@ -64,11 +68,11 @@
 
     <div class="hero-art">
       <div class="hero-orbit" aria-hidden="true"></div>
-      <!-- 點擊 Mindy 會說話（彩蛋）。手機版自動改用「揮手」半身圖，確保臉部完整置中 -->
+      <!-- 點擊 Mindy 會說話（彩蛋）。手機版自動改用「揮手」半身圖，讓臉更大、更靠近畫面中央 -->
       <button class="hero-mindy" id="heroMindy" type="button" aria-label="跟 Mindy 打招呼">
         <picture>
-          <source media="(max-width: 720px)" srcset="assets/mindy/pose-welcome.webp">
-          <img src="assets/mindy/mindy-fullbody.webp" width="308" height="850"
+          <source media="(max-width: 720px)" srcset="assets/mindy/mindy-welcome-half.webp">
+          <img src="assets/mindy/mindy-fullbody.webp" width="785" height="1000"
                alt="MINDY OS 原創 3D 角色 Mindy：長捲髮、空氣瀏海、圓框眼鏡，穿奶油色上衣和鼠尾草綠長褲">
         </picture>
       </button>
@@ -92,14 +96,14 @@
       <div class="map-title"><strong>🗺️ Mindy's Little World</strong><small>六個目的地，更多可能性</small></div>
       <svg class="path" viewBox="0 0 1200 500" preserveAspectRatio="none" aria-hidden="true"><path d="M180 205 Q310 70 545 130 T935 225 Q1060 330 780 385 T240 350" fill="none" stroke="#b1c5ac" stroke-width="4" stroke-dasharray="11 10"/></svg>
       <!-- 地圖上的小 Mindy：滑鼠移到目的地時會走過去 -->
-      <div class="map-avatar" id="mapAvatar" aria-hidden="true"><img src="assets/mindy/pose-exploring.webp" alt="" loading="lazy"></div>
+      <div class="map-avatar" id="mapAvatar" aria-hidden="true"><img src="assets/mindy/avatar-exploring.webp" alt="" width="400" height="400" loading="lazy"></div>
       <div class="map-list">
         <button class="map-node n1" type="button" data-go="about"><span class="node-icon">🌿</span><span><b>About Me</b><small>我的故事</small></span></button>
-        <button class="map-node n2" type="button" data-go="manual"><span class="node-icon">📖</span><span><b>User Manual</b><small>合作使用說明書</small></span></button>
-        <button class="map-node n3" type="button" data-go="lab"><span class="node-icon">🧪</span><span><b>Creative Lab</b><small>AI 作品實驗室</small></span></button>
-        <button class="map-node n4" type="button" data-go="history"><span class="node-icon">🕰️</span><span><b>Version History</b><small>更新紀錄</small></span></button>
-        <button class="map-node n5" type="button" data-go="roadmap"><span class="node-icon">🧭</span><span><b>Roadmap</b><small>未來探索</small></span></button>
-        <button class="map-node n6" type="button" data-go="connect"><span class="node-icon">🤝</span><span><b>Let's Connect</b><small>一起創造</small></span></button>
+        <button class="map-node n2" type="button" data-go="lab"><span class="node-icon">🧪</span><span><b>Creative Lab</b><small>AI 作品實驗室</small></span></button>
+        <button class="map-node n3" type="button" data-go="history"><span class="node-icon">🕰️</span><span><b>Version History</b><small>更新紀錄</small></span></button>
+        <button class="map-node n6" type="button" data-go="roadmap"><span class="node-icon">🧭</span><span><b>Roadmap</b><small>未來探索</small></span></button>
+        <button class="map-node n5" type="button" data-go="manual"><span class="node-icon">📖</span><span><b>User Manual</b><small>合作使用說明書</small></span></button>
+        <button class="map-node n4" type="button" data-go="connect"><span class="node-icon">🤝</span><span><b>Let's Connect</b><small>一起創造</small></span></button>
       </div>
     </div>
 
@@ -113,15 +117,16 @@
       <div>
         <span class="section-num">01 / ABOUT ME</span>
         <h2><span class="phrase">不同的經歷，</span><span class="phrase">相同的好奇心。</span></h2>
-        <p class="section-sub">從教育、行政到營運，我一直在學習如何理解人、安排事情、改善流程，並讓好的想法發生。</p>
+        <p class="section-sub">從幼兒教育、學校行政、門市營運、品牌企劃到 AI 應用，我一直在學習如何理解人、安排事情、改善流程，並讓好的想法發生。</p>
       </div>
+      <div class="pose-badge reveal" aria-hidden="true"><img src="assets/mindy/avatar-introducing.webp" alt="" width="400" height="400" loading="lazy"></div>
     </div>
     <div class="two">
       <div class="soft reveal">
         <div class="eyebrow">HELLO, MY NAME IS MINDY</div>
-        <p class="bio-story">我喜歡將複雜的問題整理得更有條理，也相信創意不該只停留在腦海裡。現在，我正在讓 AI 成為延伸能力與實現想像的橋樑。</p>
+        <p class="bio-story">你好，我是鐘敏恩。做過幼兒教育、學校行政與門市營運，也經營過店家的社群與品牌內容。我喜歡將複雜的問題整理得更有條理，也相信創意不該只停留在腦海裡。現在，我正在讓 AI 成為延伸能力與實現想像的橋樑。</p>
         <div class="pills">
-          <span class="pill">教育與教學</span><span class="pill">行政流程</span><span class="pill">門市營運</span><span class="pill">活動企劃</span><span class="pill">AI 應用</span>
+          <span class="pill">幼兒教育</span><span class="pill">學校行政</span><span class="pill">門市營運</span><span class="pill">品牌企劃</span><span class="pill">AI 應用</span>
         </div>
       </div>
       <div class="card reveal">
@@ -134,17 +139,149 @@
         </div>
       </div>
     </div>
+
+    <!-- 個人核心理念 -->
+    <div class="philosophy reveal">
+      <div class="eyebrow">CORE PHILOSOPHY · 個人核心理念</div>
+      <blockquote class="philosophy-quote"><span class="phrase">「把一個問題釐清，</span><span class="phrase">找到方法，</span><span class="phrase">再把它落地執行。」</span></blockquote>
+      <ol class="philosophy-steps">
+        <li><b>釐清問題</b><small>Clarify</small></li>
+        <li><b>尋找方法</b><small>Method</small></li>
+        <li><b>落地執行</b><small>Execute</small></li>
+      </ol>
+      <p class="muted philosophy-note">無論身處哪個產業，這始終是我推動工作的核心。</p>
+    </div>
+
+    <!-- 跨領域能力地圖：五個經歷領域，收斂成同一種能力。內容可直接修改 -->
+    <div class="skillmap reveal" aria-labelledby="skillmapTitle">
+      <div class="skillmap-head">
+        <div class="eyebrow">SKILL MAP · 跨領域能力地圖</div>
+        <h3 id="skillmapTitle">五個領域，一條主線。</h3>
+      </div>
+      <ul class="skillmap-nodes">
+        <li class="skill-node c1">
+          <span class="skill-icon" aria-hidden="true">🧸</span>
+          <b>幼兒教育</b>
+          <small>海外（新加坡）幼兒華語教師、幼兒園教保員</small>
+          <span class="skill-tags">課程設計・跨文化溝通・觀察與引導</span>
+        </li>
+        <li class="skill-node c2">
+          <span class="skill-icon" aria-hidden="true">🏫</span>
+          <b>學校行政</b>
+          <small>實驗教育機構行政教師</small>
+          <span class="skill-tags">總務・教務・學務統籌｜優化招生、出勤、圖書館系統</span>
+        </li>
+        <li class="skill-node c3">
+          <span class="skill-icon" aria-hidden="true">🏪</span>
+          <b>門市營運</b>
+          <small>門市店長</small>
+          <span class="skill-tags">現場營運・團隊管理・突發狀況應變</span>
+        </li>
+        <li class="skill-node c4">
+          <span class="skill-icon" aria-hidden="true">📣</span>
+          <b>品牌企劃</b>
+          <small>店家社群從 0 到 1 經營、豆豆貼品牌企劃</small>
+          <span class="skill-tags">受眾分析・文案與短影音・活動發想</span>
+        </li>
+        <li class="skill-node c5">
+          <span class="skill-icon" aria-hidden="true">🤖</span>
+          <b>AI 應用</b>
+          <small>青年 AI 實戰養成班</small>
+          <span class="skill-tags">Prompt・試算表資料架構・網頁原型・流程整合</span>
+        </li>
+      </ul>
+      <div class="skillmap-flow" aria-hidden="true"><span></span></div>
+      <div class="skillmap-hub">
+        <b>敏捷專案執行力</b>
+        <span>溝通・營運・企劃・問題解決</span>
+      </div>
+    </div>
+
+    <!-- 工作之外 -->
+    <div class="hobbies reveal">
+      <div class="eyebrow">OFF DUTY · 工作之外的 Mindy</div>
+      <!-- 興趣插圖：線條小圖示（SVG），顏色在 css 的 .hobby-card.h1～h6 -->
+      <ul class="hobby-list">
+        <li class="hobby-card h1"><span class="hobby-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M8 24h32a16 16 0 0 1-32 0Z"/><path d="M14 40h20"/><path d="M28 6 20 20M36 8 26 20"/><path d="M17 14c0-3 3-3 3-6M23 14c0-3 3-3 3-6" opacity=".6"/></svg></span>美食</li>
+        <li class="hobby-card h2"><span class="hobby-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M6 27 42 12c2-1 4 1 2 3L30 28l-4 12-4-9-9-1Z"/><path d="m22 31 8-3"/><path d="M8 38c5-1 8-4 9-7" stroke-dasharray="2 4"/></svg></span>旅遊</li>
+        <li class="hobby-card h3"><span class="hobby-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 12c-5-4-12-4-18-2v26c6-2 13-2 18 2 5-4 12-4 18-2V10c-6-2-13-2-18 2Z"/><path d="M24 12v26"/><path d="M11 18c3-1 6-1 8 0M11 24c3-1 6-1 8 0M29 18c3-1 6-1 8 0" opacity=".6"/></svg></span>閱讀</li>
+        <li class="hobby-card h4"><span class="hobby-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="7" y="18" width="34" height="22" rx="3"/><path d="m7 18 3-10 32 4-2 6"/><path d="m16 9 2 8M26 10l2 8M36 11l1 7" opacity=".6"/><path d="m21 24 8 5-8 5Z"/></svg></span>看電影</li>
+        <li class="hobby-card h5"><span class="hobby-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M6 17a4 4 0 0 1 4-4h6l3-5h10l3 5h6a4 4 0 0 1 4 4v19a4 4 0 0 1-4 4H10a4 4 0 0 1-4-4Z"/><circle cx="24" cy="26" r="8"/><circle cx="36" cy="19" r="1.2"/></svg></span>攝影</li>
+        <li class="hobby-card h6"><span class="hobby-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M18 30 8 8l12 6 4-8 4 8 12-6-10 22"/><path d="M18 30h12"/><path d="M18 30a6 6 0 0 0 12 0" /><path d="M16 14l4 16M32 14l-4 16" opacity=".6"/></svg></span>羽球</li>
+      </ul>
+    </div>
   </section>
 
-  <!-- ============ 02 USER MANUAL ============ -->
+  <!-- ============ 02 CREATIVE LAB 作品集 ============ -->
+  <section class="section shell" id="lab">
+    <div class="section-head reveal">
+      <div>
+        <span class="section-num">02 / CREATIVE LAB</span>
+        <h2><span class="phrase">把想法，</span><span class="phrase">變成看得見的作品。</span></h2>
+        <p class="section-sub">這裡收集品牌企劃、營運工具、產品構想，以及 AI 課堂中的各種嘗試。點擊卡片可閱讀作品摘要。</p>
+      </div>
+      <div class="pill">4 PROJECT AREAS</div>
+      <div class="pose-badge reveal" aria-hidden="true"><img src="assets/mindy/avatar-presenting.webp" alt="" width="400" height="400" loading="lazy"></div>
+    </div>
+    <div class="filter" id="filters" role="group" aria-label="作品分類篩選">
+      <button type="button" data-filter="all" class="active" aria-pressed="true">全部作品</button>
+      <button type="button" data-filter="data" aria-pressed="false">營運與資料</button>
+      <button type="button" data-filter="brand" aria-pressed="false">品牌創作</button>
+      <button type="button" data-filter="ux" aria-pressed="false">產品與 UI/UX</button>
+      <button type="button" data-filter="experiment" aria-pressed="false">AI 實驗</button>
+    </div>
+    <!-- 作品卡片：內容在 js/data.js 的 projects -->
+    <div class="projects" id="projects" aria-live="polite"></div>
+  </section>
+
+  <!-- ============ 03 VERSION HISTORY ============ -->
+  <section class="section shell" id="history">
+    <div class="section-head reveal">
+      <div>
+        <span class="section-num">03 / VERSION HISTORY</span>
+        <h2><span class="phrase">不斷更新，</span><span class="phrase">沒有最終版本。</span></h2>
+        <p class="section-sub">這次的學習，不是從不會 AI 變成會 AI，而是從完成單一任務，開始思考整體流程與新的實作可能。</p>
+      </div>
+      <div class="pose-badge reveal" aria-hidden="true"><img src="assets/mindy/avatar-thinking.webp" alt="" width="400" height="400" loading="lazy"></div>
+    </div>
+    <ol class="steps">
+      <li class="step reveal"><div class="circle">1.0</div><h3>Human Skills</h3><p>教育、行政、企劃與團隊溝通的既有能力。</p></li>
+      <li class="step reveal"><div class="circle">2.0</div><h3>AI Assistant</h3><p>查詢資料、潤飾文章、生成圖片與行政輔助。</p></li>
+      <li class="step reveal"><div class="circle">3.0</div><h3>AI Integration</h3><p>Prompt、試算表、資料管理、網頁原型與反覆除錯。</p></li>
+      <li class="step reveal"><div class="circle next">4.0</div><h3>Product Builder</h3><p>下一步：深化 UX、產品規劃與跨域協作。</p></li>
+    </ol>
+    <div class="journey">
+      <div class="card reveal"><div class="eyebrow">BEFORE</div><h3>AI as a Tool</h3><p class="muted">我習慣讓 AI 幫我處理文字、資訊和日常工作。</p></div>
+      <div class="card card-sage reveal"><div class="eyebrow">AFTER · 2026.10 →</div><h3>AI as a Partner</h3><p class="muted">我開始學習結合 AI、資料架構與操作介面，把想法一步步實作。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ 04 ROADMAP ============ -->
+  <section class="section shell" id="roadmap">
+    <div class="section-head reveal">
+      <div>
+        <span class="section-num">04 / ROADMAP</span>
+        <h2><span class="phrase">下一個版本，</span><span class="phrase">正在路上。</span></h2>
+        <p class="section-sub">把過去的經驗帶進新領域，保持好奇，也持續打磨自己的能力。</p>
+      </div>
+      <div class="pose-badge reveal" aria-hidden="true"><img src="assets/mindy/avatar-ready.webp" alt="" width="400" height="400" loading="lazy"></div>
+    </div>
+    <div class="roadmap">
+      <div class="card reveal"><div class="eyebrow">NOW</div><h3>深化 AI 工作流程</h3><p class="muted">練習 Prompt、資料整理、自動化與 AI 工具整合。</p></div>
+      <div class="card reveal"><div class="eyebrow">NEXT</div><h3>探索 PM / UI/UX</h3><p class="muted">加強需求分析、使用者體驗、原型設計與產品規劃。</p></div>
+      <div class="card reveal"><div class="eyebrow">FUTURE</div><h3>跨領域共同創造</h3><p class="muted">與不同專長的夥伴交流，打造真正有使用價值的作品。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ 05 USER MANUAL ============ -->
   <section class="section shell" id="manual">
     <div class="section-head reveal">
       <div>
-        <span class="section-num">02 / USER MANUAL</span>
+        <span class="section-num">05 / USER MANUAL</span>
         <h2><span class="phrase">如何與 Mindy</span><span class="phrase">合作？</span></h2>
         <p class="section-sub">把我當作一個持續更新的產品。這裡有核心功能、最佳使用情境與合作小提醒。</p>
       </div>
-      <div class="pose-badge reveal" aria-hidden="true"><img src="assets/mindy/pose-thinking.webp" alt="" loading="lazy"></div>
+      <div class="pose-badge reveal" aria-hidden="true"><img src="assets/mindy/avatar-collaborating.webp" alt="" width="400" height="400" loading="lazy"></div>
     </div>
     <div class="features">
       <div class="card feature reveal"><div class="feature-icon">🎯</div><h3>需求洞察</h3><p>從觀察出發，理解問題與使用情境。</p></div>
@@ -173,90 +310,72 @@
     </div>
   </section>
 
-  <!-- ============ 03 CREATIVE LAB 作品集 ============ -->
-  <section class="section shell" id="lab">
-    <div class="section-head reveal">
-      <div>
-        <span class="section-num">03 / CREATIVE LAB</span>
-        <h2><span class="phrase">把想法，</span><span class="phrase">變成看得見的作品。</span></h2>
-        <p class="section-sub">這裡收集品牌企劃、營運工具、產品構想，以及 AI 課堂中的各種嘗試。點擊卡片可閱讀作品摘要。</p>
-      </div>
-      <div class="pill">4 PROJECT AREAS</div>
-    </div>
-    <div class="filter" id="filters" role="group" aria-label="作品分類篩選">
-      <button type="button" data-filter="all" class="active" aria-pressed="true">全部作品</button>
-      <button type="button" data-filter="data" aria-pressed="false">營運與資料</button>
-      <button type="button" data-filter="brand" aria-pressed="false">品牌創作</button>
-      <button type="button" data-filter="ux" aria-pressed="false">產品與 UI/UX</button>
-      <button type="button" data-filter="experiment" aria-pressed="false">AI 實驗</button>
-    </div>
-    <!-- 作品卡片：內容在 js/data.js 的 projects -->
-    <div class="projects" id="projects" aria-live="polite"></div>
-  </section>
-
-  <!-- ============ 04 VERSION HISTORY ============ -->
-  <section class="section shell" id="history">
-    <div class="section-head reveal">
-      <div>
-        <span class="section-num">04 / VERSION HISTORY</span>
-        <h2><span class="phrase">不斷更新，</span><span class="phrase">沒有最終版本。</span></h2>
-        <p class="section-sub">這次的學習，不是從不會 AI 變成會 AI，而是從完成單一任務，開始思考整體流程與新的實作可能。</p>
-      </div>
-    </div>
-    <ol class="steps">
-      <li class="step reveal"><div class="circle">1.0</div><h3>Human Skills</h3><p>教育、行政、企劃與團隊溝通的既有能力。</p></li>
-      <li class="step reveal"><div class="circle">2.0</div><h3>AI Assistant</h3><p>查詢資料、潤飾文章、生成圖片與行政輔助。</p></li>
-      <li class="step reveal"><div class="circle">3.0</div><h3>AI Integration</h3><p>Prompt、試算表、資料管理、網頁原型與反覆除錯。</p></li>
-      <li class="step reveal"><div class="circle next">4.0</div><h3>Product Builder</h3><p>下一步：深化 UX、產品規劃與跨域協作。</p></li>
-    </ol>
-    <div class="journey">
-      <div class="card reveal"><div class="eyebrow">BEFORE</div><h3>AI as a Tool</h3><p class="muted">我習慣讓 AI 幫我處理文字、資訊和日常工作。</p></div>
-      <div class="card card-sage reveal"><div class="eyebrow">AFTER · 2026.10 →</div><h3>AI as a Partner</h3><p class="muted">我開始學習結合 AI、資料架構與操作介面，把想法一步步實作。</p></div>
-    </div>
-  </section>
-
-  <!-- ============ 05 ROADMAP ============ -->
-  <section class="section shell" id="roadmap">
-    <div class="section-head reveal">
-      <div>
-        <span class="section-num">05 / ROADMAP</span>
-        <h2><span class="phrase">下一個版本，</span><span class="phrase">正在路上。</span></h2>
-        <p class="section-sub">把過去的經驗帶進新領域，保持好奇，也持續打磨自己的能力。</p>
-      </div>
-      <div class="pose-badge reveal" aria-hidden="true"><img src="assets/mindy/pose-exploring.webp" alt="" loading="lazy"></div>
-    </div>
-    <div class="roadmap">
-      <div class="card reveal"><div class="eyebrow">NOW</div><h3>深化 AI 工作流程</h3><p class="muted">練習 Prompt、資料整理、自動化與 AI 工具整合。</p></div>
-      <div class="card reveal"><div class="eyebrow">NEXT</div><h3>探索 PM / UI/UX</h3><p class="muted">加強需求分析、使用者體驗、原型設計與產品規劃。</p></div>
-      <div class="card reveal"><div class="eyebrow">FUTURE</div><h3>跨領域共同創造</h3><p class="muted">與不同專長的夥伴交流，打造真正有使用價值的作品。</p></div>
-    </div>
-  </section>
-
   <!-- ============ 06 LET'S CONNECT ============ -->
   <section class="section shell" id="connect">
     <div class="section-head reveal">
       <div>
         <span class="section-num">06 / LET'S CONNECT</span>
         <h2><span class="phrase">我們可以一起</span><span class="phrase">創造什麼？</span></h2>
-        <p class="section-sub">選擇你的專長，看看我們可能一起嘗試的合作方向。不需登入，也不會收集個人資料。</p>
+        <p class="section-sub">留下名字、勾選你的專長，看看我們可能一起嘗試的合作方向。不需登入；送出的資料只會傳給 Mindy 作為交流統計使用，不會公開。</p>
       </div>
     </div>
     <div class="two">
       <div class="soft reveal">
-        <label for="skill" class="field-label">你的專長是……</label>
-        <select class="selectlike" id="skill">
-          <option value="design">🎨 UI/UX 與視覺設計</option>
-          <option value="code">💻 程式與系統開發</option>
-          <option value="marketing">📣 品牌與行銷</option>
-          <option value="data">📊 資料分析</option>
-          <option value="planning">🗂️ 企劃與專案管理</option>
-          <option value="other">✨ 其他領域</option>
-        </select>
-        <div class="connect-result" aria-live="polite">
-          <div class="connect-avatar" id="connectAvatar" aria-hidden="true"><img src="assets/mindy/pose-surprise.webp" alt="" loading="lazy"></div>
-          <div id="match"></div>
+        <!-- 合作意願表單：送出到 Mindy 的 Google 試算表（網址設定在 js/data.js 的 form.endpoint） -->
+        <form class="connect-form" id="connectForm" novalidate>
+          <div class="field">
+            <label for="cName" class="field-label">你的名字 <span class="req" aria-hidden="true">*</span></label>
+            <input class="selectlike" id="cName" name="name" type="text" maxlength="30" autocomplete="name" required placeholder="暱稱也可以" aria-describedby="errName">
+            <p class="field-error" id="errName" hidden>請填寫名字</p>
+          </div>
+
+          <fieldset class="field">
+            <legend class="field-label">你的專長是……（可複選）<span class="req" aria-hidden="true">*</span></legend>
+            <div class="skill-chips" id="skillChips">
+              <label class="chip"><input type="checkbox" name="skills" value="design"><span><i aria-hidden="true">🎨</i>UI/UX 與視覺設計</span></label>
+              <label class="chip"><input type="checkbox" name="skills" value="code"><span><i aria-hidden="true">💻</i>程式與系統開發</span></label>
+              <label class="chip"><input type="checkbox" name="skills" value="marketing"><span><i aria-hidden="true">📣</i>品牌與行銷</span></label>
+              <label class="chip"><input type="checkbox" name="skills" value="data"><span><i aria-hidden="true">📊</i>資料分析</span></label>
+              <label class="chip"><input type="checkbox" name="skills" value="planning"><span><i aria-hidden="true">🗂️</i>企劃與專案管理</span></label>
+              <label class="chip"><input type="checkbox" name="skills" value="other"><span><i aria-hidden="true">✨</i>其他領域</span></label>
+            </div>
+            <div class="other-wrap" id="otherWrap" hidden>
+              <label for="cOther" class="sr-only">其他專長</label>
+              <input class="selectlike" id="cOther" name="other" type="text" maxlength="30" placeholder="寫下你的專長，例如：攝影、教學">
+            </div>
+            <p class="field-error" id="errSkills" hidden>請至少勾選一項專長</p>
+          </fieldset>
+
+          <!-- 依專長顯示的預設合作情境（內容在 js/data.js 的 matches） -->
+          <div class="connect-result" aria-live="polite">
+            <div class="connect-avatar" id="connectAvatar" aria-hidden="true"><img src="assets/mindy/avatar-surprise.webp" alt="" width="400" height="400" loading="lazy"></div>
+            <div id="match"></div>
+          </div>
+          <p class="muted fineprint">此為依專長產生的預設合作情境，不是實際 AI 人才配對。</p>
+
+          <div class="field">
+            <label for="cMsg" class="field-label">想對 Mindy 說的話（選填）</label>
+            <textarea class="selectlike" id="cMsg" name="message" rows="3" maxlength="200" placeholder="想一起做的題目、交流的想法，或一句鼓勵都很歡迎！"></textarea>
+            <span class="char-count" id="msgCount" aria-hidden="true">0 / 200</span>
+          </div>
+
+          <!-- 防垃圾訊息的隱藏欄位：一般人看不到，請勿刪除 -->
+          <div class="hp" aria-hidden="true"><label>網站<input type="text" name="website" id="cWebsite" tabindex="-1" autocomplete="off"></label></div>
+
+          <button class="btn submit-btn" id="cSubmit" type="submit">送出給 Mindy ↗</button>
+          <p class="form-status" id="formStatus" role="alert" hidden></p>
+          <p class="muted fineprint">🔒 名字、專長與留言只會傳送給 Mindy 作為交流統計使用，不會公開在網站上。</p>
+        </form>
+
+        <!-- 送出成功畫面 -->
+        <div class="connect-done" id="connectDone" hidden tabindex="-1">
+          <img src="assets/mindy/mindy-success.webp" width="664" height="1000" alt="Mindy 開心地比讚" loading="lazy">
+          <div>
+            <h3 id="doneTitle">謝謝你！</h3>
+            <p>已經收到你的資料，期待和你一起創造更多可能。</p>
+            <button class="btn alt" id="againBtn" type="button">再填一份</button>
+          </div>
         </div>
-        <p class="muted fineprint">此為依專長產生的預設合作情境，不是實際 AI 人才配對。</p>
       </div>
       <div class="card invite reveal">
         <div class="eyebrow">A LITTLE INVITATION</div>
@@ -270,7 +389,9 @@
 
 <footer class="foot">
   <div class="shell">
+    <img class="foot-mindy" src="assets/mindy/mindy-thanks.webp" width="649" height="1000" alt="Mindy 雙手放在胸前，微笑向大家道謝" loading="lazy">
     <div class="eyebrow">TO BE CONTINUED...</div>
+    <p class="foot-motto">整合工具，解決痛點。</p>
     <h2><span class="phrase">AI 不光是解決問題的工具，</span><span class="phrase">也可以創造更多可能。</span></h2>
     <p class="muted">帶著過去的經驗出發，讓 AI 成為延伸能力與實現想像的橋樑。</p>
     <p class="foot-sign">MINDY OS © 2026 · Built with curiosity ♡</p>
@@ -281,7 +402,7 @@
 <button class="easter" id="easter" type="button" aria-label="幫小植物澆水（彩蛋）"><span id="plant">🌱</span><span class="easter-count" id="plantCount" aria-hidden="true"></span></button>
 <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
 <!-- 輸入 m-i-n-d-y 或植物長大時，Mindy 會從角落探出頭 -->
-<div class="peek" id="peek" aria-hidden="true"><img src="assets/mindy/pose-surprise.webp" alt="" loading="lazy"><span class="peek-bubble" id="peekText">被你找到了！</span></div>
+<div class="peek" id="peek" aria-hidden="true"><img src="assets/mindy/avatar-surprise.webp" alt="" width="400" height="400" loading="lazy"><span class="peek-bubble" id="peekText">被你找到了！</span></div>
 
 <div class="overlay" id="overlay">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">

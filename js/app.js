@@ -154,6 +154,12 @@
     });
   }
 
+  /* 作品有線上網址時，顯示「開啟作品」按鈕（另開新分頁） */
+  function linkBtn(p) {
+    if (!p.link || !/^https?:\/\//.test(p.link)) return '';
+    return `<a class="project-link" href="${esc(p.link)}" target="_blank" rel="noopener noreferrer">開啟作品 ↗</a>`;
+  }
+
   function renderProjects(filter) {
     const box = $('#projects');
     const list = projects.filter(p => filter === 'all' || p.cat === filter);
@@ -166,7 +172,10 @@
           <p>${esc(p.desc)}</p>
           <div class="pills">${(p.tools || []).map(t => `<span class="pill">${esc(t)}</span>`).join('')}</div>
           <span class="project-status">📎 ${esc(p.state || '')}</span>
-          <button type="button" class="arrowlink" data-project="${esc(p.id)}">查看專案摘要 ↗</button>
+          <div class="project-actions">
+            <button type="button" class="arrowlink" data-project="${esc(p.id)}">查看專案摘要 ↗</button>
+            ${linkBtn(p)}
+          </div>
         </div>
       </article>`).join('') || '<p class="muted">這個分類目前還沒有作品。</p>';
     $$('[data-project]', box).forEach(b => b.addEventListener('click', () => openProject(b.dataset.project, b)));
@@ -199,6 +208,7 @@
       <h2 id="modalTitle">${esc(p.name)}</h2>
       <p>${esc(p.detail)}</p>
       <div class="pills">${(p.tools || []).map(t => `<span class="pill">${esc(t)}</span>`).join('')}</div>
+      ${p.link ? `<p class="modal-link">${linkBtn(p)}</p>` : ''}
       ${gallery}`;
     lastFocus = opener || document.activeElement;
     overlay.classList.add('show');
@@ -234,15 +244,112 @@
      4. 合作互動
      ================================================================= */
   function initConnect() {
-    const sel = $('#skill'), out = $('#match'), avatar = $('#connectAvatar');
-    const update = animate => {
-      const m = (DATA.matches || {})[sel.value];
-      if (!m) return;
-      out.innerHTML = `<strong>✨ ${esc(m[0])}</strong><p>${esc(m[1])}</p>`;
+    const form = $('#connectForm'), out = $('#match'), avatar = $('#connectAvatar');
+    const boxes = $$('input[name="skills"]', form);
+    const otherWrap = $('#otherWrap'), otherInput = $('#cOther');
+    const nameInput = $('#cName'), msg = $('#cMsg'), submitBtn = $('#cSubmit'), status = $('#formStatus');
+    const done = $('#connectDone');
+
+    // 合作情境：顯示「最後勾選」的專長；都沒勾時顯示提示
+    let lastPicked = null;
+    const showMatch = animate => {
+      const picked = boxes.filter(b => b.checked).map(b => b.value);
+      const key = picked.includes(lastPicked) ? lastPicked : picked[picked.length - 1];
+      const m = key && (DATA.matches || {})[key];
+      out.innerHTML = m
+        ? `<strong>✨ ${esc(m[0])}</strong><p>${esc(m[1])}</p>`
+        : '<strong>✨ 勾選你的專長</strong><p>看看我們可以一起嘗試什麼樣的合作。</p>';
       if (animate && avatar) { avatar.classList.remove('pop'); void avatar.offsetWidth; avatar.classList.add('pop'); }
     };
-    sel.addEventListener('change', () => update(true));
-    update(false);
+    boxes.forEach(b => b.addEventListener('change', () => {
+      if (b.checked) lastPicked = b.value;
+      if (b.value === 'other') { otherWrap.hidden = !b.checked; if (b.checked) otherInput.focus(); }
+      if (boxes.some(x => x.checked)) $('#errSkills').hidden = true;
+      showMatch(b.checked);
+    }));
+    showMatch(false);
+
+    // 留言字數
+    const count = () => { $('#msgCount').textContent = msg.value.length + ' / 200'; };
+    msg.addEventListener('input', count);
+    nameInput.addEventListener('input', () => {
+      if (nameInput.value.trim()) { $('#errName').hidden = true; nameInput.setAttribute('aria-invalid', 'false'); }
+    });
+
+    const setStatus = (text, kind) => {
+      status.hidden = !text;
+      status.textContent = text || '';
+      status.className = 'form-status' + (kind ? ' ' + kind : '');
+    };
+
+    // 修改內容時，收起上一次的錯誤提示
+    form.addEventListener('input', () => { if (!status.hidden) setStatus(''); });
+    form.addEventListener('change', () => { if (!status.hidden) setStatus(''); });
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      setStatus('');
+      const name = nameInput.value.trim();
+      const picked = boxes.filter(b => b.checked).map(b => b.value);
+      // 檢查必填
+      $('#errName').hidden = !!name;
+      $('#errSkills').hidden = picked.length > 0;
+      if (!name) { nameInput.setAttribute('aria-invalid', 'true'); nameInput.focus(); return; }
+      if (!picked.length) { boxes[0].focus(); return; }
+
+      const endpoint = ((DATA.form || {}).endpoint || '').trim();
+      if (!/^https:\/\/script\.google\.com\/.+\/exec$/.test(endpoint)) {
+        setStatus('表單尚未啟用：Mindy 還沒完成 Google 試算表設定，資料目前不會被送出。', 'error');
+        return;
+      }
+      if ($('#cWebsite').value) return; // 機器人填了隱藏欄位，直接忽略
+
+      const labels = DATA.skillLabels || {};
+      const pres = document.getElementById('present');
+      const payload = {
+        name: name.slice(0, 30),
+        skills: picked.map(v => labels[v] || v),
+        other: picked.includes('other') ? otherInput.value.trim().slice(0, 30) : '',
+        message: msg.value.trim().slice(0, 200),
+        source: pres && !pres.hidden ? '簡報' : '網站'
+      };
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = '送出中…';
+      const ctrl = 'AbortController' in window ? new AbortController() : null;
+      const timer = setTimeout(() => { if (ctrl) ctrl.abort(); }, 15000);
+      try {
+        // Google Apps Script 不提供跨網域回應，因此用 no-cors 送出（送達即視為成功）
+        await fetch(endpoint, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload),
+          signal: ctrl ? ctrl.signal : undefined
+        });
+        form.hidden = true;
+        $('#doneTitle').textContent = '謝謝你，' + payload.name + '！';
+        done.hidden = false;
+        done.focus();
+      } catch (err) {
+        console.warn('[MINDY OS] 表單送出失敗：', err);
+        setStatus('送出失敗，可能是網路不穩。你填的內容都還在，請稍後再按一次「送出」。', 'error');
+      } finally {
+        clearTimeout(timer);
+        submitBtn.disabled = false;
+        submitBtn.textContent = '送出給 Mindy ↗';
+      }
+    });
+
+    // 再填一份：清空表單
+    $('#againBtn').addEventListener('click', () => {
+      form.reset();
+      otherWrap.hidden = true;
+      lastPicked = null;
+      count(); showMatch(false); setStatus('');
+      done.hidden = true; form.hidden = false;
+      nameInput.focus();
+    });
 
     $('#shareBtn').addEventListener('click', async () => {
       const url = location.href.split('#')[0];
@@ -372,9 +479,15 @@
           return `<div class="slide-shot" style="background:${esc(colors[p.cat] || '#eee')}">${shot ? `<img src="${esc(shot.src)}" alt="${esc(shot.alt || p.name)}">` : (DATA.conceptArt || {})[p.cat] || ''}</div>`;
         }).join('')}</div></div>`;
       }
+      // 最後一頁：QR code（掃描開啟合作填寫區）＋角色
+      if (s.qr) {
+        return `<div class="slide-media slide-qr-wrap">
+          <figure class="slide-qr"><img src="${esc(s.qr)}" width="330" height="330" alt="QR code：掃描開啟 MINDY OS 合作填寫區"><figcaption>掃描 QR code<br>留下名字與專長</figcaption></figure>
+          ${s.img && IMG[s.img] ? `<img class="fullbody qr-mindy" src="${esc(IMG[s.img])}" alt="Mindy 角色插圖">` : ''}
+        </div>`;
+      }
       if (s.img && IMG[s.img]) {
-        const cls = s.img === 'fullbody' ? 'fullbody' : 'pose';
-        return `<div class="slide-media"><img class="${cls}" src="${esc(IMG[s.img])}" alt="Mindy 角色插圖"></div>`;
+        return `<div class="slide-media"><img class="fullbody" src="${esc(IMG[s.img])}" alt="Mindy 角色插圖"></div>`;
       }
       return '';
     }
