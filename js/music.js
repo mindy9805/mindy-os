@@ -1,5 +1,5 @@
 /* =====================================================================
-   MINDY OS — 背景音樂（原創音樂盒旋律）
+   MINDY OS — 背景音樂（原創音樂盒旋律〈晴天散步〉）
    ---------------------------------------------------------------------
    不使用任何音樂檔案：由瀏覽器的 Web Audio 即時「演奏」，
    旋律與和弦皆為原創，沒有版權問題，也不需要網路。
@@ -13,7 +13,8 @@ window.MindyMusic = (function () {
   'use strict';
 
   const VOLUME = 0.22;
-  const BPM = 76;
+  const BPM = 120;         // 4/4 拍，像散步時輕快的步伐
+  const BEATS_PER_BAR = 4;
 
   // 音名 → 頻率（以 A4 = 440Hz 計算）
   const NOTE = n => {
@@ -23,22 +24,31 @@ window.MindyMusic = (function () {
     return 440 * Math.pow(2, (midi - 69) / 12);
   };
 
-  /* 原創旋律：8 小節循環，每小節 4 拍；[音名, 拍數]，null 為休止 */
+  /* 原創旋律〈晴天散步〉：C 大調、4/4 拍、16 小節循環；[音名, 拍數]，null 為休止
+     跳躍的八分音符＋明亮的大調，陽光輕快；伴奏像烏克麗麗的「低音＋反拍」，非流行或搖滾節奏 */
   const MELODY = [
-    ['E5', 1], ['G5', 1], ['E5', 1], ['D5', 1],
-    ['C5', 1], ['E5', 1], ['A4', 2],
-    ['F5', 1], ['E5', 1], ['D5', 1], ['C5', 1],
-    ['D5', 2], ['B4', 1], ['G4', 1],
-    ['E5', 1], ['G5', 1], ['C6', 1], ['B5', 1],
-    ['G5', 1], ['E5', 1.5], [null, 0.5], ['D5', 1],
-    ['C5', 1], ['D5', 1], ['E5', 1], ['F5', 1],
-    ['D5', 2], [null, 1], ['G4', 1]
+    ['E5', .5], ['G5', .5], ['C6', 1], ['G5', .5], ['E5', .5], ['G5', 1],            // 1  C
+    ['A5', .5], ['G5', .5], ['F5', .5], ['A5', .5], ['C6', 2],                       // 2  F
+    ['B5', .5], ['A5', .5], ['G5', 1], ['D5', .5], ['E5', .5], ['F5', 1],            // 3  G
+    ['E5', 1.5], ['D5', .5], ['C5', 1], [null, 1],                                    // 4  C
+    ['C5', .5], ['E5', .5], ['A5', 1], ['G5', .5], ['E5', .5], ['C5', 1],            // 5  Am
+    ['F5', .5], ['E5', .5], ['F5', .5], ['A5', .5], ['G5', 2],                       // 6  F
+    ['D5', .5], ['E5', .5], ['F5', .5], ['G5', .5], ['A5', .5], ['B5', .5], ['D6', 1], // 7 G
+    ['C6', 1], ['G5', .5], ['E5', .5], ['C5', 1], [null, 1],                          // 8  C
+    ['G5', .5], ['G5', .5], ['E5', .5], ['G5', .5], ['C6', 1], ['B5', .5], ['C6', .5], // 9 C
+    ['A5', 1], ['F5', .5], ['A5', .5], ['C6', 1], ['A5', 1],                          // 10 F
+    ['G5', .5], ['F5', .5], ['E5', .5], ['D5', .5], ['G5', 2],                       // 11 G
+    ['E5', .5], ['D5', .5], ['E5', .5], ['G5', .5], ['B5', 2],                       // 12 Em
+    ['A5', .5], ['B5', .5], ['C6', 1], ['A5', .5], ['G5', .5], ['F5', 1],            // 13 F
+    ['E5', .5], ['F5', .5], ['G5', 1], ['E5', .5], ['D5', .5], ['C5', 1],            // 14 C
+    ['D5', 1], ['G5', .5], ['F5', .5], ['E5', .5], ['D5', .5], ['B4', 1],            // 15 G
+    ['C5', 1.5], ['E5', .5], ['G5', .5], ['C6', .5], [null, 1]                        // 16 C
   ];
-  /* 和弦（每小節一個）：C、Am、F、G、C、Em、F、G — 以八分音符分解和弦演奏 */
-  const CHORDS = [
-    ['C3', 'G3', 'C4', 'E4'], ['A2', 'E3', 'A3', 'C4'], ['F2', 'C3', 'F3', 'A3'], ['G2', 'D3', 'G3', 'B3'],
-    ['C3', 'G3', 'C4', 'E4'], ['E2', 'B2', 'E3', 'G3'], ['F2', 'C3', 'F3', 'A3'], ['G2', 'D3', 'G3', 'B3']
-  ];
+  /* 和弦：bass＝低音（根音、五音），stab＝反拍的和弦音 */
+  const ch = (r, f, stab) => ({ bass: [r, f], stab });
+  const C = ch('C3', 'G2', ['E4', 'G4', 'C5']), F = ch('F2', 'C3', ['F4', 'A4', 'C5']), G = ch('G2', 'D3', ['D4', 'G4', 'B4']);
+  const Am = ch('A2', 'E3', ['E4', 'A4', 'C5']), Em = ch('E2', 'B2', ['E4', 'G4', 'B4']);
+  const CHORDS = [C, F, G, C, Am, F, G, C, C, F, G, Em, F, C, G, C];
 
   let ctx = null, master = null, reverb = null;
   let playing = false, timer = null, nextTime = 0, step = 0;
@@ -66,7 +76,8 @@ window.MindyMusic = (function () {
   }
 
   /* 一個音樂盒音色：主音＋高泛音，快速敲擊後自然衰減 */
-  function bell(freq, time, dur, vel) {
+  function bell(freq, time, dur, vel, ring) {
+    ring = ring == null ? 1.4 : ring;   // 餘音長度：數字越小越清脆
     const partials = [[1, 1], [2, 0.32], [3.01, 0.12], [5.98, 0.05]];
     partials.forEach(([mult, amp]) => {
       const o = ctx.createOscillator(), g = ctx.createGain();
@@ -75,27 +86,45 @@ window.MindyMusic = (function () {
       const peak = vel * amp;
       g.gain.setValueAtTime(0.0001, time);
       g.gain.exponentialRampToValueAtTime(peak, time + 0.008);
-      g.gain.exponentialRampToValueAtTime(0.0001, time + Math.min(2.6, dur + 1.4) / mult);
+      g.gain.exponentialRampToValueAtTime(0.0001, time + Math.min(2.6, dur + ring) / mult);
       o.connect(g); g.connect(master);
       o.start(time); o.stop(time + 3);
     });
   }
 
+  /* 撥弦音色（像烏克麗麗）：三角波，敲下去很快變小聲，聽起來輕巧 */
+  function pluck(freq, time, vel) {
+    const o = ctx.createOscillator(), g = ctx.createGain(), lp = ctx.createBiquadFilter();
+    o.type = 'triangle'; o.frequency.value = freq;
+    lp.type = 'lowpass'; lp.frequency.value = 2600;
+    g.gain.setValueAtTime(0.0001, time);
+    g.gain.exponentialRampToValueAtTime(vel, time + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.0001, time + 0.22);
+    o.connect(lp); lp.connect(g); g.connect(master);
+    o.start(time); o.stop(time + 0.3);
+  }
+
   // 依序排程：一次往前排 0.3 秒，讓節奏穩定
-  const totalBeats = MELODY.reduce((s, n) => s + n[1], 0); // 32 拍
+  const totalBeats = MELODY.reduce((sum, n) => sum + n[1], 0); // 64 拍＝16 小節
   const melodyStarts = []; { let t = 0; MELODY.forEach(n => { melodyStarts.push(t); t += n[1]; }); }
 
   function schedule() {
     while (nextTime < ctx.currentTime + 0.3) {
-      const pos = step * 0.5;                 // 以八分音符為單位
-      const bar = Math.floor(pos / 4) % 8, inBar = pos % 4;
-      // 分解和弦（八分音符）：1-2-3-4-3-2-3-2 的起伏
-      const chord = CHORDS[bar], order = [0, 1, 2, 3, 2, 1, 2, 1];
-      bell(NOTE(chord[order[(inBar * 2) % 8]]), nextTime, beat * 0.5, 0.05);
-      // 主旋律：在拍點上觸發
+      const pos = step * 0.5;                                   // 以八分音符為單位
       const loopPos = pos % totalBeats;
+      const bar = Math.floor(loopPos / BEATS_PER_BAR), e = Math.round((loopPos % BEATS_PER_BAR) * 2); // 一小節 8 個八分音符
+      const chord = CHORDS[bar % CHORDS.length];
+      // 低音：第 1、3 拍（根音、五音）
+      if (e === 0) bell(NOTE(chord.bass[0]), nextTime, beat, 0.075, 0.6);
+      if (e === 4) bell(NOTE(chord.bass[1]), nextTime, beat, 0.06, 0.5);
+      // 反拍和弦：2、4 拍與「後半拍」輕輕撥弦，產生跳躍感
+      if (e === 2 || e === 6) chord.stab.forEach(n => pluck(NOTE(n), nextTime, 0.035));
+      if (e === 3 || e === 7) chord.stab.forEach(n => pluck(NOTE(n), nextTime, 0.02));
+      // 每 4 小節的結尾，加一串上行的閃亮小音
+      if (bar % 4 === 3 && e >= 5) bell(NOTE(chord.stab[e - 5]) * 2, nextTime, beat * 0.5, 0.025, 0.4);
+      // 主旋律（音樂盒音色，餘音較短，聽起來更俏皮）
       melodyStarts.forEach((st, i) => {
-        if (Math.abs(st - loopPos) < 0.001 && MELODY[i][0]) bell(NOTE(MELODY[i][0]), nextTime, MELODY[i][1] * beat, 0.13);
+        if (Math.abs(st - loopPos) < 0.001 && MELODY[i][0]) bell(NOTE(MELODY[i][0]), nextTime, MELODY[i][1] * beat, 0.12, 0.7);
       });
       nextTime += beat * 0.5;
       step++;

@@ -41,18 +41,25 @@ window.MINDY_DATA = {
            ],
        (3) 第一張圖會成為卡片封面，全部圖片會出現在「查看專案摘要」視窗中。
        (4) images 留空 [] 時，會自動顯示「概念示意圖」，並清楚標示不是實際截圖。
-       (5) 作品有線上版本時，填 link（網址），卡片會出現「開啟作品」按鈕。
+       (5) 作品有線上版本時，填 link（網址），卡片會出現「開啟作品」按鈕；
+           有多個網址時改用 links: [{ label: '按鈕文字', url: '網址' }]。
+       (6) units：對應的課堂單元（會顯示在卡片上方的小標籤）。
      cat 可用值：data（營運與資料）、brand（品牌創作）、ux（產品與 UI/UX）、experiment（AI 實驗）
      ------------------------------------------------------------------- */
   projects: [
     {
       id: 'data',
+      units: ['10/29 第六單元｜營運資料架構', '11/02 第七單元｜智慧營運試算表'],
+      links: [
+        { label: '開啟原物料主檔系統', url: 'https://script.google.com/macros/s/AKfycbzRgW0gFZQSQYfbcTmY81GVTOl1rtqIyFBEGjYABMOclb8mo25ySs24zFU6JIukYDTwDQ/exec' },
+        { label: '開啟排班薪資系統', url: 'https://script.google.com/macros/s/AKfycbw4cxtMCMJGr2gsBFFyOP6DejkZ8r1pwxZcmGJRLo7iX7AMJYuUt26u_WztOzeqWq7b/exec' }
+      ],
       cat: 'data',
       label: 'DATA & AUTOMATION · 營運與資料',
       name: '營運資料與銷售管理系統',
-      desc: '從商品主檔、BOM、銷售紀錄，到可操作的網頁表單。熟悉的試算表工作，原來還能走得更遠。',
+      desc: '從商品與原物料主檔、配方 BOM，到銷售、庫存與營收毛利，再延伸出排班與薪資系統。熟悉的試算表工作，原來還能走得更遠。',
       tools: ['Excel', 'Google Sheets', 'Apps Script', 'AI 協作'],
-      detail: '以豆皮鍋貼店營運為題，規劃商品、原物料與銷售資料架構，進一步嘗試讓店員透過網頁輸入銷售資料。重點不只是公式，而是重新思考前台與後台的工作流程。',
+      detail: '以豆皮鍋貼店營運為題，先規劃商品、原物料、供應商主檔與配方 BOM，再串起銷售紀錄、進貨、商品成本、庫存管理與營收毛利，並用 Apps Script 做成店員可以操作的系統網頁。之後延伸出排班與薪資系統：從薪資設定、排班、休假申請、加班與工時彙總，一路算到薪資明細。重點不只是公式，而是重新思考前台與後台的工作流程。',
       state: '試算表與系統網頁已完成',
       featured: true,
       images: [
@@ -62,6 +69,7 @@ window.MINDY_DATA = {
     },
     {
       id: 'brand',
+      units: ['10/21 第二單元｜商業提案設計力', '10/22 第三單元｜品牌視覺生成術'],
       cat: 'brand',
       label: 'BRAND & BUSINESS · 品牌與商業',
       name: '豆豆貼｜豆皮鍋貼品牌',
@@ -70,6 +78,7 @@ window.MINDY_DATA = {
       detail: '以千張豆皮鍋貼為核心建立「豆豆貼」品牌：經營理念是低負擔享受美食，品牌色為燕麥黃與淺咖啡，核心符號是「二頭肌鍋貼」。課堂上用 AI 撰寫 Prompt，生成品牌行銷、人才招募與「健健貼近你」盲盒活動三款海報、產品宣傳圖與文創商品，並用 Canva 把 LOGO 放到帆布袋、紙杯與紙袋上。另外用 Claude 製作了 10 頁的互動式商業提案簡報（數字皆為示意資料）。LOGO 由第四組組員生成。',
       state: '品牌視覺、海報與互動提案已完成',
       link: 'https://claude.ai/artifact/PyuTwXMkRZGZanMgGaSrTU',
+      linkLabel: '開啟互動提案簡報',
       images: [
         { src: 'assets/works/brand-photo-apron.webp', alt: '豆豆貼商品宣傳圖：穿著印有 LOGO 圍裙的店員端出一盤豆皮鍋貼', caption: '商品宣傳圖（AI 圖像編修）' },
         { src: 'assets/works/brand-logo.webp', alt: '豆豆貼 LOGO：結實的手臂用筷子夾起豆皮鍋貼', caption: '品牌 LOGO（由第四組組員生成）' },
@@ -88,6 +97,7 @@ window.MINDY_DATA = {
     },
     {
       id: 'ux',
+      units: ['10/20 第一單元｜AI 商業工作流入門'],
       cat: 'ux',
       label: 'PRODUCT & UI/UX · 產品與介面',
       name: '日日好日 Daily Bloom',
@@ -107,6 +117,7 @@ window.MINDY_DATA = {
     },
     {
       id: 'homework',
+      units: ['課外創作實驗'],
       cat: 'ux',
       label: 'TOOL & UI/UX · 工具與介面',
       name: '青年AI實戰養成班—回家作業總表',
@@ -114,44 +125,13 @@ window.MINDY_DATA = {
       tools: ['Claude', '資訊架構', 'UI/UX', '網頁工具'],
       detail: '為了掌握課程進度而做的工具。以台灣學校的聯絡簿為設計靈感：方格紙底、每天一列、完成時蓋上紅色印章。依週次整理各單元主題與每天的回家作業，功能包含：今天的作業、整體與每週完成進度、待補作業提醒、子項目勾選、重要日期倒數（個人發表、Launch Day、成果發表），以及實作提醒事項；擁有者也能直接在頁面上新增或編輯課程日。手機與電腦都能使用。',
       state: '已上線，可開啟使用',
-      link: 'https://claude.ai/artifact/LZqKm48Dttu6euUq5r65gX?v=2',
+      link: 'https://claude.ai/artifact/LZqKm48Dttu6euUq5r65gX',
       images: [
         { src: 'assets/works/homework-tracker-01.webp', alt: '回家作業總表的週次聯絡簿畫面：每天一列，有分類標籤、作業與子項目勾選框，今天以黃色標示', caption: '週次聯絡簿：每天一列，分類標籤、子項目勾選，今天以黃色標示。' },
         { src: 'assets/works/homework-tracker-02.webp', alt: '回家作業總表首頁：完成進度、待補作業、重要日期倒數與今天的作業', caption: '首頁總覽：完成進度、重要日期倒數與今天的作業。（截圖為新裝置尚未勾選的初始畫面，數字不代表實際進度）' },
         { src: 'assets/works/homework-tracker-03.webp', alt: '回家作業總表的手機版畫面', caption: '手機版畫面。' }
       ]
     }
-  ],
-
-  /* -------------------------------------------------------------------
-     課堂作品（Creative Lab 下方的清單，依日期排列）
-     新增作品：複製一筆 { ... } 修改內容即可；link 留空就不顯示「開啟作品」按鈕
-     ------------------------------------------------------------------- */
-  classWorks: [
-    { date: '10/20', unit: '第一單元｜AI 商業工作流入門', title: '日日好日 Daily Bloom UI／UX 網頁',
-      desc: '透過 Gemini 的 Canvas 功能製作的產品：整合天氣、情緒、感恩與運動紀錄的生活覺察 Web App。',
-      thumb: 'assets/works/dailybloom-04.webp',
-      link: 'https://share.gemini.google/sYT2oVAAjmN5' },
-    { date: '10/21', unit: '第二單元｜商業提案設計力', title: '豆豆貼 互動提案簡報',
-      desc: '用 Claude 製作的 10 頁互動式商業提案：損益平衡計算器、全台展店地圖、營收情境與募資模擬（數字皆為示意資料）。',
-      thumb: 'assets/works/doudoutie-01.webp',
-      link: 'https://claude.ai/artifact/PyuTwXMkRZGZanMgGaSrTU' },
-    { date: '10/22', unit: '第三單元｜品牌視覺生成術', title: '豆豆貼 品牌視覺：Logo、海報與商品樣張',
-      desc: '撰寫 Prompt 生成品牌行銷、人才招募、盲盒活動三款海報與產品宣傳圖，並用 Canva 製作帆布袋、紙杯、紙袋樣張（LOGO 由第四組組員生成）。',
-      thumb: 'assets/works/brand-poster-marketing.webp',
-      project: 'brand' },
-    { date: '10/29', unit: '第六單元｜營運資料架構', title: '豆豆貼鍋貼 商品原物料供應商主檔',
-      desc: '設計能被自動化使用的資料表：鍋貼店的商品、原物料與供應商主檔，並以 Apps Script 製作成系統網頁。',
-      thumb: 'assets/works/sheet-master.webp',
-      link: 'https://script.google.com/macros/s/AKfycbzRgW0gFZQSQYfbcTmY81GVTOl1rtqIyFBEGjYABMOclb8mo25ySs24zFU6JIukYDTwDQ/exec' },
-    { date: '11/02', unit: '第七單元｜智慧營運試算表', title: '排班與薪資系統',
-      desc: '從鍋貼店的員工排班主檔延伸成 Apps Script 系統網頁：薪資設定、排班、休假申請、加班與工時彙總，一路算到薪資明細。',
-      thumb: 'assets/works/sheet-payroll.webp',
-      link: 'https://script.google.com/macros/s/AKfycbw4cxtMCMJGr2gsBFFyOP6DejkZ8r1pwxZcmGJRLo7iX7AMJYuUt26u_WztOzeqWq7b/exec' },
-    { date: '課外創作實驗', unit: '自主作品｜課程管理工具', title: '青年AI實戰養成班—回家作業總表',
-      desc: '把課程每天的單元與作業整理成可以勾選的線上聯絡簿，完成一天就蓋上紅色「完成」章。',
-      thumb: 'assets/works/homework-tracker-01.webp',
-      link: 'https://claude.ai/artifact/LZqKm48Dttu6euUq5r65gX?v=2' }
   ],
 
   /* 作品分類的卡片底色 */
@@ -206,20 +186,20 @@ window.MINDY_DATA = {
   slides: [
     /* 順序：故事線版（2026/11/3 調整）
        自我介紹 → 學習歷程 → 作品 → 合作方式 → 未來 → 邀請交流
-       完整逐字稿在 docs/發表文字稿.md；這裡的 note 是「重點提示版」。
-       ⚠ 簡報中按 N 顯示的講稿會出現在投影畫面上，觀眾也看得到。 */
+       簡報畫面不顯示講稿；完整逐字稿在 docs/發表文字稿.md（會輸出成 docs/發表講稿.pdf）。
+       這裡的 note 只作為重點備忘，修改講稿時請同步更新文字稿。 */
     { k: 'WELCOME · 01', t: 'Hello, I’m Mindy.', d: '一位持續更新中的跨領域探索者。歡迎來到 MINDY OS。',
       extra: ['好奇心持續更新', '善於企劃與協作', '用 AI 創造更多可能'], img: 'welcome', sec: 35,
       note: '自我介紹（鐘敏恩／Mindy）→ 不只是簡報，邀請大家探索 MINDY OS → 這堂課是我最新的一次「版本更新」。' },
-    { k: 'ABOUT ME · 02', t: '不同的經歷，相同的好奇心。', d: '幼兒教育、學校行政、門市營運、品牌企劃、AI 應用。核心理念：把一個問題釐清，找到方法，再把它落地執行。',
+    { k: 'ABOUT ME · 02', t: '不同的經歷，相同的好奇心。', d: '幼兒教育、學校行政、門市營運、AI 應用。核心理念：把一個問題釐清，找到方法，再把它落地執行。',
       extra: ['釐清問題', '尋找方法', '落地執行'], img: 'introducing', sec: 60,
-      note: '五個領域（含新加坡幼教 2 年）→ 共同點：面對「人」和「流程」→ 核心理念：釐清、方法、落地 → 興趣：美食、旅遊、閱讀、電影、攝影、羽球。' },
+      note: '四個領域（含新加坡幼教 2 年、門市社群經營）→ 共同點：面對「人」和「流程」→ 核心理念：釐清、方法、落地 → 興趣：美食、旅遊、閱讀、電影、攝影、羽球。' },
     { k: 'VERSION HISTORY · 03', t: '從使用 AI，到整合 AI。', d: '以前用 AI 查資料、寫文字；現在開始結合 Prompt、試算表、資料架構和網頁原型。',
       extra: ['AI as a Tool', '→ 反覆試驗與修正', 'AI as a Partner'], img: 'thinking', sec: 60,
       note: '1.0 既有能力 → 2.0 AI 當助理 → 3.0 串起 Prompt、試算表、資料架構、網頁原型 → 關鍵：從單一任務到整體流程，AI 從工具變夥伴。' },
-    { k: 'FEATURED PROJECT · 04', t: '當試算表不再只是試算表。', d: '我最有成就感的作品，是將熟悉的營運資料管理，延伸成可以操作的銷售輸入網頁。',
-      extra: ['原物料主檔', '銷售與統計', '網頁表單'], project: 'data', sec: 80,
-      note: '最有成就感的作品 → 豆皮鍋貼店營運 → 商品主檔、BOM、銷售紀錄 → 店員用網頁輸入 → 重點：重新思考前台與後台的分工 → 連結門市經驗。' },
+    { k: 'FEATURED PROJECT · 04', t: '當試算表不再只是試算表。', d: '我最有成就感的作品，是將熟悉的營運資料管理，延伸成店員可以操作的系統網頁，再一路做到排班與薪資。',
+      extra: ['主檔與 BOM', '銷售與營收', '排班與薪資'], project: 'data', sec: 80,
+      note: '最有成就感的作品 → 豆皮鍋貼店：主檔、BOM → 銷售、庫存、營收毛利 → Apps Script 系統網頁 → 延伸排班與薪資 → 重點：前台與後台的分工 → 連結門市經驗。' },
     { k: 'CREATIVE LAB · 05', t: '一個想法，可以有不同的實現方式。', d: '從豆豆貼的品牌視覺與互動提案，到 Daily Bloom 的產品介面，再到課程用的回家作業總表：我喜歡把學習運用在不同領域。',
       extra: ['豆豆貼品牌與提案', 'Daily Bloom 介面', '回家作業總表'], gallery: ['brand', 'ux', 'homework'], sec: 60,
       note: '豆豆貼：AI 生成海報、商品樣張，加上 Claude 互動提案（數字為示意；LOGO 由組員生成）／Daily Bloom：Gemini Canvas，用花朵綻放取代打分數／回家作業總表：可勾選的課程聯絡簿 → 不一定最完整，但都是練習的過程。' },

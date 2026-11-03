@@ -463,6 +463,9 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
 .visual-count { position: absolute; right: 12px; bottom: 12px; font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 99px; background: #343b35cc; color: #fff; }
 .project-body { padding: 24px; display: flex; flex-direction: column; flex: 1; }
 .project h3 { margin: 3px 0 6px; font-size: 21px; }
+.unit-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.unit-tag { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 8px; background: #f3ede1; color: #7a6248; font-size: 12px; font-weight: 750; border: 1px solid #eadfcc; }
+.modal .unit-tags { margin: 12px 0 0; }
 .project p { margin: 6px 0 15px; color: var(--muted); font-size: 14px; }
 .project small { color: #74826d; font-weight: 700; }
 .project-status { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #7a6a55; margin-top: 12px; }

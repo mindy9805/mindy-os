@@ -204,8 +204,14 @@
 
   /* 作品有線上網址時，顯示「開啟作品」按鈕（另開新分頁） */
   function linkBtn(p) {
-    if (!p.link || !/^https?:\/\//.test(p.link)) return '';
-    return `<a class="project-link" href="${esc(p.link)}" target="_blank" rel="noopener noreferrer">開啟作品 ↗</a>`;
+    const list = (p.links || []).slice();
+    if (p.link) list.unshift({ label: p.linkLabel || '開啟作品', url: p.link });
+    return list.filter(l => /^https?:\/\//.test(l.url || ''))
+      .map(l => `<a class="project-link" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.label || '開啟作品')} ↗</a>`).join('');
+  }
+  /* 卡片上方的課堂單元標籤 */
+  function unitTags(p) {
+    return (p.units || []).length ? `<div class="unit-tags">${p.units.map(u => `<span class="unit-tag">${esc(u)}</span>`).join('')}</div>` : '';
   }
 
   function renderProjects(filter) {
@@ -215,6 +221,7 @@
       <article class="card project">
         <button type="button" class="project-visual" style="background:${esc(colors[p.cat] || '#eee')}" data-project="${esc(p.id)}" aria-label="查看「${esc(p.name)}」專案摘要">${projectCover(p)}</button>
         <div class="project-body">
+          ${unitTags(p)}
           <small>${biLabel(p.label)}${p.featured ? ' · <span class="featured-flag">★ FEATURED · 主打作品</span>' : ''}</small>
           <h3>${esc(p.name)}</h3>
           <p>${esc(p.desc)}</p>
@@ -230,32 +237,8 @@
     attachImgFallback(box);
   }
 
-  /* 課堂作品清單（js/data.js 的 classWorks） */
-  function renderClassWorks() {
-    const box = $('#classWorks');
-    if (!box) return;
-    box.innerHTML = (DATA.classWorks || []).map(w => {
-      const link = w.link && /^https?:\/\//.test(w.link)
-        ? `<a class="project-link cw-link" href="${esc(w.link)}" target="_blank" rel="noopener noreferrer">開啟作品 ↗</a>` : '';
-      const more = w.project ? `<button type="button" class="cw-more" data-project="${esc(w.project)}">查看作品圖片</button>` : '';
-      return `
-      <li class="classwork${w.thumb ? ' has-thumb' : ''}">
-        <span class="cw-date">${esc(w.date)}</span>
-        <div class="cw-body">
-          <small class="cw-unit">${esc(w.unit)}</small>
-          <h4>${esc(w.title)}</h4>
-          <p>${esc(w.desc)}</p>
-        </div>
-        ${w.thumb ? `<div class="cw-thumb"><img src="${esc(w.thumb)}" alt="" loading="lazy"></div>` : ''}
-        ${link || more ? `<div class="cw-actions">${link}${more}</div>` : ''}
-      </li>`;
-    }).join('');
-    $$('[data-project]', box).forEach(b => b.addEventListener('click', () => openProject(b.dataset.project, b)));
-  }
-
   function initProjects() {
     renderProjects('all');
-    renderClassWorks();
     $$('#filters button').forEach(b => b.addEventListener('click', () => {
       $$('#filters button').forEach(x => { x.classList.remove('active'); x.setAttribute('aria-pressed', 'false'); });
       b.classList.add('active'); b.setAttribute('aria-pressed', 'true');
@@ -280,7 +263,8 @@
       <h2 id="modalTitle">${esc(p.name)}</h2>
       <p>${esc(p.detail)}</p>
       <div class="pills">${(p.tools || []).map(t => `<span class="pill">${esc(t)}</span>`).join('')}</div>
-      ${p.link ? `<p class="modal-link">${linkBtn(p)}</p>` : ''}
+      ${unitTags(p)}
+      ${linkBtn(p) ? `<p class="modal-link">${linkBtn(p)}</p>` : ''}
       ${gallery}`;
     lastFocus = opener || document.activeElement;
     overlay.classList.add('show');
@@ -520,14 +504,14 @@
   /* =================================================================
      7. 簡報模式
      快捷鍵：→ ↓ 空白鍵 PageDown 下一頁｜← ↑ PageUp 上一頁｜Home/End 首尾頁
-             N 講稿｜F 全螢幕｜Esc 結束
+             F 全螢幕｜Esc 結束
      網址加上 #present 可直接開啟簡報（#present-5 直接到第 5 頁）
      ================================================================= */
   function initPresentation() {
     const slides = DATA.slides || [];
     const pres = $('#present'), stage = $('#slideStage'), dots = $('#slideDots');
     const IMG = DATA.images || {};
-    let current = 0, showNotes = false, isOpen = false;
+    let current = 0, isOpen = false;
     let startTime = 0, timerId = null;
     const totalSec = slides.reduce((s, x) => s + (x.sec || 0), 0);
 
@@ -575,7 +559,6 @@
             <ul class="slide-extra">${(s.extra || []).map(x => `<li>✦ ${esc(x)}</li>`).join('')}</ul>
           </div>
           ${mediaHtml(s)}
-          <div class="slide-notes ${showNotes ? 'visible' : ''}"><strong>講稿提示：</strong>${esc(s.note)}${s.sec ? `<span class="sec">建議約 ${s.sec} 秒</span>` : ''}</div>
         </div>`;
       stage.scrollTop = 0;
       $('#progress').style.width = ((current + 1) / slides.length * 100) + '%';
@@ -644,12 +627,6 @@
     $('#next').addEventListener('click', next);
     $('#timer').addEventListener('click', resetTimer);
     $('#fullScreen').addEventListener('click', toggleFullscreen);
-    const toggleNotes = () => {
-      showNotes = !showNotes;
-      $('#notesToggle').setAttribute('aria-pressed', String(showNotes));
-      const n = $('.slide-notes', stage); if (n) n.classList.toggle('visible', showNotes);
-    };
-    $('#notesToggle').addEventListener('click', toggleNotes);
 
     // 鍵盤與簡報筆（簡報筆多半送出 PageUp / PageDown）
     window.addEventListener('keydown', e => {
@@ -659,7 +636,6 @@
       else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(k)) { e.preventDefault(); prev(); }
       else if (k === 'Home') { e.preventDefault(); show(0); }
       else if (k === 'End') { e.preventDefault(); show(slides.length - 1); }
-      else if (k === 'n' || k === 'N') toggleNotes();
       else if (k === 'f' || k === 'F') toggleFullscreen();
       else if (k === 'Escape' && !(document.fullscreenElement || document.webkitFullscreenElement)) exit();
     });
