@@ -344,19 +344,20 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
 .foot-sign { font-weight: 750; }
 
 /* About Me：核心理念 */
-.philosophy { margin-top: 22px; padding: 34px 32px; border-radius: 27px; background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow); text-align: center; }
-.philosophy-quote { margin: 14px auto 22px; font-size: clamp(22px, 3vw, 34px); font-weight: 800; line-height: 1.5; letter-spacing: -.01em; max-width: 900px; }
-.philosophy-steps { list-style: none; padding: 0; margin: 0 auto; display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; }
-.philosophy-steps li { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 128px; height: 128px; border-radius: 50%; color: #fff; }
+/* 核心理念：以 8px 為單位的間距系統（--ph-gap 是各段落之間的距離） */
+.philosophy { --ph-gap: 32px; --ph-circle: 128px; --ph-between: 56px; --ph-arrow: 18px; margin-top: 22px; padding: 48px 40px 46px; /* 下方少 2px：補償說明文字字形下方的留白 */ border-radius: 27px; background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow); text-align: center; }
+.philosophy .eyebrow { line-height: 1.2; }
+.philosophy-quote { margin: calc(var(--ph-gap) / 2) auto var(--ph-gap); font-size: clamp(22px, 3vw, 34px); font-weight: 800; line-height: 1.3; letter-spacing: 0; max-width: 900px; }
+.philosophy-steps { list-style: none; padding: 0; margin: 0 auto; display: flex; justify-content: center; align-items: center; gap: var(--ph-between); }
+.philosophy-steps li { position: relative; flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; width: var(--ph-circle); height: var(--ph-circle); border-radius: 50%; color: #fff; }
 .philosophy-steps li:nth-child(1) { background: #c99a78; }
 .philosophy-steps li:nth-child(2) { background: #8fa383; }
 .philosophy-steps li:nth-child(3) { background: var(--ink); }
-.philosophy-steps li + li::before { content: '→'; position: absolute; left: -22px; top: 50%; transform: translateY(-50%); color: var(--muted); font-weight: 800; }
-.philosophy-steps li { position: relative; margin-left: 22px; }
-.philosophy-steps li:first-child { margin-left: 0; }
-.philosophy-steps b { font-size: 17px; }
-.philosophy-steps small { font-size: 12px; opacity: .85; letter-spacing: 1px; }
-.philosophy-note { margin: 18px 0 0; font-size: 14px; }
+/* 箭頭：精準放在兩個圓的正中間 */
+.philosophy-steps li + li::before { content: ''; position: absolute; left: calc(var(--ph-between) / -2); top: 50%; width: var(--ph-arrow); height: calc(var(--ph-arrow) * .67); transform: translate(-50%, -50%); background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 12'%3E%3Cpath d='M1 6h15M11 1.5 16 6l-5 4.5' fill='none' stroke='%23687568' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat; }
+.philosophy-steps b { font-size: 17px; line-height: 1.3; }
+.philosophy-steps small { font-size: 12px; line-height: 1.3; opacity: .85; letter-spacing: 1px; }
+.philosophy-note { margin: calc(var(--ph-gap) + 2px) 0 0; font-size: 14px; line-height: 1.5; } /* +2px：讓「圓→說明」與「金句→圓」的實際距離相同 */
 
 /* About Me：跨領域能力地圖 */
 .skillmap { margin-top: 22px; padding: 32px; border-radius: 27px; background: #e9eee3; border: 1px solid #d6dfd0; }
@@ -722,9 +723,7 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
   .roadmap .card:last-child { grid-column: auto; }
   .soft { padding: 24px; }
   .philosophy, .skillmap { padding: 24px 18px; border-radius: 22px; }
-  .philosophy-steps { gap: 0; flex-wrap: nowrap; }
-  .philosophy-steps li { width: 88px; height: 88px; margin-left: 20px; flex: none; }
-  .philosophy-steps li + li::before { left: -16px; }
+  .philosophy { --ph-gap: 24px; --ph-circle: 84px; --ph-between: 34px; --ph-arrow: 12px; padding: 32px 18px 29px; }
   .philosophy-steps b { font-size: 15px; }
   .skillmap-nodes { grid-template-columns: 1fr; }
   .card { padding: 22px; }
@@ -790,8 +789,7 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
 
 /* 小螢幕（iPhone SE / 360px 安卓） */
 @media (max-width: 400px) {
-  .philosophy-steps li { width: 80px; height: 80px; margin-left: 18px; }
-  .philosophy-steps li + li::before { left: -15px; }
+  .philosophy { --ph-circle: 76px; --ph-between: 30px; }
   .philosophy-steps small { font-size: 10px; }
   .philosophy-steps b { font-size: 14px; }
   .logo span { display: none; }
@@ -804,6 +802,9 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
   .map-node { padding: 12px; }
   .floatnote.b { display: none; }
 }
+
+/* 核心理念：370px 以下小標會換成兩行，上方少 2px 讓上下留白一致 */
+@media (max-width: 370px) { .philosophy { padding-top: 30px; } }
 
 /* 簡報模式在較矮的直式手機（例如 iPhone 開著 Safari 工具列）：再精簡一點 */
 @media (max-width: 720px) and (max-height: 700px) {
