@@ -605,6 +605,68 @@
     if (m) start(m[1] ? parseInt(m[1], 10) - 1 : 0);
   }
 
+  /* =================================================================
+     0. 中文斷行：只在「詞與詞之間」換行，避免把一個詞拆成兩行
+     -----------------------------------------------------------------
+     用瀏覽器內建的中文斷詞（Intl.Segmenter），在詞與詞之間加上
+     可換行的位置（<wbr>），並讓瀏覽器只在這些位置換行。
+     KEEP_WORDS：瀏覽器斷錯時，在這裡補上「一定要黏在一起」的詞。
+     ================================================================= */
+  const KEEP_WORDS = [
+    '截圖', '豆皮', '豆豆貼', '鍋貼', '勾選', '優化', '鐘敏恩', '跨域', '表單', '日日好日', '痛點',
+    '點擊', '社群', '總表', '教保員', '學務', '受眾', '發想', '選填', '再填', '題型', '方格紙',
+    '週次', '待補', '這堂課', '小芽', '滿點', '好奇心', '試算表', '粉圓體', '聯絡簿', '彩蛋',
+    '核心理念', '跨領域', '探索者', '說明書', '作業系統'
+  ];
+  function initWordBreak() {
+    if (!window.Intl || !Intl.Segmenter) return; // 舊瀏覽器：維持一般換行
+    const seg = new Intl.Segmenter('zh-Hant', { granularity: 'word' });
+    const dict = new Set(KEEP_WORDS);
+    const CJK = /[㐀-鿿豈-﫿]/;
+    const NO_BREAK_BEFORE = /^[，。、；：！？」』）》〉…—～・,.!?;:)\]%]/; // 標點不放在行首
+    const NO_BREAK_AFTER = /[「『（《〈(\[]$/;                          // 開括號不放在行尾
+    const SKIP = /^(SCRIPT|STYLE|TEXTAREA|INPUT|SELECT|OPTION|CODE|PRE|TITLE)$/;
+
+    const processText = node => {
+      const text = node.nodeValue, parent = node.parentNode;
+      if (!parent || text.length < 3 || !CJK.test(text)) return;
+      if (SKIP.test(parent.nodeName) || (parent.closest && parent.closest('svg'))) return;
+      const parts = Array.from(seg.segment(text), s => s.segment);
+      const words = [];
+      for (let i = 0; i < parts.length;) {
+        let take = 1;
+        for (let n = Math.min(4, parts.length - i); n > 1; n--) {
+          if (dict.has(parts.slice(i, i + n).join(''))) { take = n; break; }
+        }
+        words.push(parts.slice(i, i + take).join(''));
+        i += take;
+      }
+      if (words.length < 2) return;
+      const frag = document.createDocumentFragment();
+      words.forEach((w, i) => {
+        const prev = words[i - 1];
+        if (i > 0 && !NO_BREAK_BEFORE.test(w) && !NO_BREAK_AFTER.test(prev) && !/\s$/.test(prev) && !/^\s/.test(w)) {
+          frag.appendChild(document.createElement('wbr'));
+        }
+        frag.appendChild(document.createTextNode(w));
+      });
+      parent.replaceChild(frag, node);
+    };
+    const walk = root => {
+      if (root.nodeType === 3) { processText(root); return; }
+      if (root.nodeType !== 1 || SKIP.test(root.nodeName)) return;
+      const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      const list = [];
+      while (tw.nextNode()) list.push(tw.currentNode);
+      list.forEach(processText);
+    };
+    walk(document.body);
+    document.documentElement.classList.add('wb'); // 啟用「只在詞間換行」的 CSS
+    // 之後動態產生的內容（作品卡片、合作情境、簡報、提示訊息）也自動處理
+    new MutationObserver(muts => muts.forEach(m => m.addedNodes.forEach(walk)))
+      .observe(document.body, { childList: true, subtree: true });
+  }
+
   /* ---------- 依序啟動所有功能 ---------- */
   safe('導覽列', initNav);
   safe('探索地圖', initExplore);
@@ -613,4 +675,5 @@
   safe('彩蛋', initEasterEggs);
   safe('簡報模式', initPresentation);
   safe('進場動畫', initReveal); // 最後啟動，才能包含動態產生的卡片
+  safe('中文斷行', initWordBreak);
 })();

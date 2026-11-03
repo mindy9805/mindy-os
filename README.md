@@ -20,7 +20,7 @@ mindy-os/
 │   ├── mindy-welcome-half.webp  手機首頁用的揮手半身圖
 │   └── avatar-*.webp         臉部特寫頭像（地圖、標題旁小圓圈、彩蛋）
 ├── assets/works/         ← 放作品截圖（見裡面的 README）
-├── assets/fonts/         ← 簡報字體（粉圓體精簡版）與授權 OFL.txt
+├── assets/fonts/         ← 網站字體：粉圓體（標題、簡報）、思源黑體（內文）精簡版與授權
 ├── assets/qr-connect.svg ← 簡報第 8 頁的 QR code（連到網站合作填寫區）
 ├── docs/表單設定教學.md   ← ★ 合作意願表單連接 Google 試算表的步驟
 ├── docs/google-apps-script.gs ← 貼到 Google Apps Script 的收件程式

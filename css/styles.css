@@ -17,12 +17,21 @@
    ===================================================================== */
 
 /* ---------- 01. 品牌色與基本設定 ---------- */
-/* 簡報字體：jf open 粉圓（Huninn，SIL OFL 1.1 授權，見 assets/fonts/OFL.txt）
+/* 簡報字體：jf open 粉圓（Huninn，SIL OFL 1.1 授權，見 assets/fonts/OFL-Huninn.txt）
    本機檔只包含網站目前用到的字；之後新增的字會改由 Google Fonts 的 Huninn 補上（需網路） */
 @font-face {
   font-family: "Huninn MINDY";
   src: url("../assets/fonts/huninn-mindy.woff2") format("woff2");
   font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+/* 內文字體：思源黑體（Noto Sans TC，SIL OFL 1.1，可變粗細 100–900）
+   本機檔只包含網站目前用到的字；新增的字會改由 Google Fonts 補上（需網路） */
+@font-face {
+  font-family: "Noto Sans TC MINDY";
+  src: url("../assets/fonts/notosanstc-mindy.woff2") format("woff2");
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
@@ -41,6 +50,9 @@
   --radius: 22px;
   --header-h: 76px;
   --ease: cubic-bezier(.2, .8, .2, 1);
+  /* 字體：標題用粉圓體（圓潤、親切），內文用思源黑體（清楚好讀） */
+  --font-display: "Huninn MINDY", "Huninn", "Noto Sans TC MINDY", "Noto Sans TC", -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --font-body: "Noto Sans TC MINDY", "Noto Sans TC", -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -49,7 +61,7 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  font-family: var(--font-body);
   line-height: 1.7;
   overflow-x: hidden;          /* 保險：防止任何元素造成水平捲動 */
 }
@@ -59,6 +71,17 @@ button { cursor: pointer; color: inherit; }
 a { color: inherit; text-decoration: none; }
 :focus-visible { outline: 3px solid #4f6a46; outline-offset: 3px; border-radius: 6px; }
 h1, h2, h3 { line-break: strict; }
+/* 粉圓體：標題、金句與角色對話 */
+h1, h2, h3, .tagline, .philosophy-quote, .skillmap-hub b, .skill-node b, .map-title strong,
+.hobby-card, .speech, .floatnote, .peek-bubble, .step .circle, .philosophy-steps b {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+/* 段落：盡量避免最後一行只剩一兩個字 */
+p, li, small, figcaption, .section-sub { text-wrap: pretty; }
+/* 由 app.js 加上 .wb 後，只在詞與詞之間換行（太長時仍會換行，不會超出畫面） */
+.wb body { word-break: keep-all; overflow-wrap: break-word; }
 
 /* 中文斷行：.phrase 是一個「不可拆開的詞組」，換行只會發生在詞組之間 */
 .phrase { display: inline-block; max-width: 100%; } /* 詞組太長時仍會在內部換行，不會超出畫面 */
@@ -117,7 +140,7 @@ h1, h2, h3 { line-break: strict; }
   min-height: 640px; display: grid; grid-template-columns: 1.06fr .94fr;
   align-items: center; gap: 25px; padding-top: 42px; padding-bottom: 60px;
 }
-.hero h1 { font-size: clamp(52px, 6vw, 91px); letter-spacing: -.05em; line-height: 1.1; margin: 18px 0 12px; }
+.hero h1 { font-size: clamp(52px, 6vw, 91px); letter-spacing: -.02em; line-height: 1.1; margin: 18px 0 12px; }
 .hero h1 em { font-style: normal; color: #8a9e7f; }
 .tagline { font-size: clamp(21px, 2.3vw, 29px); font-weight: 750; line-height: 1.5; margin: 0 0 17px; }
 .intro { max-width: 560px; font-size: 16px; }
@@ -161,7 +184,7 @@ h1, h2, h3 { line-break: strict; }
 .section { padding: 90px 0; scroll-margin-top: calc(var(--header-h) + 8px); }
 .hero { scroll-margin-top: var(--header-h); }
 .section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 25px; margin-bottom: 31px; }
-.section h2 { font-size: clamp(30px, 4vw, 52px); letter-spacing: -.04em; line-height: 1.25; margin: 9px 0 12px; text-wrap: balance; }
+.section h2 { font-size: clamp(30px, 4vw, 52px); letter-spacing: -.01em; line-height: 1.25; margin: 9px 0 12px; text-wrap: balance; }
 .section-sub { font-size: 15px; color: var(--muted); max-width: 700px; margin: 0; }
 .section-num { color: #7f9373; font-size: 12px; letter-spacing: 2px; font-weight: 900; }
 
@@ -421,7 +444,7 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
 .peek.show { transform: translateY(0); visibility: visible; transition: transform .6s var(--ease); }
 
 /* ---------- 09. 簡報模式 ---------- */
-.present { font-family: "Huninn MINDY", "Huninn", -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif; position: fixed; inset: 0; z-index: 100; background: var(--paper); display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+.present { font-family: "Huninn MINDY", "Huninn", var(--font-body); position: fixed; inset: 0; z-index: 100; background: var(--paper); display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
 .present[hidden] { display: none; }
 .present-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 28px; padding-top: calc(14px + env(safe-area-inset-top)); border-bottom: 1px solid #e4e4d9; }
 .present-brand { white-space: nowrap; }
