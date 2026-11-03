@@ -140,7 +140,7 @@ window.MINDY_DATA = {
        把「網頁應用程式網址」（結尾是 /exec）貼在下方引號中。
        留空時，網站會提示「表單尚未啟用」，不會假裝送出成功。 */
   form: {
-    endpoint: ''
+    endpoint: 'https://script.google.com/macros/s/AKfycbymaU_YiAkBk10-ckes334kaHvUMeri9mGgFLWI3h-w0Ox3I7ZoTudb5sbp-IMeCom5/exec'
   },
 
   /* 專長代碼 → 送到試算表的文字 */
