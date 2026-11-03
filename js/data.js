@@ -32,7 +32,7 @@ window.MINDY_DATA = {
   },
 
   /* -------------------------------------------------------------------
-     3) 作品卡片（Creative Lab）
+     3) 作品卡片（Creative Lab）— 依課堂日期排列，最後是課外創作實驗
      ★ 如何放入真實截圖：
        (1) 把圖片放進 assets/works/ 資料夾（建議 1600×1000 的 .webp 或 .jpg）
        (2) 在該作品的 images 裡加入一行，例如：
@@ -48,24 +48,24 @@ window.MINDY_DATA = {
      ------------------------------------------------------------------- */
   projects: [
     {
-      id: 'data',
-      units: ['10/29 第六單元｜營運資料架構', '11/02 第七單元｜智慧營運試算表'],
-      links: [
-        { label: '開啟原物料主檔系統', url: 'https://script.google.com/macros/s/AKfycbzRgW0gFZQSQYfbcTmY81GVTOl1rtqIyFBEGjYABMOclb8mo25ySs24zFU6JIukYDTwDQ/exec' },
-        { label: '開啟排班薪資系統', url: 'https://script.google.com/macros/s/AKfycbw4cxtMCMJGr2gsBFFyOP6DejkZ8r1pwxZcmGJRLo7iX7AMJYuUt26u_WztOzeqWq7b/exec' }
-      ],
-      cat: 'data',
-      label: 'DATA & AUTOMATION · 營運與資料',
-      name: '營運資料與銷售管理系統',
-      desc: '從商品與原物料主檔、配方 BOM，到銷售、庫存與營收毛利，再延伸出排班與薪資系統。熟悉的試算表工作，原來還能走得更遠。',
-      tools: ['Excel', 'Google Sheets', 'Apps Script', 'AI 協作'],
-      detail: '以豆皮鍋貼店營運為題，先規劃商品、原物料、供應商主檔與配方 BOM，再串起銷售紀錄、進貨、商品成本、庫存管理與營收毛利，並用 Apps Script 做成店員可以操作的系統網頁。之後延伸出排班與薪資系統：從薪資設定、排班、休假申請、加班與工時彙總，一路算到薪資明細。重點不只是公式，而是重新思考前台與後台的工作流程。',
-      state: '試算表與系統網頁已完成',
-      featured: true,
+      id: 'ux',
+      units: ['10/20 第一單元｜AI 商業工作流入門'],
+      cat: 'ux',
+      label: 'PRODUCT & UI/UX · 產品與介面',
+      name: '日日好日 Daily Bloom',
+      desc: '把天氣、每日資訊、情緒、感恩與生活習慣，整合進同一個溫柔日常儀式的生活覺察 Web App。',
+      tools: ['Gemini Canvas', 'UI/UX', '產品規劃', '無障礙設計'],
+      detail: '用 Gemini 的 Canvas 功能完成「日日好日 Daily Bloom」的 UI／UX 網頁，並整理成 15 頁產品提案簡報。資訊架構分成「今天 → 紀錄 → 回看」三個層級；用花朵綻放（🌱 → 🌿 → 🌷 → 🌸）取代打分數，降低自我追蹤的壓力；情緒、感恩與運動都設計成一分鐘內可以完成的微紀錄。也考量了不同使用者（通勤上班族、高齡與低視力使用者、作息不固定的學生）的需求，納入大按鈕、字體調整與減少動畫等無障礙設計。',
+      state: 'Gemini Canvas 網頁原型與提案簡報已完成',
+      link: 'https://share.gemini.google/sYT2oVAAjmN5',
       images: [
-        { src: 'assets/works/sheet-master.webp', alt: '豆豆貼鍋貼商品原物料供應商主檔試算表：設定選單、商品主檔、供應商主檔、原物料主檔、商品配方 BOM、銷售紀錄、進貨紀錄、商品成本、庫存管理、營收毛利等工作表', caption: '豆豆貼鍋貼 商品原物料供應商主檔：從設定選單、商品與原物料主檔、配方 BOM，到銷售、進貨、成本、庫存與營收毛利。' },
-        { src: 'assets/works/sheet-payroll.webp', alt: '排班和薪資試算表：薪資設定與費率參數，包含獎金、加班費率、勞健保自付額與請假扣薪規則', caption: '排班和薪資：薪資設定、排班、休假申請、加班與工時彙總，一路算到薪資明細。' }
-      ] // ← 在這裡放入真實截圖
+        { src: 'assets/works/dailybloom-04.webp', alt: 'Daily Bloom 花朵進度：從幼苗到盛開', caption: '花朵不是裝飾，而是進度的語言' },
+        { src: 'assets/works/dailybloom-01.webp', alt: '日日好日 Daily Bloom 提案簡報封面：讓今天，慢慢綻放', caption: '提案簡報封面' },
+        { src: 'assets/works/dailybloom-02.webp', alt: 'Daily Bloom 與傳統習慣 App 的設計比較', caption: '跳脫懲罰迴圈：與傳統習慣 App 的比較' },
+        { src: 'assets/works/dailybloom-03.webp', alt: 'Daily Bloom 首屏資訊架構：左欄核心覺察、右欄外部資訊', caption: '首屏資訊架構：只回答當下最重要的三件事' },
+        { src: 'assets/works/dailybloom-05.webp', alt: 'Daily Bloom 微紀錄設計：情緒輪盤、三件小事、真實運動', caption: '降低認知負擔的微紀錄設計' },
+        { src: 'assets/works/dailybloom-06.webp', alt: 'Daily Bloom 色彩系統與排版規範', caption: '品牌語彙：色彩系統與排版' }
+      ]
     },
     {
       id: 'brand',
@@ -96,24 +96,24 @@ window.MINDY_DATA = {
       ]
     },
     {
-      id: 'ux',
-      units: ['10/20 第一單元｜AI 商業工作流入門'],
-      cat: 'ux',
-      label: 'PRODUCT & UI/UX · 產品與介面',
-      name: '日日好日 Daily Bloom',
-      desc: '把天氣、每日資訊、情緒、感恩與生活習慣，整合進同一個溫柔日常儀式的生活覺察 Web App。',
-      tools: ['Gemini Canvas', 'UI/UX', '產品規劃', '無障礙設計'],
-      detail: '用 Gemini 的 Canvas 功能完成「日日好日 Daily Bloom」的 UI／UX 網頁，並整理成 15 頁產品提案簡報。資訊架構分成「今天 → 紀錄 → 回看」三個層級；用花朵綻放（🌱 → 🌿 → 🌷 → 🌸）取代打分數，降低自我追蹤的壓力；情緒、感恩與運動都設計成一分鐘內可以完成的微紀錄。也考量了不同使用者（通勤上班族、高齡與低視力使用者、作息不固定的學生）的需求，納入大按鈕、字體調整與減少動畫等無障礙設計。',
-      state: 'Gemini Canvas 網頁原型與提案簡報已完成',
-      link: 'https://share.gemini.google/sYT2oVAAjmN5',
+      id: 'data',
+      units: ['10/29 第六單元｜營運資料架構', '11/02 第七單元｜智慧營運試算表'],
+      links: [
+        { label: '開啟原物料主檔系統', url: 'https://script.google.com/macros/s/AKfycbzRgW0gFZQSQYfbcTmY81GVTOl1rtqIyFBEGjYABMOclb8mo25ySs24zFU6JIukYDTwDQ/exec' },
+        { label: '開啟排班薪資系統', url: 'https://script.google.com/macros/s/AKfycbw4cxtMCMJGr2gsBFFyOP6DejkZ8r1pwxZcmGJRLo7iX7AMJYuUt26u_WztOzeqWq7b/exec' }
+      ],
+      cat: 'data',
+      label: 'DATA & AUTOMATION · 營運與資料',
+      name: '營運資料與銷售管理系統',
+      desc: '從商品與原物料主檔、配方 BOM，到銷售、庫存與營收毛利，再延伸出排班與薪資系統。熟悉的試算表工作，原來還能走得更遠。',
+      tools: ['Excel', 'Google Sheets', 'Apps Script', 'AI 協作'],
+      detail: '以豆皮鍋貼店營運為題，先規劃商品、原物料、供應商主檔與配方 BOM，再串起銷售紀錄、進貨、商品成本、庫存管理與營收毛利，並用 Apps Script 做成店員可以操作的系統網頁。之後延伸出排班與薪資系統：從薪資設定、排班、休假申請、加班與工時彙總，一路算到薪資明細。重點不只是公式，而是重新思考前台與後台的工作流程。',
+      state: '試算表與系統網頁已完成',
+      featured: true,
       images: [
-        { src: 'assets/works/dailybloom-04.webp', alt: 'Daily Bloom 花朵進度：從幼苗到盛開', caption: '花朵不是裝飾，而是進度的語言' },
-        { src: 'assets/works/dailybloom-01.webp', alt: '日日好日 Daily Bloom 提案簡報封面：讓今天，慢慢綻放', caption: '提案簡報封面' },
-        { src: 'assets/works/dailybloom-02.webp', alt: 'Daily Bloom 與傳統習慣 App 的設計比較', caption: '跳脫懲罰迴圈：與傳統習慣 App 的比較' },
-        { src: 'assets/works/dailybloom-03.webp', alt: 'Daily Bloom 首屏資訊架構：左欄核心覺察、右欄外部資訊', caption: '首屏資訊架構：只回答當下最重要的三件事' },
-        { src: 'assets/works/dailybloom-05.webp', alt: 'Daily Bloom 微紀錄設計：情緒輪盤、三件小事、真實運動', caption: '降低認知負擔的微紀錄設計' },
-        { src: 'assets/works/dailybloom-06.webp', alt: 'Daily Bloom 色彩系統與排版規範', caption: '品牌語彙：色彩系統與排版' }
-      ]
+        { src: 'assets/works/sheet-master.webp', alt: '豆豆貼鍋貼商品原物料供應商主檔試算表：設定選單、商品主檔、供應商主檔、原物料主檔、商品配方 BOM、銷售紀錄、進貨紀錄、商品成本、庫存管理、營收毛利等工作表', caption: '豆豆貼鍋貼 商品原物料供應商主檔：從設定選單、商品與原物料主檔、配方 BOM，到銷售、進貨、成本、庫存與營收毛利。' },
+        { src: 'assets/works/sheet-payroll.webp', alt: '排班和薪資試算表：薪資設定與費率參數，包含獎金、加班費率、勞健保自付額與請假扣薪規則', caption: '排班和薪資：薪資設定、排班、休假申請、加班與工時彙總，一路算到薪資明細。' }
+      ] // ← 在這裡放入真實截圖
     },
     {
       id: 'homework',

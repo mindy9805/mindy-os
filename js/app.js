@@ -548,6 +548,18 @@
       return '';
     }
 
+    /* 重點方塊：文字維持一行；放不下時逐步縮小字級（最小 12px），不換行、不超出方塊 */
+    function fitPills() {
+      $$('.slide-extra li', stage).forEach(li => {
+        li.querySelectorAll('wbr').forEach(w => w.remove()); // 移除換行點，確保一行
+        li.style.fontSize = '';
+        let size = parseFloat(getComputedStyle(li).fontSize);
+        while (li.scrollWidth > li.clientWidth + 1 && size > 12) { size -= 0.5; li.style.fontSize = size + 'px'; }
+      });
+    }
+    window.addEventListener('resize', () => { if (isOpen) fitPills(); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (isOpen) fitPills(); });
+
     function render(dir) {
       const s = slides[current];
       stage.innerHTML = `
@@ -561,6 +573,7 @@
           ${mediaHtml(s)}
         </div>`;
       stage.scrollTop = 0;
+      fitPills();
       $('#progress').style.width = ((current + 1) / slides.length * 100) + '%';
       $('#prev').disabled = current === 0;
       $('#next').innerHTML = current === slides.length - 1 ? '回到首頁 ↺' : '下一頁 →';
@@ -707,7 +720,7 @@
       if (!parent || text.length < 3 || !CJK.test(text)) return;
       if (SKIP.test(parent.nodeName) || (parent.closest && parent.closest('svg'))) return;
       if (parent.classList && parent.classList.contains('cl')) return; // 已處理過
-      if (parent.closest && parent.closest('.eb-zh, .ln')) return;     // 不可拆開的標籤
+      if (parent.closest && parent.closest('.eb-zh, .ln, .slide-extra')) return; // 不可拆開的標籤、簡報重點方塊
       const words = toWords(text);
       // 依標點切成子句
       const clauses = [];
