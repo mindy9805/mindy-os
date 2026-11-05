@@ -572,6 +572,8 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
 .slide-text { min-width: 0; }
 .slide h1 { font-size: clamp(34px, 5vw, 72px); letter-spacing: -.04em; line-height: 1.2; margin: 12px 0 20px; text-wrap: balance; }
 .slide-desc { font-size: clamp(18px, 2.1vw, 27px); max-width: 860px; line-height: 1.65; margin: 0; }
+.slide-desc + .slide-desc { margin-top: .9em; }       /* 段落之間的距離 */
+.slide-desc .hl { color: #a0714d; font-weight: 800; } /* 強調色：暖棕 */
 .slide-extra { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 28px; padding: 0; list-style: none; }
 .slide-extra li { white-space: nowrap; overflow: hidden; min-width: 0; border: 1px solid #e0e5d9; background: #fff; border-radius: 21px; padding: 20px 18px; font-size: clamp(15px, 1.5vw, 19px); font-weight: 650; } /* 一行顯示；太長時 app.js 會自動縮小字級 */
 .slide-extra li:nth-child(1) { animation-delay: .1s; }

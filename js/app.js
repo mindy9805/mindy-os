@@ -39,7 +39,17 @@
 
   /* 中文標題斷行：在「，。、」等標點後切成詞組，避免把一個詞拆成兩行 */
   function phrases(text) {
-    return esc(text).split(/(?<=[，。、；：！？])/).map(t => `<span class="phrase">${t}</span>`).join('');
+    return String(text).split('\n').map(line =>
+      esc(line).split(/(?<=[，。、；：！？])/).map(t => `<span class="phrase">${t}</span>`).join('')
+    ).join('<br>');
+  }
+
+  /* 簡報說明文字：\n 換行、\n\n 分段、[[文字]] 以強調色顯示 */
+  function slideText(text) {
+    return String(text).split('\n\n').map(para =>
+      `<p class="slide-desc">${para.split('\n').map(line =>
+        esc(line).replace(/\[\[(.+?)\]\]/g, '<span class="hl">$1</span>')).join('<br>')}</p>`
+    ).join('');
   }
 
   /* 平滑捲動到某個區塊 */
@@ -567,7 +577,7 @@
           <div class="slide-text">
             <div class="eyebrow">${esc(s.k)}</div>
             <h1>${phrases(s.t)}</h1>
-            <p class="slide-desc">${esc(s.d)}</p>
+            <div class="slide-desc-wrap">${slideText(s.d)}</div>
             <ul class="slide-extra">${(s.extra || []).map(x => `<li>✦ ${esc(x)}</li>`).join('')}</ul>
           </div>
           ${mediaHtml(s)}
