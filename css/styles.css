@@ -293,6 +293,26 @@ details p { font-size: 14px; color: var(--muted); margin-bottom: 0; }
 .journey .card { min-height: 160px; }
 .roadmap { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
 .roadmap .card { min-height: 210px; }
+/* 我的 AI 小檔案 */
+/* About Me：個人參與動機 */
+.motive { margin-top: 40px; }
+.motive-title { font-size: clamp(22px, 2.6vw, 30px); margin: 6px 0 18px; }
+.motive-list { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.motive-card { position: relative; background: var(--card); border: 1px solid var(--border); border-radius: 22px; padding: 26px 28px 24px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; }
+.motive-no { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: #fff; background: var(--sage-deep); width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; }
+.motive-card:nth-child(2) .motive-no { background: #c99a78; }
+.motive-card h4 { font-family: var(--font-display); font-size: 20px; margin: 4px 0 0; }
+.motive-card p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.85; }
+.motive-card .pills { margin-top: auto; padding-top: 6px; }
+.sub-note { display: block; margin-top: 4px; font-size: 13px; color: #8a958a; }
+.ai-profile { margin-top: 22px; padding: 28px 32px; border-radius: 24px; background: #eaeedfe8; }
+.ai-profile-list { list-style: none; padding: 0; margin: 14px 0 0; display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: 14px; }
+.ai-profile-list li { background: #fffef9; border-radius: 18px; padding: 18px 20px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; box-shadow: 0 8px 18px #657a5914; }
+.ap-label { font-size: 12px; font-weight: 800; letter-spacing: 1px; color: #74826d; }
+.ai-profile-list b { font-family: var(--font-display); font-size: 18px; line-height: 1.4; }
+.ai-profile-list small { color: var(--muted); font-size: 14px; line-height: 1.6; }
+.ai-profile-list .ap-topic { border: 2px solid var(--sage); }
+.ai-profile-list .project-link { margin-top: 6px; }
 
 .field-label { font-weight: 750; display: block; margin-bottom: 10px; }
 .selectlike { width: 100%; min-height: 48px; padding: 12px 14px; border-radius: 12px; border: 1px solid #cfd9c8; background: #fff; color: #394d38; font-size: 16px; }
@@ -577,6 +597,8 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
 .slide-qr img { width: clamp(190px, 20vw, 270px); height: auto; aspect-ratio: 1 / 1; display: block; }
 .slide-qr figcaption { margin-top: 8px; font-size: 15px; font-weight: 700; line-height: 1.4; color: #3f513c; }
 .slide-media .fullbody.qr-mindy { height: min(46vh, 420px); }
+/* 寬度不足時，第 8 頁只留 QR code，讓左側重點方塊有足夠空間 */
+@media (max-width: 1199px) { .slide-media .fullbody.qr-mindy { display: none; } }
 .slide-minis .slide-shot { aspect-ratio: 16 / 6; }
 .slide-notes { display: none; grid-column: 1 / -1; background: #fff; padding: 14px 20px; border-radius: 14px; border: 1px solid #e5e5dc; font-size: 15px; max-width: 920px; }
 .slide-notes.visible { display: block; }
@@ -713,7 +735,10 @@ textarea.selectlike { resize: vertical; min-height: 92px; line-height: 1.6; padd
   .pose-badge { position: absolute; right: 0; top: -6px; width: 64px; height: 64px; border-width: 3px; }
   .section-head:has(.pose-badge) > div:first-child { padding-right: 70px; }
 
-  .cards, .projects, .two, .journey, .roadmap, .classworks-list { grid-template-columns: 1fr; }
+  .cards, .projects, .two, .journey, .roadmap, .classworks-list, .ai-profile-list, .motive-list { grid-template-columns: 1fr; }
+  .motive-card { padding: 22px 20px; }
+  .motive-card p { font-size: 14px; }
+  .ai-profile { padding: 22px 18px; }
   .classwork { padding: 16px; grid-template-columns: 1fr; gap: 8px; }
   .cw-date { grid-row: auto; justify-self: start; min-width: 0; font-size: 15px; padding: 4px 12px; }
   .cw-link { grid-column: auto; }
