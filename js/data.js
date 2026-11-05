@@ -99,8 +99,8 @@ window.MINDY_DATA = {
       id: 'data',
       units: ['10/29 第六單元｜營運資料架構', '11/02 第七單元｜智慧營運試算表'],
       links: [
-        { label: '開啟原物料主檔系統', url: 'https://script.google.com/macros/s/AKfycbzRgW0gFZQSQYfbcTmY81GVTOl1rtqIyFBEGjYABMOclb8mo25ySs24zFU6JIukYDTwDQ/exec' },
-        { label: '開啟排班薪資系統', url: 'https://script.google.com/macros/s/AKfycbw4cxtMCMJGr2gsBFFyOP6DejkZ8r1pwxZcmGJRLo7iX7AMJYuUt26u_WztOzeqWq7b/exec' }
+        { label: '開啟原物料主檔系統', system: true, url: 'https://script.google.com/macros/s/AKfycbzRgW0gFZQSQYfbcTmY81GVTOl1rtqIyFBEGjYABMOclb8mo25ySs24zFU6JIukYDTwDQ/exec' },
+        { label: '開啟排班薪資系統', system: true, url: 'https://script.google.com/macros/s/AKfycbw4cxtMCMJGr2gsBFFyOP6DejkZ8r1pwxZcmGJRLo7iX7AMJYuUt26u_WztOzeqWq7b/exec' }
       ],
       cat: 'data',
       label: 'DATA & AUTOMATION · 營運與資料',
@@ -110,6 +110,7 @@ window.MINDY_DATA = {
       detail: '以豆皮鍋貼店營運為題，先規劃商品、原物料、供應商主檔與配方 BOM，再串起銷售紀錄、進貨、商品成本、庫存管理與營收毛利，並用 Apps Script 做成店員可以操作的系統網頁。之後延伸出排班與薪資系統：從薪資設定、排班、休假申請、加班與工時彙總，一路算到薪資明細。重點不只是公式，而是重新思考前台與後台的工作流程。',
       state: '試算表與系統網頁已完成',
       featured: true,
+      highlight: '學習突破：從試算表，到 GAS 操作網頁', // 主打作品卡片上的重點句
       images: [
         { src: 'assets/works/sheet-master.webp', alt: '豆豆貼鍋貼商品原物料供應商主檔試算表：設定選單、商品主檔、供應商主檔、原物料主檔、商品配方 BOM、銷售紀錄、進貨紀錄、商品成本、庫存管理、營收毛利等工作表', caption: '豆豆貼鍋貼 商品原物料供應商主檔：從設定選單、商品與原物料主檔、配方 BOM，到銷售、進貨、成本、庫存與營收毛利。' },
         { src: 'assets/works/sheet-payroll.webp', alt: '排班和薪資試算表：薪資設定與費率參數，包含獎金、加班費率、勞健保自付額與請假扣薪規則', caption: '排班和薪資：薪資設定、排班、休假申請、加班與工時彙總，一路算到薪資明細。' }
@@ -152,6 +153,12 @@ window.MINDY_DATA = {
   /* ★ 表單收件網址：依 docs/表單設定教學.md 建立 Google Apps Script 後，
        把「網頁應用程式網址」（結尾是 /exec）貼在下方引號中。
        留空時，網站會提示「表單尚未啟用」，不會假裝送出成功。 */
+  /* ★ 安全開關：作品中的 Apps Script「系統網址」（system: true）是公開網頁，
+       任何拿到網址的人都能開啟、甚至操作試算表資料。
+       發表前請用無痕視窗打開確認：畫面上沒有真實姓名、薪資、電話等資料，
+       也不能被陌生人改壞。若不確定，把下面改成 false，網站就不會顯示這兩個按鈕。 */
+  showSystemLinks: true,
+
   form: {
     endpoint: 'https://script.google.com/macros/s/AKfycbymaU_YiAkBk10-ckes334kaHvUMeri9mGgFLWI3h-w0Ox3I7ZoTudb5sbp-IMeCom5/exec'
   },
@@ -184,35 +191,87 @@ window.MINDY_DATA = {
      sec = 建議講述秒數（只用於講稿提示，不會自動換頁）、note = 講稿
      t、d 的排版小技巧：\n 換行、\n\n 分段、[[文字]] 用強調色標示
      ------------------------------------------------------------------- */
+  /* 網站導覽的時間（秒）：簡報最後一頁按「開始瀏覽網站」後，可選擇是否帶大家快速看網站 */
+  tourSec: 0, // 網站導覽改為「時間允許」的選擇性收尾，不計入建議時間
+
   slides: [
-    /* 順序：與網頁區塊一致（2026/11/3 調整）
-       自我介紹 → 作品（依課堂日期）→ 學習歷程 → 未來 → 合作方式 → 邀請交流
-       簡報畫面不顯示講稿；完整逐字稿在 docs/發表文字稿.md（會輸出成 docs/發表講稿.pdf）。
-       這裡的 note 只作為重點備忘，修改講稿時請同步更新文字稿。 */
-    { k: 'WELCOME · 01', t: 'Hello, I’m Mindy.', d: '一位持續更新中的跨領域探索者。歡迎來到 MINDY OS。',
-      extra: ['好奇心持續更新', '善於企劃與協作', '用 AI 創造更多可能'], img: 'welcome', sec: 35,
-      note: '自我介紹（鐘敏恩／Mindy）→ 不只是簡報，邀請大家探索 MINDY OS → 這堂課是我最新的一次「版本更新」。' },
-    { k: 'ABOUT ME · 02', t: '不同的經歷，相同的好奇心', d: '幼兒教育、學校行政、門市營運、AI 應用。核心理念：把一個問題釐清，找到方法，再把它落地執行。',
-      extra: ['釐清問題', '尋找方法', '落地執行'], img: 'introducing', sec: 60,
-      note: '四個領域（含新加坡幼教 2 年、門市社群經營）→ 共同點：面對「人」和「流程」→ 核心理念：釐清、方法、落地 → 興趣：美食、旅遊、閱讀、電影、攝影、羽球。' },
-    { k: 'CREATIVE LAB · 03', t: '一個想法，可以有不同的實現方式', d: '依照上課日期：10/20 用 Gemini Canvas 做出 Daily Bloom 的產品介面，10/21–22 為豆豆貼做互動提案與品牌視覺。',
-      extra: ['10/20 Daily Bloom', '10/21 互動提案', '10/22 品牌視覺'], gallery: ['ux', 'brand'], sec: 60,
-      note: 'Daily Bloom：Gemini Canvas，用花朵綻放取代打分數／豆豆貼：Claude 互動提案（數字為示意）、AI 生成海報與商品樣張（LOGO 由組員生成）。' },
-    { k: 'FEATURED PROJECT · 04', t: '當試算表不再只是試算表', d: '10/29–11/02，我最有成就感的作品：把熟悉的營運資料管理，延伸成店員可以操作的系統網頁，再一路做到排班與薪資。',
-      extra: ['主檔與 BOM', '銷售與營收', '排班與薪資'], project: 'data', sec: 80,
-      note: '10/29 第六單元到 11/02 第七單元 → 主檔、BOM → 銷售、庫存、營收毛利 → Apps Script 系統網頁 → 排班與薪資 → 前台與後台的分工 → 課外：回家作業總表。' },
-    { k: 'VERSION HISTORY · 05', t: '從使用 AI，到整合 AI', d: '以前用 AI 查資料、寫文字；現在開始結合 Prompt、試算表、資料架構和網頁原型。',
-      extra: ['AI as a Tool', '→ 反覆試驗與修正', 'AI as a Partner'], img: 'thinking', sec: 60,
-      note: '1.0 既有能力 → 2.0 AI 當助理 → 3.0 串起 Prompt、試算表、資料架構、網頁原型 → 關鍵：從單一任務到整體流程，AI 從工具變夥伴。' },
-    { k: 'ROADMAP · 06', t: '下一個版本，正在路上', d: '最有信心的操作：試算表資料架構，以及用 AI 做互動網頁與簡報。最喜歡的應用：把想法變成可以操作的產品。接下來想深入 AI 工作流程、PM 與 UI/UX。',
-      extra: ['最有信心：資料架構', '最喜歡：想法變產品', '想深入：PM 與 UX'], img: 'ready', sec: 50,
-      note: '最有信心：試算表資料架構、用 AI 做互動網頁與簡報 → 最喜歡：把想法變成可操作的產品 → 想深入：AI 工作流程、PM、UI/UX。' },
-    { k: 'USER MANUAL · 07', t: '如何與 Mindy 合作？', d: '喜歡先釐清目標，也重視直接而尊重的交流、責任感與工作品質。',
-      extra: ['先對齊目標', '尊重不同觀點', '一起把想法落地'], img: 'collaborating', sec: 50,
-      note: '看完作品，這是我的使用說明書 → 四個核心功能 → 合作偏好：對齊目標、直接而尊重、分工清楚 → 更新中：排序優化、思考時間（停下來 = 系統運算中）。' },
-    { k: 'LET’S CONNECT · 08', t: '整合工具\n解決痛點', d: '[[想做的題目：用 AI 架設個人網站]]\n讓每個人的經歷與作品都能被看見\n\n歡迎掃描 QR code，留下名字與專長\n一起組隊！',
-      extra: ['架設個人網站', '一起組隊', '歡迎交流！'], img: 'thanks', qr: 'assets/qr-connect.svg', sec: 50,
-      note: '想做的題目：用 AI 架設個人網站（今天的簡報網站就是例子）→ 邀請同學掃 QR code 組隊 → 結語：整合工具，解決痛點。AI 不光是解決問題的工具……請多多指教，歡迎交流！' }
+    /* ★ 簡報：9 頁「濃縮重點版」（不加外框），合計 380 秒＝6 分 20 秒，保留現場操作緩衝（規定最長 8 分鐘）。
+       口頭介紹以「問題 → 方法 → 結果 → 收穫」為核心；完整逐字稿在 docs/發表文字稿.md（輸出為 docs/發表講稿.pdf）。
+       修改方式：直接改文字即可；layout 是版型名稱，side 是右側會動的角色圖（版面有空位才放）。 */
+    { k: 'WELCOME · 01', layout: 'hero', sec: 30,
+      t: 'Hello,\nI\'m Mindy.', lead: '一個持續更新中的跨領域探索者',
+      tags: ['好奇', '企劃', '跨域', '創造'], img: 'welcome',
+      foot: '今天的簡報，就是我的個人網站 MINDY OS',
+      note: '自我介紹；今天的簡報就是我的網站。' },
+    { k: 'ABOUT ME · 02', layout: 'domains', side: 'introducing', flip: true, sec: 55,
+      t: '不同的經歷，相同的好奇心',
+      items: [
+        { icon: '🧸', name: '幼兒教育', line: '新加坡幼兒華語教師、教保員' },
+        { icon: '🏫', name: '學校行政', line: '實驗教育機構行政教師' },
+        { icon: '🏪', name: '門市營運', line: '店長，社群從 0 到 1' },
+        { icon: '🤖', name: 'AI 應用', line: '青年 AI 實戰養成班' }
+      ],
+      story: { label: '一個小故事', text: '人工點名和請假統計很花時間 → 重新設計流程：學生自主點名，教師更方便管理資料' },
+      foot: '我喜歡從觀察需求開始，一步步改善工作方式',
+      note: '四個領域；學校出勤系統小故事（問題→方法→收穫）。' },
+    { k: 'ABOUT ME · 03', layout: 'flow', side: 'thinking', flip: true, sec: 20,
+      t: '核心理念',
+      items: [
+        { name: '釐清問題', en: 'Clarify', color: '#c99a78' },
+        { name: '尋找方法', en: 'Method', color: '#8fa383' },
+        { name: '落地執行', en: 'Execute', color: '#343b35' }
+      ],
+      foot: '參加動機：用 AI 解決實際工作問題 × 轉型 PM、數位行銷、營運企劃',
+      note: '核心理念；參加動機。' },
+    { k: 'CREATIVE LAB · 04', layout: 'works', sec: 35,
+      t: '一個想法，可以有不同的實現方式',
+      items: [
+        { date: '10/20', name: '日日好日 Daily Bloom', line: 'Gemini Canvas｜用花朵綻放取代打分數', img: 'assets/works/dailybloom-04.webp' },
+        { date: '10/21–22', name: '豆豆貼 品牌與提案', line: 'Claude 互動提案＋AI 品牌視覺', img: 'assets/works/brand-photo-apron.webp' }
+      ],
+      foot: '※ 提案中的數字為示意資料；豆豆貼 LOGO 由組員生成',
+      note: '依上課日期介紹；提醒數字為示意、LOGO 由組員生成。' },
+    { k: 'FEATURED PROJECT · 05', layout: 'featured', sec: 80,
+      t: '從試算表，到 GAS 操作網頁', tag: '★ 主打作品｜營運資料與銷售管理系統｜10/29–11/02',
+      items: [
+        { name: '設計資料架構', line: '商品、原物料、供應商主檔＋配方 BOM', img: 'assets/works/sheet-master.webp' },
+        { name: '做成 GAS 操作網頁', line: '用 Google Apps Script，讓店員直接輸入與查詢', icon: '🖥️', imgNote: '現場可開啟系統示範' },
+        { name: '延伸排班薪資', line: '排班、休假、加班 → 自動算出薪資明細', img: 'assets/works/sheet-payroll.webp' }
+      ],
+      breakthrough: '不再只是「基礎操作」，而是開始設計資料，也思考前台的人要怎麼操作。這正好連結到我過去在門市營運和學校出勤系統的經驗。',
+      note: '問題→方法→結果→收穫；從試算表到 GAS 操作網頁。' },
+    { k: 'VERSION HISTORY · 06', layout: 'compare', side: 'presenting', flip: true, sec: 45,
+      t: '最大的學習收穫',
+      items: [
+        { label: 'BEFORE · 以前', name: 'AI 是工具', line: '查資料、潤飾文字，完成單一任務' },
+        { label: 'AFTER · v3.0 現在', name: 'AI 是夥伴', line: '串起 Prompt、試算表、資料架構與網頁原型' }
+      ],
+      story: { label: 'v3.0 學習轉折', text: '以前請 AI 幫忙找答案；現在練習把需求說清楚、持續修正結果，也用 AI 協助找出程式問題' },
+      foot: '從「完成單一任務」，到「思考整體流程」',
+      note: '前後對照；學習轉折（學習方法）。' },
+    { k: 'ROADMAP · 07', layout: 'profile', side: 'ready', sec: 30,
+      t: '我的 AI 小檔案',
+      items: [
+        { label: '最有信心的操作', name: '試算表資料架構', line: '以及用 AI 做互動網頁與簡報' },
+        { label: '最喜歡的應用', name: '把想法變成產品', line: '從需求一步步做出能用的東西' },
+        { label: '接下來想深入', name: 'AI 工作流程', line: 'PM 與 UI/UX 產品規劃' }
+      ],
+      note: '最有信心、最喜歡的應用、研究方向。' },
+    { k: 'USER MANUAL · 08', layout: 'manual', side: 'collaborating', sec: 20,
+      t: '如何與 Mindy 合作？',
+      items: [
+        { icon: '🎯', name: '需求洞察' }, { icon: '🗓️', name: '企劃整合' },
+        { icon: '💬', name: '協作溝通' }, { icon: '💡', name: '創意實作' }
+      ],
+      foot: '先對齊目標・歡迎直接而尊重的討論',
+      note: '四個核心功能；合作偏好。' },
+    { k: 'LET’S CONNECT · 09', layout: 'connect', sec: 65,
+      t: '一起探索，一起創造', img: 'thanks', qr: 'assets/qr-connect.svg',
+      topic: '用 AI 架設個人網站', topicLine: '讓每個人的經歷與作品都能被看見',
+      roles: '我願意擔任發想與執行者，也樂意擔任合作與支持者。',
+      invite: '歡迎不同領域的朋友交流合作！',
+      thanks: '請多多指教，謝謝大家 ♡',
+      note: '想做的題目與角色；結尾串起：從哪裡出發、AI 帶來的改變、想與誰一起走下去。' }
   ],
 
   /* -------------------------------------------------------------------

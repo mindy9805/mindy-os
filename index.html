@@ -13,10 +13,7 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E">
   <link rel="preload" as="image" href="assets/mindy/mindy-fullbody.webp" media="(min-width: 721px)">
   <link rel="preload" as="image" href="assets/mindy/mindy-welcome-half.webp" media="(max-width: 720px)">
-  <!-- 字體備援：本機字體檔沒有的字，才會從 Google Fonts 下載（粉圓體、思源黑體） -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
+  <!-- 字體：使用 assets/fonts 內建的精簡字型（網站用到的字都已包含），不再額外下載 Google Fonts，iPhone 載入更快、也能離線顯示 -->
   <link rel="stylesheet" href="css/styles.css">
   <!-- 先標記「JavaScript 可用」，讓進場動畫只在 JS 正常時啟用（JS 失敗時內容仍完整顯示） -->
   <script>document.documentElement.classList.add('js');</script>
@@ -162,6 +159,8 @@
       <div class="skillmap-head">
         <div class="eyebrow">SKILL MAP<span class="eb-zh"> · 跨領域能力地圖</span></div>
         <h3 id="skillmapTitle">四個領域，一條主線</h3>
+        <!-- 串起四種經歷的小故事 -->
+        <p class="skillmap-story prose"><span class="story-tag">一個小故事</span>在學校工作時，我發現人工點名和請假統計很花時間，於是重新設計流程，讓學生自主點名，也讓教師更方便管理資料。這讓我發現：我喜歡從觀察需求開始，一步步改善工作方式。</p>
       </div>
       <!-- 能力地圖：每一列分成三段「領域｜經歷｜練就的能力」，內容可直接修改 -->
       <div class="skill-head" aria-hidden="true"><span>領域</span><span>經歷</span><span>練就的能力</span></div>
@@ -272,6 +271,8 @@
       <li class="step reveal"><div class="circle">3.0</div><h3>AI Integration<small class="zh-sub">AI 整合</small></h3><p>Prompt、試算表、資料管理、網頁原型與反覆除錯。</p></li>
       <li class="step reveal"><div class="circle next">4.0</div><h3>Product Builder<small class="zh-sub">產品打造</small></h3><p>下一步：深化 UX、產品規劃與跨域協作。</p></li>
     </ol>
+    <!-- v3.0 的學習轉折 -->
+    <p class="history-reflect prose"><span class="story-tag">v3.0 學習轉折</span>以前遇到問題，我會請 AI 幫忙找答案；現在我開始練習把需求說清楚、持續修正結果，也學會用 AI 協助找出程式問題。</p>
     <div class="journey">
       <div class="card reveal"><div class="eyebrow">BEFORE<span class="eb-zh"> · 以前</span></div><h3>AI as a Tool<small class="zh-sub">AI 是工具</small></h3><p class="muted">我習慣讓 AI 幫我處理文字、資訊和日常工作。</p></div>
       <div class="card card-sage reveal"><div class="eyebrow">AFTER<span class="eb-zh"> · 現在 · 2026.10 →</span></div><h3>AI as a Partner<small class="zh-sub">AI 是夥伴</small></h3><p class="muted">我開始學習結合 AI、資料架構與操作介面，把想法一步步實作。</p></div>
@@ -300,7 +301,7 @@
       <ul class="ai-profile-list">
         <li><span class="ap-label">最有信心的操作</span><b>試算表資料架構</b><b>用 AI 做互動網頁與簡報</b></li>
         <li><span class="ap-label">最喜歡的應用</span><b>把想法變成可以操作的產品</b></li>
-        <li class="ap-topic"><span class="ap-label">想做的題目</span><b>用 AI 架設個人網站</b><small>讓每個人的經歷與作品都能被看見。有興趣的同學，歡迎一起組隊！</small><a class="project-link" href="#connect">一起組隊 ↗</a></li>
+        <li class="ap-topic"><span class="ap-label">想做的題目</span><b>用 AI 架設個人網站</b><small>讓每個人的經歷與作品都能被看見。我願意擔任發想與執行者，也樂意擔任合作與支持者。歡迎一起組隊！</small><a class="project-link" href="#connect">一起組隊 ↗</a></li>
       </ul>
     </div>
   </section>

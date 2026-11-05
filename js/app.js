@@ -214,7 +214,8 @@
 
   /* 作品有線上網址時，顯示「開啟作品」按鈕（另開新分頁） */
   function linkBtn(p) {
-    const list = (p.links || []).slice();
+    // 安全開關關閉時，不顯示 Apps Script 系統網址（system: true）
+    const list = (p.links || []).filter(l => !(l.system && DATA.showSystemLinks === false));
     if (p.link) list.unshift({ label: p.linkLabel || '開啟作品', url: p.link });
     return list.filter(l => /^https?:\/\//.test(l.url || ''))
       .map(l => `<a class="project-link" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.label || '開啟作品')} ↗</a>`).join('');
@@ -227,13 +228,23 @@
   function renderProjects(filter) {
     const box = $('#projects');
     const list = projects.filter(p => filter === 'all' || p.cat === filter);
-    box.innerHTML = list.map(p => `
-      <article class="card project">
+    /* 版面：主打作品佔滿一整列（橫式大卡）；其他作品維持精簡卡片。
+       若某張精簡卡片落單在最後一列，就改成橫式，避免右邊空一塊。 */
+    let col = 0;
+    const layoutClass = list.map((p, i) => {
+      if (p.featured) { col = 0; return ' is-featured'; }
+      const alone = col === 0 && i === list.length - 1;
+      col = (col + 1) % 2;
+      return ' is-compact' + (alone ? ' is-wide' : '');
+    });
+    box.innerHTML = list.map((p, i) => `
+      <article class="card project${layoutClass[i]}">
         <button type="button" class="project-visual" style="background:${esc(colors[p.cat] || '#eee')}" data-project="${esc(p.id)}" aria-label="查看「${esc(p.name)}」專案摘要">${projectCover(p)}</button>
         <div class="project-body">
           ${unitTags(p)}
           <small>${biLabel(p.label)}${p.featured ? ' · <span class="featured-flag">★ FEATURED · 主打作品</span>' : ''}</small>
           <h3>${esc(p.name)}</h3>
+          ${p.featured && p.highlight ? `<p class="feat-highlight">${esc(p.highlight)}</p>` : ''}
           <p>${esc(p.desc)}</p>
           <div class="pills">${(p.tools || []).map(t => `<span class="pill">${esc(t)}</span>`).join('')}</div>
           <span class="project-status">📎 ${esc(p.state || '')}</span>
@@ -266,12 +277,12 @@
     if (!p) return;
     const imgs = p.images || [];
     const gallery = imgs.length
-      ? `<div class="gallery">${imgs.map(im => `<figure><img src="${esc(im.src)}" alt="${esc(im.alt || p.name)}" loading="lazy">${im.caption ? `<figcaption>${esc(im.caption)}</figcaption>` : ''}</figure>`).join('')}</div>`
+      ? `<div class="gallery">${imgs.map(im => `<figure><img src="${esc(im.src)}" alt="${esc(im.alt || p.name)}" loading="lazy">${im.caption ? `<figcaption class="prose">${esc(im.caption)}</figcaption>` : ''}</figure>`).join('')}</div>`
       : `<div class="gallery-placeholder"><div class="concept" style="background:${esc(colors[p.cat] || '#eee')}">${(DATA.conceptArt || {})[p.cat] || ''}</div>📎 ${esc(p.state)}。上方為概念示意圖，並非作品實際截圖。</div>`;
     $('#modalContent').innerHTML = `
       <div class="eyebrow">${biLabel(p.label)}</div>
       <h2 id="modalTitle">${esc(p.name)}</h2>
-      <p>${esc(p.detail)}</p>
+      <p class="prose">${esc(p.detail)}</p>
       <div class="pills">${(p.tools || []).map(t => `<span class="pill">${esc(t)}</span>`).join('')}</div>
       ${unitTags(p)}
       ${linkBtn(p) ? `<p class="modal-link">${linkBtn(p)}</p>` : ''}
@@ -523,7 +534,7 @@
     const IMG = DATA.images || {};
     let current = 0, isOpen = false;
     let startTime = 0, timerId = null;
-    const totalSec = slides.reduce((s, x) => s + (x.sec || 0), 0);
+    const totalSec = slides.reduce((s, x) => s + (x.sec || 0), 0) + (DATA.tourSec || 0); // 簡報＋最後的網站導覽
 
     // 頁碼點點（手機版改顯示「3 / 8」）
     dots.innerHTML = slides.map((s, i) => `<button type="button" data-i="${i}" aria-label="第 ${i + 1} 頁：${esc(s.t)}">${i + 1}</button>`).join('') + '<span class="slide-count" id="slideCount"></span>';
@@ -570,8 +581,125 @@
     window.addEventListener('resize', () => { if (isOpen) fitPills(); });
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (isOpen) fitPills(); });
 
+    /* ---------- 網頁區塊簡報 ----------
+       slide.web = { hash: '#about', parts: ['CSS 選擇器', ...] }
+       parts 會從網站上「複製」對應區塊放進瀏覽器外框；
+       用 { wrap: 'projects', sels: [...] } 可以把多張卡片放進同一個排版容器；
+       hide: ['選擇器'] 可以在簡報中隱藏次要內容，讓字更大。 */
+    const DESIGN_W = 1120;   // 網頁區塊排版的設計寬度，再依畫面大小縮放（越小，投影時字越大）
+    function cloneParts(parts) {
+      const box = document.createElement('div');
+      box.className = 'shell web-content';
+      parts.forEach(part => {
+        const sels = typeof part === 'string' ? [part] : part.sels;
+        const host = typeof part === 'string' ? box : box.appendChild(Object.assign(document.createElement('div'), { className: part.wrap }));
+        sels.forEach(sel => {
+          const el = document.querySelector(sel);
+          if (!el) return;
+          const c = el.cloneNode(true);
+          [c, ...c.querySelectorAll('*')].forEach(n => {
+            n.removeAttribute('id'); n.removeAttribute('for'); n.removeAttribute('aria-controls');
+            if (n.classList) { n.classList.remove('reveal'); n.classList.add('in'); }
+            if (n.tagName === 'IMG') n.loading = 'eager';
+          });
+          c.querySelectorAll('[hidden]').forEach(n => n.remove());
+          host.appendChild(c);
+        });
+      });
+      return box;
+    }
+    /* ---------- 濃縮重點簡報（slide.layout） ----------
+       每一頁只放整理過的重點，內容寫在 js/data.js 的 slides。
+       版型：hero 首頁｜domains 經歷｜flow 理念｜works 作品｜featured 主打作品｜
+             compare 前後對照｜profile 小檔案｜manual 合作｜connect 最後一頁 */
+    function sumHtml(s) {
+      const L = s.layout, it = s.items || [];
+      const img = (src, alt, cls) => src ? `<img class="${cls || ''}" src="${esc(src)}" alt="${esc(alt || '')}">` : '';
+      const head = `<div class="ps-head"><div class="eyebrow">${esc(s.k)}</div>${s.tag ? `<span class="ps-tag">${esc(s.tag)}</span>` : ''}<h2 class="ps-title">${phrases(s.t)}</h2>${s.lead ? `<p class="ps-lead">${esc(s.lead)}</p>` : ''}</div>`;
+      const foot = s.foot ? `<p class="ps-foot">${esc(s.foot)}</p>` : '';
+      // 小故事（About Me）／學習轉折（Version History）：一段短短的說明卡
+      const story = s.story ? `<div class="ps-story"><span class="ps-story-label">${esc(s.story.label)}</span><p>${esc(s.story.text)}</p></div>` : '';
+      // 右側會動的 Mindy（只有版面有空位的頁面才設定 side）
+      // flip: true → 角色左右翻轉，讓手勢／視線朝向左邊的內容
+      const side = s.side && (DATA.images || {})[s.side] ? `<img class="ps-side-img${s.flip ? ' is-flipped' : ''}" src="${esc(DATA.images[s.side])}" alt="Mindy 角色插圖">` : '';
+      let body = '';
+      if (L === 'hero') {
+        // 首頁標題與網站一致：「Hello,」換行「I'm Mindy.」，Mindy. 用綠色
+        return `<div class="ps ps-hero"><div class="ps-hero-text">${head.replace('Mindy.', '<em>Mindy.</em>')}<div class="ps-chips">${(s.tags || []).map(t => `<span>✦ ${esc(t)}</span>`).join('')}</div>${foot}</div>${img((DATA.images || {})[s.img], 'Mindy 揮手打招呼', 'ps-hero-img')}</div>`;
+      }
+      if (L === 'domains' || L === 'manual' || L === 'profile') {
+        body = `<div class="ps-grid ps-${L}">${it.map(x => `<div class="ps-card">${x.icon ? `<span class="ps-icon" aria-hidden="true">${x.icon}</span>` : ''}${x.label ? `<small>${esc(x.label)}</small>` : ''}<b>${esc(x.name)}</b>${x.line ? `<p>${esc(x.line)}</p>` : ''}</div>`).join('')}</div>`;
+      } else if (L === 'flow') {
+        body = `<ol class="ps-flow">${it.map(x => `<li style="--c:${x.color}"><b>${esc(x.name)}</b><small>${esc(x.en)}</small></li>`).join('')}</ol>`;
+      } else if (L === 'works') {
+        body = `<div class="ps-works">${it.map(x => `<div class="ps-work"><div class="ps-shot">${img(x.img, x.name)}</div><div class="ps-work-text"><span class="ps-date">${esc(x.date)}</span><b>${esc(x.name)}</b><p>${esc(x.line)}</p></div></div>`).join('')}</div>`;
+      } else if (L === 'featured') {
+        body = `<ol class="ps-steps">${it.map((x, i) => `<li><span class="ps-no">${i + 1}</span><div class="ps-shot ${x.img ? '' : 'ps-noimg'}">${x.img ? img(x.img, x.name) : `<span class="ps-big-icon" aria-hidden="true">${x.icon || ''}</span><em>${esc(x.imgNote || '')}</em>`}</div><b>${esc(x.name)}</b><p>${esc(x.line)}</p></li>`).join('<li class="ps-arrow" aria-hidden="true">→</li>')}</ol>${s.breakthrough ? `<div class="ps-break"><span class="ps-break-label">學習突破</span><span class="ps-break-text">${esc(s.breakthrough)}</span></div>` : ''}`;
+      } else if (L === 'compare') {
+        body = `<div class="ps-compare">${it.map((x, i) => `<div class="ps-card ${i ? 'after' : ''}"><small>${esc(x.label)}</small><b>${esc(x.name)}</b><p>${esc(x.line)}</p></div>`).join('<span class="ps-arrow" aria-hidden="true">→</span>')}</div>`;
+      } else if (L === 'connect') {
+        return `<div class="ps ps-connect"><div class="ps-connect-text">${head}<div class="ps-topic"><span class="ps-topic-label">想做的題目</span><b>${esc(s.topic)}</b><p>${esc(s.topicLine)}</p>${s.roles ? `<p class="ps-roles">${esc(s.roles)}</p>` : ''}</div><p class="ps-invite">${esc(s.invite)}</p><p class="ps-thanks">${esc(s.thanks)}</p></div><figure class="ps-qr"><img src="${esc(s.qr)}" width="330" height="330" alt="QR code：掃描開啟 MINDY OS 合作填寫區"><figcaption>掃描 QR code<br>留下名字與專長</figcaption></figure>${img((DATA.images || {})[s.img], 'Mindy 雙手放在胸前道謝', 'ps-connect-img')}</div>`;
+      }
+      const main = `${head}${body}${story}${foot}`;
+      return side ? `<div class="ps ps-has-side"><div class="ps-main">${main}</div>${side}</div>` : `<div class="ps">${main}</div>`;
+    }
+
+    function webSlideHtml(s) {
+      const url = 'mindy9805.github.io/mindy-os/' + ((s.web && s.web.hash) || s.hash || '');
+      return `
+        <div class="slide web-slide ${reduceMotion ? '' : 'enter-fade'}">
+          <div class="browser">
+            <div class="browser-bar" aria-hidden="true">
+              <span class="b-dots"><i></i><i></i><i></i></span>
+              <span class="b-tab">${esc(s.tab || s.t)}</span>
+              <span class="b-url">🔒 ${esc(url)}</span>
+            </div>
+            <div class="browser-view"><div class="web-scale"></div></div>
+          </div>
+        </div>`;
+    }
+    /* 依畫面大小縮放網頁區塊，讓整個區塊剛好放得下 */
+    function fitWeb() {
+      const view = $('.browser-view, .sum-view', stage), scaler = $('.web-scale', stage);
+      if (!view || !scaler) return;
+      const phone = window.innerWidth <= 720;
+      const PHONE_SCALE = 0.88;  // 手機：稍微縮小，內容寬度與網頁一致
+      const designW = phone ? view.clientWidth / PHONE_SCALE : DESIGN_W;
+      scaler.style.width = designW + 'px';
+      scaler.style.transform = 'none';
+      const h = scaler.scrollHeight;
+      let scale = phone ? PHONE_SCALE : Math.min(view.clientWidth / designW, (view.clientHeight - 8) / h, 1.6); // 最多放大 1.6 倍
+      scaler.style.transform = `scale(${scale})`;
+      scaler.style.left = Math.max(0, (view.clientWidth - designW * scale) / 2) + 'px';
+      scaler.style.top = phone ? '0px' : Math.max(0, (view.clientHeight - h * scale) / 2) + 'px';
+      view.style.overflowY = phone ? 'auto' : 'hidden';
+      if (phone) scaler.parentElement.style.minHeight = (h * scale) + 'px';
+    }
+    window.addEventListener('resize', () => { if (isOpen) fitWeb(); });
+
     function render(dir) {
       const s = slides[current];
+      if (s.layout) {
+        // 濃縮重點版：整理過的摘要，直接放在簡報畫面（不加瀏覽器外框，字更大），再依畫面大小縮放
+        stage.innerHTML = `<div class="slide sum-slide ${reduceMotion ? '' : 'enter-fade'}"><div class="sum-view"><div class="web-scale"></div></div></div>`;
+        $('.web-scale', stage).innerHTML = sumHtml(s);
+        fitWeb();
+        $$('.web-scale img', stage).forEach(im => { if (!im.complete) im.addEventListener('load', fitWeb, { once: true }); });
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitWeb);
+        afterRender();
+        return;
+      }
+      if (s.web) {
+        stage.innerHTML = webSlideHtml(s);
+        const content = cloneParts(s.web.parts);
+        (s.web.hide || []).forEach(sel => content.querySelectorAll(sel).forEach(n => n.remove())); // 簡報中隱藏次要內容
+        $('.web-scale', stage).appendChild(content);
+        fitWeb();
+        $$('.web-scale img', stage).forEach(im => { if (!im.complete) im.addEventListener('load', fitWeb, { once: true }); });
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitWeb);
+        afterRender();
+        return;
+      }
       stage.innerHTML = `
         <div class="slide ${reduceMotion ? '' : (dir < 0 ? 'enter-prev' : 'enter-next')}">
           <div class="slide-text">
@@ -582,11 +710,14 @@
           </div>
           ${mediaHtml(s)}
         </div>`;
-      stage.scrollTop = 0;
       fitPills();
+      afterRender();
+    }
+    function afterRender() {
+      stage.scrollTop = 0;
       $('#progress').style.width = ((current + 1) / slides.length * 100) + '%';
       $('#prev').disabled = current === 0;
-      $('#next').innerHTML = current === slides.length - 1 ? '回到首頁 ↺' : '下一頁 →';
+      $('#next').innerHTML = current === slides.length - 1 ? '開始瀏覽網站 ↗' : '下一頁 →';
       $$('button', dots).forEach((b, i) => b.setAttribute('aria-current', String(i === current)));
       $('#slideCount').textContent = `${current + 1} / ${slides.length}`;
       if (isOpen) history.replaceState(null, '', '#present-' + (current + 1));
@@ -731,6 +862,7 @@
       if (SKIP.test(parent.nodeName) || (parent.closest && parent.closest('svg'))) return;
       if (parent.classList && parent.classList.contains('cl')) return; // 已處理過
       if (parent.closest && parent.closest('.eb-zh, .ln, .slide-extra')) return; // 不可拆開的標籤、簡報重點方塊
+      if (parent.closest && parent.closest('.prose')) return; // .prose：一般作文排版，文字自然排滿整行，不在標點處提早換行
       const words = toWords(text);
       // 依標點切成子句
       const clauses = [];
@@ -777,13 +909,29 @@
       });
       parent.replaceChild(frag, node);
     };
+    // 不可拆開的英文詞組（例：UI/UX），包成 .nowrap，避免在「/」後面換行
+    const KEEP_TOGETHER = /UI\/UX/g;
+    const keepTogether = node => {
+      const parent = node.parentNode, text = node.nodeValue;
+      if (!parent || !KEEP_TOGETHER.test(text)) return [node];
+      KEEP_TOGETHER.lastIndex = 0;
+      if (SKIP.test(parent.nodeName) || (parent.classList && parent.classList.contains('nowrap'))) return [node];
+      const frag = document.createDocumentFragment(), rest = [];
+      text.split(/(UI\/UX)/).forEach(part => {
+        if (!part) return;
+        if (part === 'UI/UX') { const sp = document.createElement('span'); sp.className = 'nowrap'; sp.textContent = part; frag.appendChild(sp); }
+        else { const t = document.createTextNode(part); frag.appendChild(t); rest.push(t); }
+      });
+      parent.replaceChild(frag, node);
+      return rest;
+    };
     const walk = root => {
-      if (root.nodeType === 3) { processText(root); return; }
+      if (root.nodeType === 3) { keepTogether(root).forEach(processText); return; }
       if (root.nodeType !== 1 || SKIP.test(root.nodeName)) return;
       const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
       const list = [];
       while (tw.nextNode()) list.push(tw.currentNode);
-      list.forEach(processText);
+      list.forEach(n => keepTogether(n).forEach(processText));
     };
     walk(document.body);
     document.documentElement.classList.add('wb'); // 啟用「只在詞間換行」的 CSS
