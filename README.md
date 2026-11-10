@@ -124,3 +124,13 @@ git push -u origin main
 ## 8. 隱私與內容原則
 
 網站不收集任何資料、不使用 Cookie 或追蹤程式（瀏覽器只在本機記住小植物的點擊次數）。不放電話、家庭背景、私人生活。所有作品敘述沿用原稿，未加入未經確認的成果數字；沒有截圖的作品一律標示「概念示意｜非實際截圖」。
+
+---
+
+## 9. Rewire｜重塑大腦的可能（神經可塑性互動學習網站）
+
+同一個儲存庫中另有一個獨立的學習網站，原始碼在 `rewire-app/`（React + TypeScript + Vite），建置結果在 `rewire/`。
+
+- 網址：`https://mindy9805.github.io/mindy-os/rewire/`
+- 開發、測試與部署說明：請看 [`rewire-app/README.md`](rewire-app/README.md)
+- 若要讓 GitHub 在每次推送後自動重新建置，請到 **Settings → Pages → Source** 改選 **GitHub Actions**（作品集首頁會一起部署，不受影響）。
