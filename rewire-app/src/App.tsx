@@ -22,6 +22,9 @@ import PatternHub from './pages/PatternHub';
 import PatternHabitPage from './pages/PatternHabitPage';
 import PatternAssessment from './pages/PatternAssessment';
 import PatternWorkshop from './pages/PatternWorkshop';
+import Habits7Hub from './pages/Habits7Hub';
+import Habits7Page from './pages/Habits7Page';
+import Habits7Plan from './pages/Habits7Plan';
 import ReadingMode from './components/daily/ReadingMode';
 import NotFound from './pages/NotFound';
 
@@ -49,6 +52,10 @@ export default function App() {
                 <Route path="pattern/workshop" element={<PatternWorkshop />} />
                 <Route path="pattern/:habitId" element={<PatternHabitPage />} />
                 <Route path="habits" element={<Navigate to="/pattern" replace />} />
+                {/* 7 Habits｜高效能生活實踐 */}
+                <Route path="habits7" element={<Habits7Hub />} />
+                <Route path="habits7/plan" element={<Habits7Plan />} />
+                <Route path="habits7/:habitId" element={<Habits7Page />} />
                 <Route path="journal" element={<Journal />} />
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="references" element={<References />} />

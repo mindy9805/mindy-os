@@ -427,6 +427,158 @@ export interface PatternChallengeState {
   progress: Partial<Record<PatternHabitId, Record<string, PatternDayRecord>>>;
 }
 
+/* ========== 7 Habits｜高效能生活實踐 ========== */
+
+export type H7Id = 'proactive' | 'end' | 'first' | 'winwin' | 'understand' | 'synergize' | 'renew';
+
+/** 章節學習狀態：未記錄代表「未開始」 */
+export interface H7Progress {
+  status: 'learning' | 'done';
+  startedAt: string;
+  completedAt?: string;
+}
+
+/** 每個習慣的三題自我評估（1–5） */
+export interface H7SelfCheck {
+  id: string;
+  habitId: H7Id;
+  date: string;
+  answers: Record<string, number>;
+  createdAt: string;
+}
+
+/** 工具 1：關注圈與影響圈 */
+export type CircleZone = 'control' | 'influence' | 'outside';
+export interface CircleEntry {
+  id: string;
+  problem: string;
+  items: { id: string; text: string; zone: CircleZone }[];
+  actionItemId: string;
+  commitmentId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** 工具 2：人生羅盤（單一物件） */
+export interface CompassArea {
+  values: string;
+  why: string;
+  oneYear: string;
+  adjust: string;
+  next: string;
+}
+export interface LifeCompass {
+  areas: Record<string, CompassArea>;
+  vision: string;
+  keyword: string;
+  goals: { id: string; text: string; plan: string; done: boolean }[];
+  updatedAt: string;
+}
+
+/** 工具 3：四象限任務與本週三件要事 */
+export interface QuadrantTask {
+  id: string;
+  title: string;
+  quadrant: 1 | 2 | 3 | 4;
+  due: string;
+  done: boolean;
+  note: string;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface Big3Week {
+  /** id 為該週星期一的日期（YYYY-MM-DD） */
+  id: string;
+  items: { id: string; text: string; when: string; done: boolean }[];
+  updatedAt: string;
+}
+
+/** 工具 4：雙贏協商工作坊 */
+export interface Negotiation {
+  id: string;
+  situation: string;
+  myNeeds: string;
+  theirNeeds: string;
+  commonGoal: string;
+  boundaries: string;
+  flexible: string;
+  options: { id: string; text: string; mine: number; theirs: number; feasible: number }[];
+  note: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** 工具 5：同理溝通模擬器的練習紀錄 */
+export interface EmpathyLog {
+  id: string;
+  scenarioId: string;
+  choice: number;
+  createdAt: string;
+}
+
+/** 工具 6：團隊合作思考板 */
+export type BoardZone = 'problem' | 'goal' | 'stakeholders' | 'views' | 'resources' | 'conflicts' | 'solutions' | 'next';
+export interface TeamBoard {
+  id: string;
+  title: string;
+  cards: { id: string; zone: BoardZone; text: string }[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** 工具 7：四維成長儀表板 */
+export type RenewDim = 'physical' | 'mental' | 'spiritual' | 'social';
+export interface RenewalSettings {
+  /** 使用者自訂的重視程度（1–5），不強制相同權重 */
+  weights: Record<RenewDim, number>;
+  goals: Record<RenewDim, string>;
+  /** 價值與靈性面向可依個人信仰或非宗教價值觀自訂名稱 */
+  spiritualLabel: string;
+}
+export interface RenewalCheck {
+  id: string;
+  weekKey: string;
+  scores: Record<RenewDim, number>; // 1–10 自評
+  reflection: string;
+  adjustment: string;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface RenewalHabit {
+  id: string;
+  dim: RenewDim;
+  text: string;
+  active: boolean;
+  createdAt: string;
+}
+export interface RenewalHabitLog {
+  id: string;
+  habitId: string;
+  date: string;
+}
+export interface RestLog {
+  id: string;
+  date: string;
+  kind: string;
+  minutes: number;
+  note: string;
+  createdAt: string;
+}
+
+/** 21 天七習慣探索計畫 */
+export interface H7PlanDay {
+  completed: boolean;
+  completedAt?: string;
+  reflection: string;
+  actionPlan: string;
+  updatedAt?: string;
+}
+export interface H7Plan {
+  startedAt: string;
+  days: Record<string, H7PlanDay>;
+  finalReview: string;
+}
+
 /** 反向選擇紀錄：一次「選自律、選進步、選自由」的具體小選擇 */
 export interface CounterChoice {
   id: string;
@@ -466,6 +618,26 @@ export interface AppData {
   commitmentLogs: CommitmentLog[];
   workshops: Workshop[];
   patternChallenge: PatternChallengeState;
+  /* 7 Habits */
+  h7Progress: Partial<Record<H7Id, H7Progress>>;
+  h7Quizzes: Partial<Record<H7Id, QuizResult>>;
+  h7SelfChecks: H7SelfCheck[];
+  circles: CircleEntry[];
+  lifeCompass: LifeCompass;
+  quadrantTasks: QuadrantTask[];
+  big3Weeks: Big3Week[];
+  negotiations: Negotiation[];
+  empathyLogs: EmpathyLog[];
+  empathyFavorites: string[];
+  teamBoards: TeamBoard[];
+  renewalSettings: RenewalSettings;
+  renewalChecks: RenewalCheck[];
+  renewalHabits: RenewalHabit[];
+  renewalHabitLogs: RenewalHabitLog[];
+  restLogs: RestLog[];
+  h7Plan: H7Plan;
+  /** 資料結構修訂號：新增模組時遞增，讀取舊資料時自動補齊預設值 */
+  revision: number;
   /** 神經道路模擬器累積次數（概念示意） */
   neuralReps: number;
 }
@@ -490,4 +662,15 @@ export type CollectionKey =
   | 'patternEntries'
   | 'microCommitments'
   | 'commitmentLogs'
-  | 'workshops';
+  | 'workshops'
+  | 'h7SelfChecks'
+  | 'circles'
+  | 'quadrantTasks'
+  | 'big3Weeks'
+  | 'negotiations'
+  | 'empathyLogs'
+  | 'teamBoards'
+  | 'renewalChecks'
+  | 'renewalHabits'
+  | 'renewalHabitLogs'
+  | 'restLogs';

@@ -5,7 +5,7 @@
  *   避免舊資料或手動修改造成網站當機。
  * - 匯入備份時使用 validateBackup()，格式錯誤會回傳清楚的中文錯誤訊息。
  */
-import type { AppData, ChapterId, CollectionKey, PatternChallengeState, PatternHabitId, Settings } from '../types';
+import type { AppData, ChapterId, CollectionKey, H7Id, H7Plan, LifeCompass, PatternChallengeState, PatternHabitId, RenewalSettings, RenewDim, Settings } from '../types';
 
 export const STORAGE_KEY = 'rewire:v1';
 
@@ -31,7 +31,38 @@ export const COLLECTION_KEYS: CollectionKey[] = [
   'microCommitments',
   'commitmentLogs',
   'workshops',
+  'h7SelfChecks',
+  'circles',
+  'quadrantTasks',
+  'big3Weeks',
+  'negotiations',
+  'empathyLogs',
+  'teamBoards',
+  'renewalChecks',
+  'renewalHabits',
+  'renewalHabitLogs',
+  'restLogs',
 ];
+
+/**
+ * 資料結構修訂紀錄（version 仍為 1，代表備份格式相容）：
+ * - revision 1：初版（章節、筆記、14 天挑戰、工具）
+ * - revision 2：Daily Rewire、Break the Pattern
+ * - revision 3：7 Habits｜高效能生活實踐
+ * 讀取任何舊修訂的資料都會由 normalize() 補齊新欄位，不會刪除既有紀錄。
+ */
+export const CURRENT_REVISION = 3;
+
+export const H7_IDS: H7Id[] = ['proactive', 'end', 'first', 'winwin', 'understand', 'synergize', 'renew'];
+export const RENEW_DIMS: RenewDim[] = ['physical', 'mental', 'spiritual', 'social'];
+
+export const emptyCompass = (): LifeCompass => ({ areas: {}, vision: '', keyword: '', goals: [], updatedAt: '' });
+export const emptyRenewalSettings = (): RenewalSettings => ({
+  weights: { physical: 3, mental: 3, spiritual: 3, social: 3 },
+  goals: { physical: '', mental: '', spiritual: '', social: '' },
+  spiritualLabel: '價值與意義',
+});
+export const emptyH7Plan = (): H7Plan => ({ startedAt: '', days: {}, finalReview: '' });
 
 export const PATTERN_IDS: PatternHabitId[] = ['approval', 'convenience', 'impress', 'solitude', 'promises', 'environment', 'shortterm'];
 
@@ -74,6 +105,24 @@ export function createEmptyData(): AppData {
     commitmentLogs: [],
     workshops: [],
     patternChallenge: emptyPatternChallenge(),
+    h7Progress: {},
+    h7Quizzes: {},
+    h7SelfChecks: [],
+    circles: [],
+    lifeCompass: emptyCompass(),
+    quadrantTasks: [],
+    big3Weeks: [],
+    negotiations: [],
+    empathyLogs: [],
+    empathyFavorites: [],
+    teamBoards: [],
+    renewalSettings: emptyRenewalSettings(),
+    renewalChecks: [],
+    renewalHabits: [],
+    renewalHabitLogs: [],
+    restLogs: [],
+    h7Plan: emptyH7Plan(),
+    revision: CURRENT_REVISION,
     neuralReps: 0,
   };
 }
@@ -179,6 +228,60 @@ export function normalize(input: unknown): AppData {
       progress,
     };
   }
+  // ===== 7 Habits =====
+  const str = (v: unknown) => (typeof v === 'string' ? v : '');
+  if (isObj(input.h7Progress)) {
+    for (const id of H7_IDS) {
+      const p = input.h7Progress[id];
+      if (isObj(p) && (p.status === 'learning' || p.status === 'done')) {
+        base.h7Progress[id] = { status: p.status, startedAt: str(p.startedAt), completedAt: typeof p.completedAt === 'string' ? p.completedAt : undefined };
+      }
+    }
+  }
+  if (isObj(input.h7Quizzes)) {
+    for (const id of H7_IDS) {
+      const q = input.h7Quizzes[id];
+      if (isObj(q) && typeof q.score === 'number' && typeof q.total === 'number' && isObj(q.answers)) base.h7Quizzes[id] = q as unknown as AppData['h7Quizzes'][H7Id];
+    }
+  }
+  if (isObj(input.lifeCompass)) {
+    const c = input.lifeCompass;
+    const areas: LifeCompass['areas'] = {};
+    if (isObj(c.areas)) for (const [k, v] of Object.entries(c.areas)) if (isObj(v)) areas[k] = { values: str(v.values), why: str(v.why), oneYear: str(v.oneYear), adjust: str(v.adjust), next: str(v.next) };
+    base.lifeCompass = {
+      areas,
+      vision: str(c.vision),
+      keyword: str(c.keyword),
+      goals: Array.isArray(c.goals) ? c.goals.filter(isObj).map((g) => ({ id: str(g.id) || Math.random().toString(36).slice(2), text: str(g.text), plan: str(g.plan), done: g.done === true })) : [],
+      updatedAt: str(c.updatedAt),
+    };
+  }
+  if (Array.isArray(input.empathyFavorites)) base.empathyFavorites = [...new Set(input.empathyFavorites.filter((x): x is string => typeof x === 'string'))];
+  if (isObj(input.renewalSettings)) {
+    const r = input.renewalSettings;
+    const def = emptyRenewalSettings();
+    const weights = { ...def.weights };
+    const goals = { ...def.goals };
+    for (const d of RENEW_DIMS) {
+      const w = isObj(r.weights) ? r.weights[d] : undefined;
+      if (typeof w === 'number' && w >= 1 && w <= 5) weights[d] = Math.round(w);
+      if (isObj(r.goals)) goals[d] = str(r.goals[d]);
+    }
+    base.renewalSettings = { weights, goals, spiritualLabel: str(r.spiritualLabel) || def.spiritualLabel } as RenewalSettings;
+  }
+  base.renewalChecks = base.renewalChecks.map((c) => ({ ...c, scores: { physical: 0, mental: 0, spiritual: 0, social: 0, ...(isObj(c.scores) ? c.scores : {}) } as Record<RenewDim, number> }));
+  if (isObj(input.h7Plan)) {
+    const p = input.h7Plan;
+    const days: H7Plan['days'] = {};
+    if (isObj(p.days)) {
+      for (const [k, v] of Object.entries(p.days)) {
+        const n = Number(k);
+        if (Number.isInteger(n) && n >= 1 && n <= 21 && isObj(v)) days[k] = { completed: v.completed === true, completedAt: typeof v.completedAt === 'string' ? v.completedAt : undefined, reflection: str(v.reflection), actionPlan: str(v.actionPlan), updatedAt: typeof v.updatedAt === 'string' ? v.updatedAt : undefined };
+      }
+    }
+    base.h7Plan = { startedAt: str(p.startedAt), days, finalReview: str(p.finalReview) };
+  }
+  base.revision = CURRENT_REVISION;
   if (typeof input.neuralReps === 'number' && input.neuralReps >= 0) base.neuralReps = Math.floor(input.neuralReps);
   return base;
 }

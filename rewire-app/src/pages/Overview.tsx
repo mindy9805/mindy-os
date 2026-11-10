@@ -7,6 +7,8 @@ import { chapterStats, challengeStats, dailyStats } from '../lib/stats';
 import DailyRewireSection from '../components/daily/DailyRewireSection';
 import { PATTERN_MODULE, PATTERN_SUBTITLE, PATTERN_TITLE } from '../content/breakPattern';
 import { FocusPicker, PatternClosing } from '../components/pattern/shared';
+import { StageMap } from '../components/habits7/shared';
+import { H7_MODULE, H7_SUBTITLE, H7_TITLE } from '../content/habits7';
 import { ProgressBar } from '../components/ui/basics';
 
 const paths = [
@@ -76,6 +78,18 @@ export default function Overview() {
         <div className="mt-5 flex flex-wrap gap-2">
           <Link to="/pattern/assessment" className="btn-primary">做 21 題自我覺察評估 <ArrowRight className="h-4 w-4" aria-hidden /></Link>
           <Link to="/pattern" className="btn-secondary">認識七個習慣</Link>
+        </div>
+      </section>
+
+      {/* 7 Habits：三階段學習地圖 */}
+      <section aria-labelledby="h7-h">
+        <p className="font-display text-xs uppercase tracking-[0.25em] text-accent">{H7_MODULE}</p>
+        <h2 id="h7-h" className="mt-2 font-serif text-2xl font-bold sm:text-3xl">{H7_TITLE}</h2>
+        <p className="mb-4 mt-2 text-muted">{H7_SUBTITLE}</p>
+        <StageMap />
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link to="/habits7" className="btn-primary">進入 7 Habits 學習總覽 <ArrowRight className="h-4 w-4" aria-hidden /></Link>
+          <Link to="/habits7/plan" className="btn-secondary">21 天七習慣探索計畫</Link>
         </div>
       </section>
 

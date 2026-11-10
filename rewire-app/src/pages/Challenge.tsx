@@ -198,6 +198,7 @@ export default function Challenge() {
           </button>
         ))}
       </div>
+      <p className="-mt-3 mb-6 text-sm text-muted">另有獨立的學習方案：<Link to="/habits7/plan" className="text-accent underline">21 天七習慣探索計畫</Link>（進度與這裡的挑戰分開保存）。</p>
       <div role="tabpanel">{type === 'pattern' ? <PatternChallenge /> : <NeuroChallenge />}</div>
     </div>
   );

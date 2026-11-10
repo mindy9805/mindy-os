@@ -9,6 +9,8 @@ import { affirmationMap } from '../content/dailyRewire';
 import { formatDate, formatDateTime } from './date';
 import { MOODS } from '../components/ui/basics';
 import { patternHabits, patternMap } from '../content/breakPattern';
+import { compassAreas, h7Habits, h7Map, planDays, quadrants, renewDims } from '../content/habits7';
+import { selfCheckAverage } from './habits7';
 import { scoreAssessment } from './pattern';
 
 const moodText = (m: number) => MOODS.find((x) => x.v === m)?.label ?? '未填';
@@ -124,8 +126,46 @@ export function patternToMarkdown(d: AppData): string {
   return L.join('\n');
 }
 
+/** 7 Habits：學習進度、願景、四象限、協商、同理、思考板、四維成長、21 天計畫 */
+export function habits7ToMarkdown(d: AppData): string {
+  const L = ['# 7 Habits｜高效能生活實踐 紀錄', ''];
+  L.push('## 學習進度', '', ...h7Habits.map((h) => `- 習慣${h.no}「${h.title}」：${d.h7Progress[h.id]?.status === 'done' ? '已完成' : d.h7Progress[h.id] ? '學習中' : '未開始'}${d.h7Quizzes[h.id] ? `（測驗 ${d.h7Quizzes[h.id]!.score}/${d.h7Quizzes[h.id]!.total}）` : ''}`), '');
+  if (d.h7SelfChecks.length) L.push('## 自我評估', '', ...d.h7SelfChecks.map((c) => `- ${formatDate(c.date)}｜${h7Map[c.habitId].title}：平均 ${selfCheckAverage(c.answers)}／5`), '');
+  for (const c of d.circles) L.push(`## 關注圈與影響圈：${c.problem}`, '', ...c.items.map((i) => `- [${i.zone === 'control' ? '能控制' : i.zone === 'influence' ? '能影響' : '超出控制'}] ${i.text}`), '');
+  const lc = d.lifeCompass;
+  if (lc.vision || lc.keyword || lc.goals.length || Object.keys(lc.areas).length) {
+    L.push('## 人生羅盤', '');
+    if (lc.vision) L.push(`**個人願景宣言**：${lc.vision}`, '');
+    if (lc.keyword) L.push(`**年度關鍵字**：${lc.keyword}`, '');
+    for (const a of compassAreas) {
+      const v = lc.areas[a.id];
+      if (v && Object.values(v).some((x) => x.trim())) L.push(`### ${a.label}`, `- 重視：${v.values}`, `- 為什麼：${v.why}`, `- 一年後：${v.oneYear}`, `- 需要調整：${v.adjust}`, `- 下一步：${v.next}`, '');
+    }
+    if (lc.goals.length) L.push('### 年度目標', ...lc.goals.map((g) => `- ${g.done ? '✅' : '⬜'} ${g.text}${g.plan ? `（計畫：${g.plan.replace(/\n/g, ' ')}）` : ''}`), '');
+  }
+  if (d.quadrantTasks.length) {
+    L.push('## 四象限任務', '');
+    for (const q of quadrants) L.push(`### ${q.title}：${q.desc}`, ...d.quadrantTasks.filter((t) => t.quadrant === q.q).map((t) => `- ${t.done ? '✅' : '⬜'} ${t.title}${t.due ? `（截止 ${t.due}）` : ''}${t.note ? `｜${t.note}` : ''}`), '');
+  }
+  for (const w of d.big3Weeks) L.push(`## 本週三件要事（${w.id} 起）`, ...w.items.map((i) => `- ${i.done ? '✅' : '⬜'} ${i.text}${i.when ? `（${i.when}）` : ''}`), '');
+  for (const n of d.negotiations) L.push(`## 雙贏協商：${n.situation}`, `- 我的需求：${n.myNeeds}`, `- 對方可能的需求：${n.theirNeeds}`, `- 共同目標：${n.commonGoal}`, `- 界線：${n.boundaries}`, ...n.options.map((o) => `- 方案：${o.text}（我 ${o.mine}／對方 ${o.theirs}／可行性 ${o.feasible}）`), '');
+  if (d.empathyFavorites.length) L.push('## 收藏的同理句型', ...d.empathyFavorites.map((p) => `- ${p}`), '');
+  for (const b of d.teamBoards) L.push(`## 團隊合作思考板：${b.title}`, ...b.cards.map((c) => `- [${c.zone}] ${c.text}`), '');
+  if (d.renewalChecks.length) {
+    const label = (id: string) => (id === 'spiritual' ? d.renewalSettings.spiritualLabel : renewDims.find((x) => x.id === id)?.label);
+    L.push('## 四維成長自評', '', ...[...d.renewalChecks].sort((a, b) => b.weekKey.localeCompare(a.weekKey)).map((c) => `- ${c.weekKey} 週：${renewDims.map((x) => `${label(x.id)} ${c.scores[x.id]}`).join('、')}${c.reflection ? `｜${c.reflection.replace(/\n/g, ' ')}` : ''}`), '');
+  }
+  if (d.restLogs.length) L.push('## 休息與恢復', ...d.restLogs.map((r) => `- ${r.date}｜${r.kind} ${r.minutes} 分鐘${r.note ? `｜${r.note}` : ''}`), '');
+  const days = Object.keys(d.h7Plan.days);
+  if (days.length || d.h7Plan.finalReview) {
+    L.push('## 21 天七習慣探索計畫', '', ...planDays.filter((p) => d.h7Plan.days[String(p.day)]).map((p) => { const r = d.h7Plan.days[String(p.day)]; return `- Day ${p.day} ${r.completed ? '✅' : '⬜'} ${p.title}${r.reflection ? `｜反思：${r.reflection.replace(/\n/g, ' ')}` : ''}${r.actionPlan ? `｜計畫：${r.actionPlan.replace(/\n/g, ' ')}` : ''}`; }));
+    if (d.h7Plan.finalReview) L.push('', `**課程回顧**：${d.h7Plan.finalReview}`);
+  }
+  return L.join('\n');
+}
+
 export function allToMarkdown(d: AppData): string {
-  return [notesToMarkdown(d), journalToMarkdown(d), challengeToMarkdown(d), dailyToMarkdown(d), patternToMarkdown(d)].join('\n\n---\n\n');
+  return [notesToMarkdown(d), journalToMarkdown(d), challengeToMarkdown(d), dailyToMarkdown(d), patternToMarkdown(d), habits7ToMarkdown(d)].join('\n\n---\n\n');
 }
 
 export const stamp = () => new Date().toISOString().slice(0, 10);

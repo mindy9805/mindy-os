@@ -43,6 +43,25 @@ describe('Break the Pattern 資料', () => {
   });
 });
 
+describe('7 Habits 資料與版本相容', () => {
+  it('舊修訂（沒有 7 Habits 欄位）的資料可正常讀取並補齊預設值，既有紀錄不遺失', () => {
+    const old = { version: 1, notes: [{ id: 'n', content: 'x', tags: [] }], patternFocus: ['approval'] };
+    const d = normalize(old);
+    expect(d.notes).toHaveLength(1);
+    expect(d.patternFocus).toEqual(['approval']);
+    expect(d.quadrantTasks).toEqual([]);
+    expect(d.lifeCompass.goals).toEqual([]);
+    expect(d.renewalSettings.weights.physical).toBe(3);
+    expect(d.revision).toBe(3);
+  });
+  it('權重只接受 1–5，21 天計畫只保留 1–21 天', () => {
+    const d = normalize({ renewalSettings: { weights: { physical: 9, mental: 5 } }, h7Plan: { days: { '21': { completed: true }, '22': {} } }, h7Progress: { proactive: { status: 'done' }, bad: { status: 'done' } } });
+    expect(d.renewalSettings.weights).toEqual({ physical: 3, mental: 5, spiritual: 3, social: 3 });
+    expect(Object.keys(d.h7Plan.days)).toEqual(['21']);
+    expect(Object.keys(d.h7Progress)).toEqual(['proactive']);
+  });
+});
+
 describe('validateBackup', () => {
   it('接受本網站匯出的備份', () => {
     const data = createEmptyData();

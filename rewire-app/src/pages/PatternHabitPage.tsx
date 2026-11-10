@@ -17,6 +17,7 @@ import AffirmationCard from '../components/daily/AffirmationCard';
 import PatternTool from '../components/pattern/PatternTool';
 import PracticeAffirmation from '../components/pattern/PracticeAffirmation';
 import { HabitIcon } from '../components/pattern/shared';
+import { h7Map, recommendationRules } from '../content/habits7';
 import { DeleteButton } from '../components/pattern/EntryList';
 import { nowIso, uid } from '../lib/id';
 import { formatDate, toDateKey } from '../lib/date';
@@ -151,6 +152,21 @@ export default function PatternHabitPage() {
         <h2 id="aff-h" className="mb-4 flex items-center gap-2 text-xl font-bold"><Sparkles className="h-5 w-5 text-accent" aria-hidden />對應的每日心智語句</h2>
         <div className="grid gap-4 md:grid-cols-2">{h.affirmationIds.map((id) => <AffirmationCard key={id} a={affirmationMap[id]} compact />)}</div>
       </section>
+
+      {(() => {
+        const rule = recommendationRules.find((r) => r.patternId === h.id);
+        if (!rule) return null;
+        return (
+          <section aria-labelledby="h7rec-h" className="mt-12 rounded-2xl bg-soft/50 p-5">
+            <h2 id="h7rec-h" className="font-serif text-lg font-bold">延伸學習：7 Habits</h2>
+            <p className="mt-1 text-sm text-muted">{rule.reason}（依公開的推薦規則）</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {rule.habits.map((id) => <Link key={id} to={`/habits7/${id}`} className="btn-secondary btn-sm">習慣{h7Map[id].no}：{h7Map[id].title}</Link>)}
+              {rule.practices.map((p) => <Link key={p.to} to={p.to} className="btn-ghost btn-sm">{p.label}</Link>)}
+            </div>
+          </section>
+        );
+      })()}
 
       <nav aria-label="習慣切換" className="mt-14 grid gap-3 border-t border-line pt-6 sm:grid-cols-2">
         {prev ? <Link to={`/pattern/${prev.id}`} className="card-hover flex items-center gap-2 rounded-2xl border border-line bg-surface p-4"><ChevronLeft className="h-5 w-5 text-accent" aria-hidden /><span><span className="block text-xs text-muted">上一個</span>{prev.title}</span></Link> : <span />}

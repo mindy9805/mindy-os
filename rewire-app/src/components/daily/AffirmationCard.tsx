@@ -12,6 +12,7 @@ import { useToast } from '../ui/Toast';
 import { copyText } from '../../lib/clipboard';
 import { chapterMap } from '../../content/chapters';
 import { patternHabits } from '../../content/breakPattern';
+import { h7Habits } from '../../content/habits7';
 
 export default function AffirmationCard({ a, defaultOpen = false, compact = false }: { a: Affirmation; defaultOpen?: boolean; compact?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
@@ -77,6 +78,9 @@ export default function AffirmationCard({ a, defaultOpen = false, compact = fals
               <div className="mt-1 flex flex-wrap gap-1.5">
                 {patternHabits.filter((h) => h.affirmationIds.includes(a.id)).map((h) => (
                   <Link key={h.id} to={`/pattern/${h.id}`} className="chip hover:bg-sage/40">打破慣性：{h.short}</Link>
+                ))}
+                {h7Habits.filter((h) => h.id !== 'renew' && h.links.affirmationIds.includes(a.id)).map((h) => (
+                  <Link key={h.id} to={`/habits7/${h.id}`} className="chip hover:bg-sage/40">7 Habits：{h.title}</Link>
                 ))}
                 {a.chapterIds.map((id) => (
                   <Link key={id} to={`/learn/${id}`} className="chip hover:bg-sage/40">

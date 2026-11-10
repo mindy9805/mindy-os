@@ -8,6 +8,7 @@ import { BookOpen, ListChecks, CalendarCheck, Sparkles, Award, Lock } from 'luci
 import { useStore } from '../store/AppStore';
 import { chapterStats, challengeStats, dailyStats, milestones, moodTrend, practiceFrequency } from '../lib/stats';
 import PatternDashboard from '../components/pattern/PatternDashboard';
+import H7Dashboard from '../components/habits7/H7Dashboard';
 import { Card, EmptyState, SectionTitle, MOODS } from '../components/ui/basics';
 import { affirmationMap } from '../content/dailyRewire';
 import { chapterLabel } from '../content/chapters';
@@ -116,6 +117,7 @@ export default function Dashboard() {
                   <Bar dataKey="每日語句" stackId="a" fill="#7E9C8C" isAnimationActive={false} />
                   <Bar dataKey="挑戰" stackId="a" fill="#C9A88A" isAnimationActive={false} />
                   <Bar dataKey="打破慣性" stackId="a" fill="#5E7F70" isAnimationActive={false} />
+                  <Bar dataKey="7 習慣" stackId="a" fill="#9FB3C8" isAnimationActive={false} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -145,6 +147,8 @@ export default function Dashboard() {
       </div>
 
       <PatternDashboard />
+
+      <H7Dashboard />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>

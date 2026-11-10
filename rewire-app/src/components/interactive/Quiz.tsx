@@ -3,15 +3,18 @@
  */
 import { useState } from 'react';
 import { CheckCircle2, XCircle, RotateCcw } from 'lucide-react';
-import type { ChapterId, QuizQuestion } from '../../types';
+import type { ChapterId, QuizQuestion, QuizResult } from '../../types';
 import { useStore } from '../../store/AppStore';
 import { useToast } from '../ui/Toast';
 import { nowIso } from '../../lib/id';
 
-export default function Quiz({ chapterId, questions }: { chapterId: ChapterId; questions: QuizQuestion[] }) {
+/**
+ * chapterId：用於章節測驗（存入 quizzes）；也可傳入 saved／onSave 讓其他模組（7 Habits）保存成績。
+ */
+export default function Quiz({ chapterId, questions, saved: savedProp, onSave }: { chapterId: ChapterId | string; questions: QuizQuestion[]; saved?: QuizResult; onSave?: (r: QuizResult) => void }) {
   const { data, update } = useStore();
   const toast = useToast();
-  const saved = data.quizzes[chapterId];
+  const saved = onSave ? savedProp : data.quizzes[chapterId as ChapterId];
   const [answers, setAnswers] = useState<Record<string, number>>(saved?.answers ?? {});
   const [submitted, setSubmitted] = useState(!!saved);
 
@@ -20,7 +23,9 @@ export default function Quiz({ chapterId, questions }: { chapterId: ChapterId; q
 
   const submit = () => {
     if (!allAnswered) return;
-    update((p) => ({ ...p, quizzes: { ...p.quizzes, [chapterId]: { answers, score, total: questions.length, submittedAt: nowIso() } } }));
+    const result = { answers, score, total: questions.length, submittedAt: nowIso() };
+    if (onSave) onSave(result);
+    else update((p) => ({ ...p, quizzes: { ...p.quizzes, [chapterId]: result } }));
     setSubmitted(true);
     toast(`已完成測驗：${score}/${questions.length} 題答對`);
   };
