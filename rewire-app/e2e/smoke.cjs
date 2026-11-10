@@ -472,7 +472,7 @@ const AFF = ['我現在是安全的', '我的大腦可以改變', '我已經足�
     let tasks = (await store(page)).quadrantTasks;
     if (tasks.find((t) => t.title === '回覆廠商信件').quadrant !== 1) throw new Error('拖曳');
     await page.getByRole('button', { name: '編輯任務：預約健康檢查' }).click();
-    await page.getByLabel(/^編輯任務/).fill('預約年度健康檢查');
+    await page.getByRole('textbox', { name: /^編輯任務/ }).fill('預約年度健康檢查');
     await page.getByLabel('截止日期（選填）').fill('2026-11-12');
     await page.getByRole('button', { name: '儲存修改' }).click();
     await page.getByLabel('完成：預約年度健康檢查').check();
