@@ -18,6 +18,7 @@ import Dashboard from './pages/Dashboard';
 import References from './pages/References';
 import DataPage from './pages/DataPage';
 import Daily from './pages/Daily';
+import Habits from './pages/Habits';
 import ReadingMode from './components/daily/ReadingMode';
 import NotFound from './pages/NotFound';
 
@@ -39,6 +40,7 @@ export default function App() {
                 <Route path="lab/:toolId" element={<BrainLab />} />
                 <Route path="challenge" element={<Challenge />} />
                 <Route path="daily" element={<Daily />} />
+                <Route path="habits" element={<Habits />} />
                 <Route path="journal" element={<Journal />} />
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="references" element={<References />} />

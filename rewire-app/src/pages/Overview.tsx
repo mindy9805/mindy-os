@@ -5,6 +5,7 @@ import { chapters } from '../content/chapters';
 import { useStore } from '../store/AppStore';
 import { chapterStats, challengeStats, dailyStats } from '../lib/stats';
 import DailyRewireSection from '../components/daily/DailyRewireSection';
+import { weakeningHabits, WEAKENING_TITLE, WEAKENING_INTRO, WEAKENING_CLOSING } from '../content/weakeningHabits';
 import { ProgressBar } from '../components/ui/basics';
 
 const paths = [
@@ -64,6 +65,26 @@ export default function Overview() {
       </section>
 
       <DailyRewireSection />
+
+      {/* 削弱習慣預覽 */}
+      <section aria-labelledby="weak-h" className="rounded-3xl border border-line bg-surface p-5 sm:p-8">
+        <p className="font-display text-xs uppercase tracking-[0.25em] text-accent">Habit Check-up · 削弱習慣檢視</p>
+        <h2 id="weak-h" className="mt-2 font-serif text-2xl font-bold sm:text-3xl">{WEAKENING_TITLE}</h2>
+        <p className="mt-2 text-muted">{WEAKENING_INTRO.join('')}</p>
+        <ol className="mt-5 grid gap-2 sm:grid-cols-2">
+          {weakeningHabits.map((h, i) => (
+            <li key={h.id}>
+              <Link to={`/habits#h-${h.id}`} className="flex items-center gap-3 rounded-xl bg-soft/50 px-4 py-3 text-sm hover:bg-soft">
+                <span className="font-display text-lg italic text-sage">{i + 1}</span>{h.title}
+              </Link>
+            </li>
+          ))}
+        </ol>
+        <ul className="mt-5 flex flex-wrap gap-2">
+          {WEAKENING_CLOSING.choices.map((c) => <li key={c} className="chip px-3 py-1 text-sm">{c}</li>)}
+        </ul>
+        <Link to="/habits" className="btn-primary mt-5">做一次自我檢視 <ArrowRight className="h-4 w-4" aria-hidden /></Link>
+      </section>
 
       {/* 學習路徑 */}
       <section aria-labelledby="paths-h">

@@ -276,6 +276,25 @@ export interface DailyLog {
   updatedAt: string;
 }
 
+/** 削弱習慣自我檢視：每次檢視的頻率評分（0 從不 ～ 3 幾乎每天） */
+export interface HabitAudit {
+  id: string;
+  date: string; // YYYY-MM-DD
+  ratings: Record<string, number>;
+  focusId: string; // 本週想調整的習慣 id，'' 代表未選
+  note: string;
+  createdAt: string;
+}
+
+/** 反向選擇紀錄：一次「選自律、選進步、選自由」的具體小選擇 */
+export interface CounterChoice {
+  id: string;
+  date: string; // YYYY-MM-DD
+  habitId: string;
+  choice: string;
+  createdAt: string;
+}
+
 export interface AppData {
   version: 1;
   settings: Settings;
@@ -295,6 +314,8 @@ export interface AppData {
   challenge: Record<string, ChallengeDayRecord>;
   dailyLogs: DailyLog[];
   dailyFavorites: number[];
+  habitAudits: HabitAudit[];
+  counterChoices: CounterChoice[];
   /** 神經道路模擬器累積次數（概念示意） */
   neuralReps: number;
 }
@@ -312,4 +333,6 @@ export type CollectionKey =
   | 'sessions'
   | 'identityRewrites'
   | 'selfTalk'
-  | 'dailyLogs';
+  | 'dailyLogs'
+  | 'habitAudits'
+  | 'counterChoices';

@@ -5,6 +5,7 @@
 import type { AppData } from '../types';
 import { isoToDateKey, lastNDays } from './date';
 import { CHAPTER_IDS } from '../store/storage';
+import { weakeningMap, type ChoiceKind } from '../content/weakeningHabits';
 
 export function chapterStats(d: AppData) {
   const completed = CHAPTER_IDS.filter((id) => d.chapters[id]?.completed).length;
@@ -42,7 +43,7 @@ export function dailyStats(d: AppData, today = new Date()) {
 /** 最近 n 天各類練習次數（習慣練習頻率圖） */
 export function practiceFrequency(d: AppData, n = 14, today = new Date()) {
   const days = lastNDays(n, today);
-  const empty = () => ({ 習慣紀錄: 0, 情緒命名: 0, 呼吸練習: 0, 每日語句: 0, 挑戰: 0 });
+  const empty = () => ({ 習慣紀錄: 0, 情緒命名: 0, 呼吸練習: 0, 每日語句: 0, 挑戰: 0, 反向選擇: 0 });
   const map: Record<string, ReturnType<typeof empty>> = Object.fromEntries(days.map((k) => [k, empty()]));
   const add = (iso: string | undefined, key: keyof ReturnType<typeof empty>) => {
     if (!iso) return;
@@ -54,8 +55,9 @@ export function practiceFrequency(d: AppData, n = 14, today = new Date()) {
   d.sessions.forEach((h) => add(h.createdAt, '呼吸練習'));
   d.dailyLogs.filter((l) => l.completedReading).forEach((l) => add(l.date, '每日語句'));
   Object.values(d.challenge).forEach((c) => c.completed && add(c.completedAt, '挑戰'));
+  d.counterChoices.forEach((c) => add(c.date, '反向選擇'));
   const rows = days.map((k) => ({ date: k, ...map[k] }));
-  const total = rows.reduce((s, r) => s + r.習慣紀錄 + r.情緒命名 + r.呼吸練習 + r.每日語句 + r.挑戰, 0);
+  const total = rows.reduce((s, r) => s + r.習慣紀錄 + r.情緒命名 + r.呼吸練習 + r.每日語句 + r.挑戰 + r.反向選擇, 0);
   return { rows, total };
 }
 
@@ -100,5 +102,18 @@ export function milestones(d: AppData): Milestone[] {
     { id: 'm10', label: '行動設計師', desc: '建立第一份 If-Then 計畫', achieved: d.plans.length >= 1 },
     { id: 'm11', label: '自我覺察', desc: '寫下第一篇反思日誌', achieved: d.journal.length >= 1 },
     { id: 'm12', label: '習慣偵探', desc: '留下第一筆習慣紀錄', achieved: d.habitLogs.length >= 1 },
+    { id: 'm13', label: '誠實面對自己', desc: '完成第一次削弱習慣自我檢視', achieved: d.habitAudits.length >= 1 },
+    { id: 'm14', label: '更難被打倒', desc: '累積 10 次反向選擇', achieved: d.counterChoices.length >= 10 },
   ];
+}
+
+/** 反向選擇統計：依「自律／進步／自由」分類，並找出最近一次自我檢視 */
+export function counterChoiceStats(d: AppData) {
+  const byKind: Record<ChoiceKind, number> = { 自律: 0, 進步: 0, 自由: 0 };
+  for (const c of d.counterChoices) {
+    const h = weakeningMap[c.habitId];
+    if (h) byKind[h.kind] += 1;
+  }
+  const latestAudit = [...d.habitAudits].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+  return { total: d.counterChoices.length, byKind, latestAudit };
 }

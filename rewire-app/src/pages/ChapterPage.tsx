@@ -5,10 +5,11 @@
  */
 import { useEffect, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { Bookmark, BookmarkCheck, CheckCircle2, ChevronLeft, ChevronRight, Clock, Target, Lightbulb, Users, Wrench, MessageCircleQuestion, ListChecks, Library, Sparkles, NotebookPen, FlaskConical } from 'lucide-react';
+import { Bookmark, BookmarkCheck, CheckCircle2, ChevronLeft, ChevronRight, Clock, Target, Lightbulb, Users, Wrench, MessageCircleQuestion, ListChecks, Library, Sparkles, NotebookPen, FlaskConical, ShieldCheck } from 'lucide-react';
 import { chapterMap, chapters } from '../content/chapters';
 import { affirmationMap } from '../content/dailyRewire';
 import { getReferences } from '../content/references';
+import { weakeningHabits, choiceMeta } from '../content/weakeningHabits';
 import { useStore } from '../store/AppStore';
 import { useToast } from '../components/ui/Toast';
 import ChapterDiagram from '../components/diagrams/ChapterDiagram';
@@ -53,6 +54,7 @@ export default function ChapterPage() {
   const next = chapters[idx + 1];
   const progress = data.chapters[chapter.id];
   const notes = data.notes.filter((n) => n.chapterId === chapter.id);
+  const relatedHabits = weakeningHabits.filter((h) => h.chapterIds.includes(chapter.id));
   const highlightOf = (source: string) => notes.find((n) => n.kind === 'highlight' && n.source === source);
 
   const toggleHighlight = (source: string, content: string) => {
@@ -211,6 +213,23 @@ export default function ChapterPage() {
           <Sparkles className="h-4 w-4" aria-hidden /> 進入每日朗讀練習
         </Link>
       </Block>
+
+      {relatedHabits.length > 0 && (
+        <Block id="weakening" icon={ShieldCheck} title="日常中的削弱習慣">
+          <p className="-mt-2 mb-4 text-sm text-muted">本章的概念，可以幫助你理解這些看似無害、卻會慢慢削弱紀律與信心的習慣。</p>
+          <ul className="grid gap-3 md:grid-cols-2">
+            {relatedHabits.map((h) => (
+              <li key={h.id}>
+                <Link to={`/habits#h-${h.id}`} className="card-hover block h-full rounded-2xl border border-line bg-surface p-4">
+                  <span className="chip">{choiceMeta[h.kind].slogan}</span>
+                  <span className="mt-2 block font-serif font-bold">{h.title}</span>
+                  <span className="mt-1 block text-sm text-muted">{h.lines[h.lines.length - 1]}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </Block>
+      )}
 
       <Block id="notes" icon={NotebookPen} title="本章筆記">
         <div className="rounded-2xl border border-line bg-surface p-4 sm:p-5">

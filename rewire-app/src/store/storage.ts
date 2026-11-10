@@ -24,6 +24,8 @@ export const COLLECTION_KEYS: CollectionKey[] = [
   'identityRewrites',
   'selfTalk',
   'dailyLogs',
+  'habitAudits',
+  'counterChoices',
 ];
 
 export const defaultSettings: Settings = {
@@ -54,6 +56,8 @@ export function createEmptyData(): AppData {
     challenge: {},
     dailyLogs: [],
     dailyFavorites: [],
+    habitAudits: [],
+    counterChoices: [],
     neuralReps: 0,
   };
 }
@@ -100,6 +104,7 @@ export function normalize(input: unknown): AppData {
   }
   // 標籤欄位一律確保為字串陣列
   base.notes = base.notes.map((n) => ({ ...n, tags: Array.isArray(n.tags) ? n.tags.filter((t) => typeof t === 'string') : [] }));
+  base.habitAudits = base.habitAudits.map((a) => ({ ...a, ratings: isObj(a.ratings) ? a.ratings : {}, focusId: typeof a.focusId === 'string' ? a.focusId : '' }));
   base.journal = base.journal.map((n) => ({ ...n, tags: Array.isArray(n.tags) ? n.tags.filter((t) => typeof t === 'string') : [] }));
 
   if (isObj(input.challenge)) {

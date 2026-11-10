@@ -41,6 +41,11 @@ export default function BrainLab() {
           );
         })}
       </div>
+      <Link to="/habits" className="card-hover mt-3 block rounded-2xl border border-accent/40 bg-soft/50 p-5">
+        <span className="chip">選自律・選進步・選自由</span>
+        <p className="mt-2 font-serif text-lg font-bold">削弱習慣自我檢視</p>
+        <p className="mt-1 text-sm text-muted">檢視不知不覺中削弱紀律與信心的習慣，並記錄每一個反向選擇。</p>
+      </Link>
       <h2 className="mb-3 mt-12 text-xl font-bold">七個神經可塑性實踐工具</h2>
       <ToolCards initial={tool?.id} />
     </div>

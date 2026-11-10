@@ -216,6 +216,31 @@ const AFF = ['我現在是安全的', '我的大腦可以改變', '我已經足�
     await page.locator('a[href^="https://doi.org/"]').first().waitFor();
     await page.getByText('可能過度簡化的說法').first().waitFor();
   });
+  await step('削弱習慣檢視：卡片、科學視角、反向選擇、自我檢視', async () => {
+    await page.goto(BASE + '#/habits');
+    await page.getByRole('heading', { name: '在不知不覺中削弱你的習慣' }).waitFor();
+    if ((await page.locator('article[id^="h-"]').count()) !== 6) throw new Error('卡片數量');
+    const card = page.locator('#h-convenience');
+    await card.getByRole('button', { name: '科學視角與反向練習' }).click();
+    await card.getByText('習得勤勉').waitFor();
+    await card.getByLabel('今天我做了什麼反向選擇？').fill('自己煮晚餐');
+    await card.getByRole('button', { name: '記錄這個選擇' }).click();
+    for (const h of await page.locator('#audit-h ~ form fieldset').all()) await h.getByRole('button', { name: '偶爾' }).click();
+    await page.getByLabel('這週想先調整哪一個？（只選一個就好）').selectOption('solitude');
+    await page.getByRole('button', { name: '儲存自我檢視' }).click();
+    await page.getByText('合計 6/18').waitFor();
+    const s = await store(page);
+    if (s.counterChoices[0].choice !== '自己煮晚餐' || s.habitAudits[0].focusId !== 'solitude') throw new Error('未儲存');
+    await page.getByRole('button', { name: '刪除這個選擇紀錄' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: '刪除' }).click();
+    if ((await store(page)).counterChoices.length !== 0) throw new Error('刪除');
+    await page.getByLabel('今天我做了什麼反向選擇？').last().fill('走路去上班');
+    await page.getByRole('button', { name: '記錄這個選擇' }).last().click();
+    await page.goto(BASE + '#/learn/ch8');
+    await page.getByRole('heading', { name: '日常中的削弱習慣' }).waitFor();
+    await page.getByRole('link', { name: /跟接受平庸的人待在一起/ }).click();
+    await page.waitForURL(/habits/);
+  });
   await step('14 天挑戰：完成、取消、紀錄保留於重新整理後', async () => {
     await page.goto(BASE + '#/challenge?day=3');
     await page.getByLabel('我的紀錄與反思').fill('我發現是焦慮');
@@ -273,6 +298,8 @@ const AFF = ['我現在是安全的', '我的大腦可以改變', '我已經足�
     await page.locator('.recharts-bar').first().waitFor();
     if ((await page.locator('.recharts-bar-rectangle path').count()) < 1) throw new Error('長條圖沒有資料');
     await page.getByText('踏出第一步').waitFor();
+    await page.getByText('誠實面對自己').waitFor();
+    await page.getByText('累計反向選擇 1 次').waitFor();
   });
   await step('主題切換與字體大小', async () => {
     await page.getByRole('button', { name: /^主題：/ }).click();
@@ -326,7 +353,7 @@ const AFF = ['我現在是安全的', '我的大腦可以改變', '我已經足�
   const m = await mctx.newPage();
   m.on('pageerror', (e) => errors.push('mobile: ' + e.message));
   await step('手機版：所有頁面無橫向捲動', async () => {
-    const routes = ['', 'daily', 'learn', 'learn/ch1', 'learn/ch2', 'learn/ch6', 'learn/ch7', 'learn/ch9', 'lab', 'lab/habit-curve', 'challenge', 'journal', 'journal?tab=notes', 'dashboard', 'references', 'data', 'daily/read'];
+    const routes = ['', 'daily', 'learn', 'learn/ch1', 'learn/ch2', 'learn/ch6', 'learn/ch7', 'learn/ch9', 'lab', 'lab/habit-curve', 'challenge', 'journal', 'journal?tab=notes', 'dashboard', 'references', 'data', 'daily/read', 'habits'];
     const bad = [];
     for (const r of routes) {
       await m.goto(BASE + '#/' + r);
@@ -346,7 +373,7 @@ const AFF = ['我現在是安全的', '我的大腦可以改變', '我已經足�
     await m.waitForURL(/challenge/);
   });
   if (process.env.SHOT_DIR) {
-    for (const [r, n] of [['', 'm-home'], ['daily/read', 'm-read'], ['learn/ch1', 'm-ch1'], ['challenge', 'm-challenge']]) {
+    for (const [r, n] of [['habits', 'm-habits'], ['', 'm-home'], ['daily/read', 'm-read'], ['learn/ch1', 'm-ch1'], ['challenge', 'm-challenge']]) {
       await m.goto(BASE + '#/' + r); await m.waitForTimeout(400);
       await m.screenshot({ path: `${process.env.SHOT_DIR}/${n}.png` });
     }

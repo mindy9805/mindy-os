@@ -94,6 +94,13 @@ export default function Challenge() {
           <div className="rounded-2xl bg-soft/60 p-4 text-sm leading-relaxed"><p className="mb-1 font-medium text-accent">具體行動</p>{info.action}</div>
           <div className="rounded-2xl bg-soft/60 p-4 text-sm leading-relaxed"><p className="mb-1 font-medium text-accent">反思問題</p>{info.reflection}</div>
         </div>
+        {(day === 1 || day === 14) && (
+          <p className="mt-3 rounded-xl bg-apricot/25 px-3 py-2 text-sm">
+            {day === 1 ? '不確定從哪個習慣開始？' : '想規劃下一階段？'}先做一次
+            <Link to="/habits" className="mx-1 text-accent underline">削弱習慣自我檢視</Link>
+            ，找出最想調整的一項。
+          </p>
+        )}
         <Link to={`/learn/${info.chapterId}`} className="mt-3 inline-flex items-center gap-1 text-sm text-accent underline">
           <BookOpen className="h-4 w-4" aria-hidden />延伸閱讀：第 {chapterMap[info.chapterId].number} 章 {chapterMap[info.chapterId].title}
         </Link>

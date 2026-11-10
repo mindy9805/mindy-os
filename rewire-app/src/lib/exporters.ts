@@ -8,6 +8,7 @@ import { challengeDays } from '../content/challenge';
 import { affirmationMap } from '../content/dailyRewire';
 import { formatDate, formatDateTime } from './date';
 import { MOODS } from '../components/ui/basics';
+import { auditScale, weakeningHabits, weakeningMap } from '../content/weakeningHabits';
 
 const moodText = (m: number) => MOODS.find((x) => x.v === m)?.label ?? '未填';
 
@@ -68,8 +69,28 @@ export function dailyToMarkdown(d: AppData): string {
   return lines.join('\n');
 }
 
+export function habitsToMarkdown(d: AppData): string {
+  const lines = ['# 削弱習慣自我檢視與反向選擇', ''];
+  [...d.habitAudits].sort((a, b) => b.date.localeCompare(a.date)).forEach((a) => {
+    lines.push(`## ${formatDate(a.date)} 自我檢視`, '');
+    weakeningHabits.forEach((h) => lines.push(`- ${h.title}：${auditScale[a.ratings[h.id] ?? 0]?.label}`));
+    if (a.focusId && weakeningMap[a.focusId]) lines.push(`- 本週專注：${weakeningMap[a.focusId].title}`);
+    if (a.note) lines.push(`- 備註：${a.note.replace(/\n/g, ' ')}`);
+    lines.push('');
+  });
+  if (d.counterChoices.length) {
+    lines.push('## 反向選擇紀錄', '');
+    [...d.counterChoices].sort((a, b) => b.date.localeCompare(a.date)).forEach((c) => {
+      const h = weakeningMap[c.habitId];
+      lines.push(`- ${formatDate(c.date)}｜${h ? `選${h.kind}（${h.title}）` : ''}：${c.choice}`);
+    });
+  }
+  if (!d.habitAudits.length && !d.counterChoices.length) lines.push('（目前沒有紀錄）');
+  return lines.join('\n');
+}
+
 export function allToMarkdown(d: AppData): string {
-  return [notesToMarkdown(d), journalToMarkdown(d), challengeToMarkdown(d), dailyToMarkdown(d)].join('\n\n---\n\n');
+  return [notesToMarkdown(d), journalToMarkdown(d), challengeToMarkdown(d), dailyToMarkdown(d), habitsToMarkdown(d)].join('\n\n---\n\n');
 }
 
 export const stamp = () => new Date().toISOString().slice(0, 10);
