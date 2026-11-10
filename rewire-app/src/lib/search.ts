@@ -7,11 +7,12 @@ import { affirmations } from '../content/dailyRewire';
 import { challengeDays } from '../content/challenge';
 import { patternHabits } from '../content/breakPattern';
 import { h7Habits } from '../content/habits7';
+import { quests, socialStories } from '../content/play';
 import type { AppData } from '../types';
 
 export interface SearchResult {
   key: string;
-  type: '章節' | '概念' | '每日語句' | '14 天挑戰' | '打破慣性' | '7 Habits' | '我的筆記' | '我的日誌';
+  type: '章節' | '概念' | '每日語句' | '14 天挑戰' | '打破慣性' | '7 Habits' | '輕鬆探索' | '我的筆記' | '我的日誌';
   title: string;
   snippet: string;
   to: string;
@@ -80,6 +81,8 @@ const staticDocs: Doc[] = (() => {
       text: [h.title, h.en, h.core, ...h.definition, ...h.situations.map((s) => s.text), ...h.misconceptions.map((m) => `${m.myth} ${m.better}`), ...h.concepts.map((c) => `${c.term} ${c.text}`), ...h.strategies, h.toolTitle].join(' '),
     });
   }
+  for (const s of socialStories) docs.push({ key: `story-${s.id}`, type: '輕鬆探索', title: `人際小劇場：${s.title}`, snippet: s.scene, to: `/play/stories?story=${s.id}`, text: [s.title, s.theme, s.scene, ...s.options.map((o) => o.text)].join(' ') });
+  for (const q of quests) docs.push({ key: `quest-${q.id}`, type: '輕鬆探索', title: `輕冒險：${q.title}`, snippet: q.depths.short, to: '/play/quest', text: [q.title, ...Object.values(q.depths)].join(' ') });
   return docs;
 })();
 

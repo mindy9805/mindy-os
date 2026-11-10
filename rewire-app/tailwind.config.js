@@ -30,10 +30,21 @@ export default {
       keyframes: {
         'fade-up': { from: { opacity: '0', transform: 'translateY(8px)' }, to: { opacity: '1', transform: 'none' } },
         twinkle: { '0%,100%': { opacity: '0.25' }, '50%': { opacity: '1' } },
+        // 輕遊戲化動畫：皆為短暫、柔和的動作；系統「減少動畫」時以 motion-safe 自動停用
+        'buddy-float': { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-4px)' } },
+        'buddy-hop': { '0%,100%': { transform: 'translateY(0)' }, '30%': { transform: 'translateY(-10px)' }, '60%': { transform: 'translateY(0)' } },
+        pop: { '0%': { opacity: '0', transform: 'scale(.92)' }, '100%': { opacity: '1', transform: 'scale(1)' } },
+        wiggle: { '0%,100%': { transform: 'rotate(0)' }, '92%': { transform: 'rotate(0)' }, '95%': { transform: 'rotate(-4deg)' }, '98%': { transform: 'rotate(4deg)' } },
+        grow: { '0%': { transform: 'scaleY(.3)', opacity: '0' }, '100%': { transform: 'scaleY(1)', opacity: '1' } },
       },
       animation: {
         'fade-up': 'fade-up .4s ease-out both',
         twinkle: 'twinkle 3s ease-in-out infinite',
+        'buddy-float': 'buddy-float 4s ease-in-out infinite',
+        'buddy-hop': 'buddy-hop .9s ease-out 2',
+        pop: 'pop .35s ease-out both',
+        wiggle: 'wiggle 4s ease-in-out infinite',
+        grow: 'grow .6s ease-out both',
       },
     },
   },

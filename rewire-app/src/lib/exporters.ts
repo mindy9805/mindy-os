@@ -11,6 +11,7 @@ import { MOODS } from '../components/ui/basics';
 import { patternHabits, patternMap } from '../content/breakPattern';
 import { compassAreas, h7Habits, h7Map, planDays, quadrants, renewDims } from '../content/habits7';
 import { selfCheckAverage } from './habits7';
+import { badges, moodCardMap, questMap, storyMap, DEPTH_LABEL } from '../content/play';
 import { scoreAssessment } from './pattern';
 
 const moodText = (m: number) => MOODS.find((x) => x.v === m)?.label ?? '未填';
@@ -164,8 +165,23 @@ export function habits7ToMarkdown(d: AppData): string {
   return L.join('\n');
 }
 
+/** 輕鬆探索：輕冒險、收藏、小劇場、時光膠囊（未到期的封存內容不匯出，保留驚喜） */
+export function playToMarkdown(d: AppData): string {
+  const L = ['# 輕鬆探索 Playful Growth 紀錄', ''];
+  const got = badges.filter((b) => d.unlocks[`badge:${b.id}`]);
+  if (got.length) L.push('## 成長徽章', ...got.map((b) => `- ${b.emoji} ${b.title}（${d.unlocks[`badge:${b.id}`].date}）：${d.unlocks[`badge:${b.id}`].evidence}`), '');
+  if (d.questLogs.length) L.push('## 今日輕冒險', ...[...d.questLogs].sort((a, b) => b.date.localeCompare(a.date)).map((q) => `- ${q.date}｜${questMap[q.questId]?.title}（${DEPTH_LABEL[q.depth]}）${q.note ? `：${q.note}` : ''}`), '');
+  if (d.savedCards.length) L.push('## 收藏的小卡', ...d.savedCards.map((c) => `- ${moodCardMap[c.cardId]?.text ?? ''}`), '');
+  if (d.storyPlays.length) L.push('## 人際情境小劇場', ...[...new Set(d.storyPlays.map((p) => p.storyId))].map((id) => `- ${storyMap[id]?.title}（玩了 ${d.storyPlays.filter((p) => p.storyId === id).length} 次）`), '');
+  const today = new Date().toISOString().slice(0, 10);
+  if (d.capsules.length) L.push('## 時光膠囊', ...d.capsules.map((c) => `- 開啟日 ${c.openOn}：${c.openedAt || !c.sealed || c.openOn <= today ? c.message : '（封存中）'}`), '');
+  if (d.garden.plants.length) L.push(`## 心智花園`, `- 已種下 ${d.garden.plants.length} 株植物與裝飾`, '');
+  if (L.length <= 2) L.push('（目前沒有紀錄）');
+  return L.join('\n');
+}
+
 export function allToMarkdown(d: AppData): string {
-  return [notesToMarkdown(d), journalToMarkdown(d), challengeToMarkdown(d), dailyToMarkdown(d), patternToMarkdown(d), habits7ToMarkdown(d)].join('\n\n---\n\n');
+  return [notesToMarkdown(d), journalToMarkdown(d), challengeToMarkdown(d), dailyToMarkdown(d), patternToMarkdown(d), habits7ToMarkdown(d), playToMarkdown(d)].join('\n\n---\n\n');
 }
 
 export const stamp = () => new Date().toISOString().slice(0, 10);

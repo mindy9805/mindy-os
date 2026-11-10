@@ -1,6 +1,6 @@
 // 資料層單元測試：確認容錯讀取、匯入驗證與不會產生假資料
 import { describe, expect, it } from 'vitest';
-import { createBackup, createEmptyData, loadData, normalize, saveData, STORAGE_KEY, validateBackup } from './storage';
+import { CURRENT_REVISION, createBackup, createEmptyData, loadData, normalize, saveData, STORAGE_KEY, validateBackup } from './storage';
 
 describe('normalize', () => {
   it('非物件輸入回傳空白資料', () => {
@@ -52,13 +52,34 @@ describe('7 Habits 資料與版本相容', () => {
     expect(d.quadrantTasks).toEqual([]);
     expect(d.lifeCompass.goals).toEqual([]);
     expect(d.renewalSettings.weights.physical).toBe(3);
-    expect(d.revision).toBe(3);
+    expect(d.revision).toBe(CURRENT_REVISION);
+    expect(d.unlocks).toEqual({});
+    expect(d.garden.plants).toEqual([]);
+    expect(d.settings.buddyVisible).toBe(true);
+    expect(d.settings.homeSections.today).toBe(true);
+    expect(d.settings.homeSections.chapters).toBe(false);
   });
   it('權重只接受 1–5，21 天計畫只保留 1–21 天', () => {
     const d = normalize({ renewalSettings: { weights: { physical: 9, mental: 5 } }, h7Plan: { days: { '21': { completed: true }, '22': {} } }, h7Progress: { proactive: { status: 'done' }, bad: { status: 'done' } } });
     expect(d.renewalSettings.weights).toEqual({ physical: 3, mental: 5, spiritual: 3, social: 3 });
     expect(Object.keys(d.h7Plan.days)).toEqual(['21']);
     expect(Object.keys(d.h7Progress)).toEqual(['proactive']);
+  });
+});
+
+describe('Playful Growth 資料', () => {
+  it('花園只保留合法格子，解鎖紀錄保留', () => {
+    const d = normalize({ garden: { theme: 'autumn', plants: [{ id: 'a', kind: 'fern', cell: 3 }, { id: 'b', kind: 'fern', cell: 99 }] }, unlocks: { 'badge:curious': { date: '2026-11-01', evidence: 'x' } } });
+    expect(d.garden.theme).toBe('autumn');
+    expect(d.garden.plants.map((p) => p.id)).toEqual(['a']);
+    expect(d.unlocks['badge:curious'].date).toBe('2026-11-01');
+  });
+  it('首頁區塊設定與預設值合併', () => {
+    const d = normalize({ settings: { homeSections: { daily: true, bogus: true }, buddyVisible: false } });
+    expect(d.settings.homeSections.daily).toBe(true);
+    expect(d.settings.homeSections.today).toBe(true);
+    expect('bogus' in d.settings.homeSections).toBe(false);
+    expect(d.settings.buddyVisible).toBe(false);
   });
 });
 

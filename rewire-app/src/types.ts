@@ -122,7 +122,15 @@ export interface Settings {
   rightPanelOpen: boolean;
   /** 是否已關閉首次本地儲存提示 */
   storageNoticeDismissed: boolean;
+  /** 是否顯示成長夥伴 Rewire Buddy */
+  buddyVisible: boolean;
+  /** 首頁要顯示的區塊（使用者可自訂） */
+  homeSections: Record<HomeSectionId, boolean>;
+  /** 儀表板中使用者選擇隱藏的統計區塊 */
+  hiddenStats: string[];
 }
+
+export type HomeSectionId = 'buddy' | 'garden' | 'today' | 'collection' | 'explore' | 'daily' | 'pattern' | 'habits7' | 'chapters';
 
 export interface ChapterProgress {
   completed: boolean;
@@ -579,6 +587,46 @@ export interface H7Plan {
   finalReview: string;
 }
 
+/* ========== Playful Growth｜輕遊戲化 ========== */
+
+/** 今日輕冒險完成紀錄 */
+export interface QuestLog {
+  id: string;
+  questId: string;
+  depth: 'short' | 'medium' | 'long'; // 30 秒／2 分鐘／5 分鐘
+  date: string;
+  note: string;
+  createdAt: string;
+}
+/** 心情盲盒收藏卡 */
+export interface SavedCard {
+  id: string;
+  cardId: string;
+  createdAt: string;
+}
+/** 人際情境小劇場的一次遊玩 */
+export interface StoryPlay {
+  id: string;
+  storyId: string;
+  choice: number;
+  createdAt: string;
+}
+/** 時光膠囊 */
+export interface TimeCapsule {
+  id: string;
+  message: string;
+  openOn: string; // YYYY-MM-DD
+  sealed: boolean;
+  openedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+/** 心智花園：使用者自由擺放的植物 */
+export interface GardenState {
+  theme: string;
+  plants: { id: string; kind: string; cell: number; placedAt: string }[];
+}
+
 /** 反向選擇紀錄：一次「選自律、選進步、選自由」的具體小選擇 */
 export interface CounterChoice {
   id: string;
@@ -636,6 +684,15 @@ export interface AppData {
   renewalHabitLogs: RenewalHabitLog[];
   restLogs: RestLog[];
   h7Plan: H7Plan;
+  /* Playful Growth｜輕遊戲化成長體驗 */
+  questLogs: QuestLog[];
+  savedCards: SavedCard[];
+  storyPlays: StoryPlay[];
+  capsules: TimeCapsule[];
+  wheelExcluded: string[];
+  garden: GardenState;
+  /** 已解鎖的收藏與植物：一旦解鎖就永久保留（不因中斷、刪除紀錄而收回） */
+  unlocks: Record<string, { date: string; evidence: string }>;
   /** 資料結構修訂號：新增模組時遞增，讀取舊資料時自動補齊預設值 */
   revision: number;
   /** 神經道路模擬器累積次數（概念示意） */
@@ -673,4 +730,8 @@ export type CollectionKey =
   | 'renewalChecks'
   | 'renewalHabits'
   | 'renewalHabitLogs'
-  | 'restLogs';
+  | 'restLogs'
+  | 'questLogs'
+  | 'savedCards'
+  | 'storyPlays'
+  | 'capsules';

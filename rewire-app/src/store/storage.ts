@@ -42,6 +42,10 @@ export const COLLECTION_KEYS: CollectionKey[] = [
   'renewalHabits',
   'renewalHabitLogs',
   'restLogs',
+  'questLogs',
+  'savedCards',
+  'storyPlays',
+  'capsules',
 ];
 
 /**
@@ -49,9 +53,10 @@ export const COLLECTION_KEYS: CollectionKey[] = [
  * - revision 1：初版（章節、筆記、14 天挑戰、工具）
  * - revision 2：Daily Rewire、Break the Pattern
  * - revision 3：7 Habits｜高效能生活實踐
+ * - revision 4：Playful Growth（輕冒險、盲盒、小劇場、收藏、花園、時光膠囊）與首頁自訂
  * 讀取任何舊修訂的資料都會由 normalize() 補齊新欄位，不會刪除既有紀錄。
  */
-export const CURRENT_REVISION = 3;
+export const CURRENT_REVISION = 4;
 
 export const H7_IDS: H7Id[] = ['proactive', 'end', 'first', 'winwin', 'understand', 'synergize', 'renew'];
 export const RENEW_DIMS: RenewDim[] = ['physical', 'mental', 'spiritual', 'social'];
@@ -68,11 +73,30 @@ export const PATTERN_IDS: PatternHabitId[] = ['approval', 'convenience', 'impres
 
 export const emptyPatternChallenge = (): PatternChallengeState => ({ activeHabitId: '', status: 'none', level: 'standard', progress: {} });
 
+/** 心智花園格子數（6 × 4） */
+export const GARDEN_CELLS = 24;
+
+export const defaultHomeSections: Settings['homeSections'] = {
+  buddy: true,
+  garden: true,
+  today: true,
+  collection: true,
+  explore: true,
+  // 既有的完整內容區塊預設收起，可在「自訂首頁」重新開啟
+  daily: false,
+  pattern: false,
+  habits7: false,
+  chapters: false,
+};
+
 export const defaultSettings: Settings = {
   theme: 'system',
   fontScale: 'md',
   rightPanelOpen: true,
   storageNoticeDismissed: false,
+  buddyVisible: true,
+  homeSections: { ...defaultHomeSections },
+  hiddenStats: [],
 };
 
 /** 建立一份全新的空白資料（不含任何假資料） */
@@ -122,6 +146,13 @@ export function createEmptyData(): AppData {
     renewalHabitLogs: [],
     restLogs: [],
     h7Plan: emptyH7Plan(),
+    questLogs: [],
+    savedCards: [],
+    storyPlays: [],
+    capsules: [],
+    wheelExcluded: [],
+    garden: { theme: 'spring', plants: [] },
+    unlocks: {},
     revision: CURRENT_REVISION,
     neuralReps: 0,
   };
@@ -148,6 +179,9 @@ export function normalize(input: unknown): AppData {
       : defaultSettings.fontScale,
     rightPanelOpen: typeof s.rightPanelOpen === 'boolean' ? s.rightPanelOpen : true,
     storageNoticeDismissed: s.storageNoticeDismissed === true,
+    buddyVisible: s.buddyVisible !== false,
+    homeSections: { ...defaultHomeSections, ...(isObj(s.homeSections) ? Object.fromEntries(Object.entries(s.homeSections).filter(([k, v]) => k in defaultHomeSections && typeof v === 'boolean')) : {}) },
+    hiddenStats: Array.isArray(s.hiddenStats) ? s.hiddenStats.filter((x): x is string => typeof x === 'string') : [],
   };
 
   if (isObj(input.chapters)) {
@@ -280,6 +314,20 @@ export function normalize(input: unknown): AppData {
       }
     }
     base.h7Plan = { startedAt: str(p.startedAt), days, finalReview: str(p.finalReview) };
+  }
+  // ===== Playful Growth =====
+  if (Array.isArray(input.wheelExcluded)) base.wheelExcluded = input.wheelExcluded.filter((x): x is string => typeof x === 'string');
+  if (isObj(input.garden)) {
+    const g = input.garden;
+    base.garden = {
+      theme: str(g.theme) || 'spring',
+      plants: Array.isArray(g.plants)
+        ? g.plants.filter(isObj).filter((p) => typeof p.kind === 'string' && Number.isInteger(p.cell) && (p.cell as number) >= 0 && (p.cell as number) < GARDEN_CELLS).map((p) => ({ id: str(p.id) || Math.random().toString(36).slice(2), kind: p.kind as string, cell: p.cell as number, placedAt: str(p.placedAt) }))
+        : [],
+    };
+  }
+  if (isObj(input.unlocks)) {
+    for (const [k, v] of Object.entries(input.unlocks)) if (isObj(v)) base.unlocks[k] = { date: str(v.date), evidence: str(v.evidence) };
   }
   base.revision = CURRENT_REVISION;
   if (typeof input.neuralReps === 'number' && input.neuralReps >= 0) base.neuralReps = Math.floor(input.neuralReps);

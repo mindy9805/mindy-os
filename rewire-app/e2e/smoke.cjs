@@ -21,11 +21,13 @@ const AFF = ['我現在是安全的', '我的大腦可以改變', '我已經足�
   page.on('console', (m) => m.type() === 'error' && !/fonts\.g|ERR_|Failed to load resource/.test(m.text()) && errors.push(m.text()));
   page.on('dialog', (d) => d.accept());
 
-  await step('首頁載入與標題', async () => {
+  await step('首頁載入：主要入口與三個大按鈕', async () => {
     await page.goto(BASE);
-    await page.getByRole('heading', { name: 'Rewire｜重塑大腦的可能' }).waitFor();
+    await page.getByRole('heading', { name: '今天，你想怎麼探索自己？' }).waitFor();
+    for (const n of [/給我一個小驚喜/, /今天想玩個小遊戲/, /我想安靜一下/]) await page.getByRole('button', { name: n }).waitFor();
   });
   await step('Daily Rewire 七句原文與順序完全一致', async () => {
+    await page.goto(BASE + '#/daily');
     const texts = await page.locator('#daily-title').locator('..').locator('article h3').allTextContents();
     if (JSON.stringify(texts) !== JSON.stringify(AFF)) throw new Error(JSON.stringify(texts));
   });
@@ -216,8 +218,8 @@ const AFF = ['我現在是安全的', '我的大腦可以改變', '我已經足�
     await page.locator('a[href^="https://doi.org/"]').first().waitFor();
     await page.getByText('可能過度簡化的說法').first().waitFor();
   });
-  await step('打破慣性：首頁焦點卡片（選 1–3 項）', async () => {
-    await page.goto(BASE + '#/');
+  await step('打破慣性：焦點卡片（選 1–3 項）', async () => {
+    await page.goto(BASE + '#/pattern');
     await page.getByRole('heading', { name: '你最想調整哪一個習慣？' }).waitFor();
     for (const n of ['過度尋求認可', '反覆違背承諾', '缺少獨處思考', '過度依賴便利']) await page.getByRole('button', { name: `選擇「${n}」` }).click();
     const f = (await store(page)).patternFocus;
@@ -584,6 +586,108 @@ const AFF = ['我現在是安全的', '我的大腦可以改變', '我已經足�
     const p = (await store(page)).h7Plan;
     if (!p.days['1'].completed || p.days['1'].actionPlan !== '每天寫一件能控制的事' || p.finalReview !== '影響圈' || !p.startedAt) throw new Error(JSON.stringify(p));
   });
+  await step('首頁：小驚喜盲盒（開盒、收藏、再抽、跳過）', async () => {
+    await page.goto(BASE + '#/');
+    await page.getByRole('button', { name: /給我一個小驚喜/ }).click();
+    await page.getByRole('button', { name: '打開盲盒，抽一張卡' }).click();
+    await page.getByRole('button', { name: '收藏這張卡' }).click();
+    if ((await store(page)).savedCards.length !== 1) throw new Error('收藏');
+    await page.getByRole('button', { name: '再抽一次' }).click();
+    await page.getByRole('button', { name: '收藏這張卡' }).waitFor();
+    await page.getByRole('button', { name: '先跳過' }).click();
+    if (await page.locator('#hero-panel').count()) throw new Error('未關閉');
+  });
+  await step('首頁：小遊戲與安靜一下入口、自訂首頁', async () => {
+    await page.getByRole('button', { name: /今天想玩個小遊戲/ }).click();
+    await page.locator('#hero-panel').getByRole('link', { name: /今日輕冒險/ }).waitFor();
+    await page.getByRole('button', { name: /我想安靜一下/ }).click();
+    await page.locator('#hero-panel').getByRole('link', { name: /安靜五分鐘/ }).waitFor();
+    await page.getByText('自訂首頁').click();
+    await page.getByLabel('九個神經可塑性章節').check();
+    await page.getByRole('heading', { name: '九個章節' }).waitFor();
+    await page.getByLabel('在所有頁面顯示成長夥伴「小芽」').uncheck();
+    const st = (await store(page)).settings;
+    if (!st.homeSections.chapters || st.buddyVisible) throw new Error(JSON.stringify(st));
+    await page.getByLabel('在所有頁面顯示成長夥伴「小芽」').check();
+    await page.getByLabel('九個神經可塑性章節').uncheck();
+  });
+  await step('今日輕冒險：分類、深度、換一個、完成', async () => {
+    await page.goto(BASE + '#/play/quest');
+    await page.getByRole('button', { name: /勇敢探索/ }).click();
+    await page.getByRole('radio', { name: /2 分鐘/ }).click();
+    await page.getByRole('button', { name: '換一個冒險' }).click();
+    await page.getByLabel('想留一句心得嗎？（選填）').fill('問了同事一個問題');
+    await page.getByRole('button', { name: '我完成了這次小冒險' }).click();
+    await page.getByRole('button', { name: '再來一個' }).waitFor();
+    const q = (await store(page)).questLogs[0];
+    if (!q || q.depth !== 'medium' || q.note !== '問了同事一個問題') throw new Error(JSON.stringify(q));
+    await page.waitForFunction(() => JSON.parse(localStorage.getItem('rewire:v1')).unlocks['badge:question']);
+  });
+  await step('隨機探索轉盤：取消類別、旋轉、結果不空白', async () => {
+    await page.goto(BASE + '#/play/wheel');
+    await page.getByRole('button', { name: '價值探索', exact: true }).click();
+    if (!(await store(page)).wheelExcluded.includes('values')) throw new Error('排除');
+    await page.getByRole('button', { name: '轉轉看' }).click();
+    await page.getByText('轉到了：').waitFor({ timeout: 6000 });
+    const label = ((await page.getByText('轉到了：').locator('xpath=following-sibling::p[1]').textContent()) || '').trim();
+    if (!label || label === '價值探索') throw new Error('結果：' + label);
+    await page.getByRole('button', { name: '再轉一次' }).click();
+    await page.getByText('轉到了：').waitFor({ timeout: 6000 });
+  });
+  await step('人際情境小劇場：選擇、不同發展、重玩、全部看過後顯示反思', async () => {
+    await page.goto(BASE + '#/play/stories');
+    await page.getByRole('button', { name: /週五晚上的加班請求/ }).click();
+    const n = await page.locator('article button[aria-pressed]').count();
+    if (n < 2) throw new Error('選項');
+    for (let i = 0; i < n; i++) {
+      await page.locator('article button[aria-pressed]').nth(i).click();
+      await page.getByText('這個選擇的優點').waitFor();
+    }
+    await page.getByText('反思一下').waitFor();
+    if ((await store(page)).storyPlays.length !== n) throw new Error('紀錄');
+  });
+  await step('時光膠囊：草稿編輯、封存、到期開啟', async () => {
+    await page.goto(BASE + '#/play/capsule');
+    await page.getByLabel('寫一句話給未來的自己').fill('希望你有好好睡覺');
+    await page.getByRole('button', { name: '先存草稿' }).click();
+    await page.getByRole('button', { name: '編輯膠囊' }).click();
+    await page.getByLabel('編輯膠囊（封存前可修改）').fill('希望你有好好睡覺，也常常散步');
+    await page.getByRole('button', { name: '1 個月後' }).click();
+    await page.getByRole('button', { name: '封存膠囊' }).click();
+    const c = (await store(page)).capsules;
+    if (c.length !== 1 || !c[0].sealed || c[0].message !== '希望你有好好睡覺，也常常散步') throw new Error(JSON.stringify(c));
+    await page.getByText(/封存中，還有 \d+ 天/).waitFor();
+    // 模擬膠囊到期：把開啟日改成過去
+    await page.evaluate(() => { const d = JSON.parse(localStorage.getItem('rewire:v1')); d.capsules[0].openOn = '2020-01-01'; localStorage.setItem('rewire:v1', JSON.stringify(d)); });
+    await page.goto(BASE + '#/');
+    await page.reload();
+    await page.getByText('你有 1 個時光膠囊可以打開了。').click();
+    await page.getByRole('button', { name: '打開', exact: true }).click();
+    await page.getByText('希望你有好好睡覺，也常常散步').waitFor();
+    if (!(await store(page)).capsules[0].openedAt) throw new Error('開啟');
+  });
+  await step('心智花園：種下、收回、景觀；收藏冊顯示徽章日期', async () => {
+    await page.goto(BASE + '#/play/garden');
+    await page.getByText(/成長點：/).waitFor();
+    await page.getByRole('gridcell', { name: /第 1 格：空地/ }).click();
+    await page.getByRole('gridcell', { name: /第 2 格：空地/ }).click();
+    let g = (await store(page)).garden;
+    if (g.plants.length !== 2) throw new Error('種下');
+    await page.getByRole('gridcell', { name: /第 1 格：.*（點擊收回）/ }).click();
+    g = (await store(page)).garden;
+    if (g.plants.length !== 1) throw new Error('收回');
+    await page.getByRole('button', { name: '夏日午後' }).click();
+    if ((await store(page)).garden.theme !== 'summer') throw new Error('景觀');
+    await page.goto(BASE + '#/play/collection');
+    await page.getByText('勇敢提問者').waitFor();
+    await page.getByText(/取得於/).first().waitFor();
+  });
+  await step('解鎖不會被收回：刪除紀錄後徽章仍保留', async () => {
+    await page.evaluate(() => { const d = JSON.parse(localStorage.getItem('rewire:v1')); d.questLogs = []; localStorage.setItem('rewire:v1', JSON.stringify(d)); });
+    await page.reload();
+    await page.getByText('勇敢提問者').waitFor();
+    if (!(await store(page)).unlocks['badge:question']) throw new Error('被收回了');
+  });
   await step('14 天挑戰：完成、取消、紀錄保留於重新整理後', async () => {
     await page.goto(BASE + '#/challenge?day=3');
     await page.getByLabel('我的紀錄與反思').fill('我發現是焦慮');
@@ -642,6 +746,11 @@ const AFF = ['我現在是安全的', '我的大腦可以改變', '我已經足�
     if ((await page.locator('.recharts-bar-rectangle path').count()) < 1) throw new Error('長條圖沒有資料');
     await page.getByText('踏出第一步').waitFor();
     await page.getByText('看見自己的模式').waitFor();
+    await page.getByRole('heading', { name: '自願參與與輕鬆探索' }).waitFor();
+    await page.getByRole('button', { name: '隱藏「自願參與與輕鬆探索」' }).click();
+    await page.getByText('已隱藏「自願參與與輕鬆探索」').waitFor();
+    if (!(await store(page)).settings.hiddenStats.includes('play')) throw new Error('隱藏');
+    await page.getByRole('button', { name: '顯示「自願參與與輕鬆探索」' }).click();
     await page.getByRole('heading', { name: 'Break the Pattern｜打破慣性' }).waitFor();
     await page.getByText('七大習慣自我評估變化').waitFor();
     await page.getByText('晚上 11 點').first().waitFor();
@@ -702,7 +811,7 @@ const AFF = ['我現在是安全的', '我的大腦可以改變', '我已經足�
   const m = await mctx.newPage();
   m.on('pageerror', (e) => errors.push('mobile: ' + e.message));
   await step('手機版：所有頁面無橫向捲動', async () => {
-    const routes = ['', 'daily', 'learn', 'learn/ch1', 'learn/ch2', 'learn/ch6', 'learn/ch7', 'learn/ch9', 'lab', 'lab/habit-curve', 'challenge', 'journal', 'journal?tab=notes', 'dashboard', 'references', 'data', 'daily/read', 'pattern', 'pattern/approval', 'pattern/impress', 'pattern/promises', 'pattern/shortterm', 'pattern/assessment', 'pattern/workshop', 'challenge?type=pattern', 'habits7', 'habits7/proactive', 'habits7/end', 'habits7/first', 'habits7/winwin', 'habits7/understand', 'habits7/synergize', 'habits7/renew', 'habits7/plan'];
+    const routes = ['', 'daily', 'learn', 'learn/ch1', 'learn/ch2', 'learn/ch6', 'learn/ch7', 'learn/ch9', 'lab', 'lab/habit-curve', 'challenge', 'journal', 'journal?tab=notes', 'dashboard', 'references', 'data', 'daily/read', 'pattern', 'pattern/approval', 'pattern/impress', 'pattern/promises', 'pattern/shortterm', 'pattern/assessment', 'pattern/workshop', 'challenge?type=pattern', 'habits7', 'habits7/proactive', 'habits7/end', 'habits7/first', 'habits7/winwin', 'habits7/understand', 'habits7/synergize', 'habits7/renew', 'habits7/plan', 'play', 'play/quest', 'play/surprise', 'play/wheel', 'play/stories', 'play/garden', 'play/collection', 'play/capsule'];
     const bad = [];
     for (const r of routes) {
       await m.goto(BASE + '#/' + r);
@@ -722,7 +831,7 @@ const AFF = ['我現在是安全的', '我的大腦可以改變', '我已經足�
     await m.waitForURL(/challenge/);
   });
   if (process.env.SHOT_DIR) {
-    for (const [r, n] of [['habits7', 'm-h7'], ['habits7/first', 'm-h7first'], ['habits7/renew', 'm-h7renew'], ['habits7/synergize', 'm-h7board'], ['pattern', 'm-pattern'], ['pattern/promises', 'm-promises'], ['challenge?type=pattern', 'm-pchallenge'], ['dashboard', 'm-dash'], ['', 'm-home'], ['daily/read', 'm-read'], ['learn/ch1', 'm-ch1'], ['challenge', 'm-challenge']]) {
+    for (const [r, n] of [['', 'm-home2'], ['play/garden', 'm-garden'], ['play/stories?story=decline', 'm-story'], ['habits7', 'm-h7'], ['habits7/first', 'm-h7first'], ['habits7/renew', 'm-h7renew'], ['habits7/synergize', 'm-h7board'], ['pattern', 'm-pattern'], ['pattern/promises', 'm-promises'], ['challenge?type=pattern', 'm-pchallenge'], ['dashboard', 'm-dash'], ['', 'm-home'], ['daily/read', 'm-read'], ['learn/ch1', 'm-ch1'], ['challenge', 'm-challenge']]) {
       await m.goto(BASE + '#/' + r); await m.waitForTimeout(400);
       await m.screenshot({ path: `${process.env.SHOT_DIR}/${n}.png` });
     }

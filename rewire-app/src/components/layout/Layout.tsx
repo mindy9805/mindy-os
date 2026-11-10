@@ -12,6 +12,7 @@ import BottomNav from './BottomNav';
 import MobileDrawer from './MobileDrawer';
 import SearchDialog from './SearchDialog';
 import StorageNotice from './StorageNotice';
+import GrowthWatcher from '../play/GrowthWatcher';
 import { useStore } from '../../store/AppStore';
 
 export default function Layout() {
@@ -52,6 +53,7 @@ export default function Layout() {
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[80] focus:rounded-full focus:bg-accent focus:px-4 focus:py-2 focus:text-onaccent">
         跳到主要內容
       </a>
+      <GrowthWatcher />
       <TopBar onMenu={() => setDrawer(true)} onSearch={() => setSearchOpen(true)} />
       <div className="flex">
         <Sidebar />

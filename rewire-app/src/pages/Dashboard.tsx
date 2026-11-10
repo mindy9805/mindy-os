@@ -9,6 +9,8 @@ import { useStore } from '../store/AppStore';
 import { chapterStats, challengeStats, dailyStats, milestones, moodTrend, practiceFrequency } from '../lib/stats';
 import PatternDashboard from '../components/pattern/PatternDashboard';
 import H7Dashboard from '../components/habits7/H7Dashboard';
+import PlayDashboard from '../components/play/PlayDashboard';
+import Hideable from '../components/ui/Hideable';
 import { Card, EmptyState, SectionTitle, MOODS } from '../components/ui/basics';
 import { affirmationMap } from '../content/dailyRewire';
 import { chapterLabel } from '../content/chapters';
@@ -45,15 +47,22 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8 motion-safe:animate-fade-up">
-      <SectionTitle eyebrow="Dashboard" title="學習進度儀表板" desc="所有數字都來自你在這台裝置上留下的真實紀錄。沒有紀錄的地方會保持空白。" />
+      <SectionTitle eyebrow="Dashboard" title="學習進度儀表板" desc="所有數字都來自你在這台裝置上留下的真實紀錄，只用來回顧，不是評分。任何區塊都可以按右上角的眼睛圖示隱藏。" />
 
+      <Hideable id="play" title="自願參與與輕鬆探索">
+        <PlayDashboard />
+      </Hideable>
+
+      <Hideable id="overview" title="學習概覽">
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Stat icon={BookOpen} label="已完成章節" value={`${cs.completed}/${cs.total}`} />
         <Stat icon={ListChecks} label="已完成測驗" value={`${cs.quizDone}/9`} sub={cs.quizDone ? `平均答對率 ${cs.quizAvg}%` : '尚未作答'} />
         <Stat icon={CalendarCheck} label="14 天挑戰" value={`${ch.done}/14`} />
         <Stat icon={Sparkles} label="每日心智練習" value={`${ds.totalDays} 天`} sub={`累計完成 ${ds.totalSessions} 次`} />
       </div>
+      </Hideable>
 
+      <Hideable id="daily" title="每日心智練習">
       {/* Daily Rewire 統計 */}
       <Card>
         <h2 className="font-serif text-lg font-bold">每日心智練習 Daily Rewire</h2>
@@ -96,7 +105,9 @@ export default function Dashboard() {
           </div>
         )}
       </Card>
+      </Hideable>
 
+      <Hideable id="charts" title="練習頻率與情緒趨勢">
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <h2 className="font-serif text-lg font-bold">習慣練習頻率（近 14 天）</h2>
@@ -145,11 +156,17 @@ export default function Dashboard() {
           )}
         </Card>
       </div>
+      </Hideable>
 
+      <Hideable id="pattern" title="打破慣性">
       <PatternDashboard />
+      </Hideable>
 
+      <Hideable id="habits7" title="7 Habits">
       <H7Dashboard />
+      </Hideable>
 
+      <Hideable id="reflections" title="反思與計畫">
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <h2 className="font-serif text-lg font-bold">最近的反思筆記</h2>
@@ -174,7 +191,9 @@ export default function Dashboard() {
           )}
         </Card>
       </div>
+      </Hideable>
 
+      <Hideable id="milestones" title="學習里程碑">
       <Card>
         <h2 className="font-serif text-lg font-bold">個人學習里程碑（{ms.filter((m) => m.achieved).length}/{ms.length}）</h2>
         <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
@@ -188,6 +207,7 @@ export default function Dashboard() {
           ))}
         </ul>
       </Card>
+      </Hideable>
     </div>
   );
 }

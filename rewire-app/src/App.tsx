@@ -25,6 +25,7 @@ import PatternWorkshop from './pages/PatternWorkshop';
 import Habits7Hub from './pages/Habits7Hub';
 import Habits7Page from './pages/Habits7Page';
 import Habits7Plan from './pages/Habits7Plan';
+import Play from './pages/Play';
 import ReadingMode from './components/daily/ReadingMode';
 import NotFound from './pages/NotFound';
 
@@ -52,6 +53,9 @@ export default function App() {
                 <Route path="pattern/workshop" element={<PatternWorkshop />} />
                 <Route path="pattern/:habitId" element={<PatternHabitPage />} />
                 <Route path="habits" element={<Navigate to="/pattern" replace />} />
+                {/* Playful Growth｜輕鬆探索 */}
+                <Route path="play" element={<Play />} />
+                <Route path="play/:game" element={<Play />} />
                 {/* 7 Habits｜高效能生活實踐 */}
                 <Route path="habits7" element={<Habits7Hub />} />
                 <Route path="habits7/plan" element={<Habits7Plan />} />
