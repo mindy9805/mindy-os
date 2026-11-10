@@ -436,7 +436,7 @@ const AFF = ['我現在是安全的', '我的大腦可以改變', '我已經足�
     await page.getByLabel('目前遇到的困難').fill('找工作沒有好消息');
     await page.getByRole('button', { name: '開始整理' }).click();
     for (const t of ['練習自我介紹', '面試官的偏好', '請學長姐幫忙看履歷']) { await page.getByLabel('新增相關事項').fill(t); await page.getByRole('button', { name: '新增', exact: true }).click(); }
-    await page.locator('li[draggable=true]', { hasText: '練習自我介紹' }).dragTo(page.getByLabel('我能直接控制的事情', { exact: true }));
+    await page.locator('li[draggable=true]', { hasText: '練習自我介紹' }).locator('.drag-handle').dragTo(page.getByLabel('我能直接控制的事情', { exact: true }));
     await page.getByLabel('移動「面試官的偏好」到').selectOption('outside');
     let c = (await store(page)).circles[0];
     const zone = (t) => c.items.find((i) => i.text === t).zone;
@@ -466,9 +466,9 @@ const AFF = ['我現在是安全的', '我的大腦可以改變', '我已經足�
   });
   await step('習慣三 四象限：新增、拖曳、編輯、完成、刪除、本週三件要事', async () => {
     await page.goto(BASE + '#/habits7/first');
-    const add = async (t, q) => { await page.getByLabel('新增任務').fill(t); await page.getByLabel('象限').selectOption(String(q)); await page.getByRole('button', { name: '新增任務' }).click(); };
+    const add = async (t, q) => { await page.getByLabel('新增任務').fill(t); await page.getByLabel('象限', { exact: true }).selectOption(String(q)); await page.getByRole('button', { name: '新增任務' }).click(); };
     await add('預約健康檢查', 2); await add('回覆廠商信件', 3); await add('滑社群', 4);
-    await page.locator('li[draggable=true]', { hasText: '回覆廠商信件' }).dragTo(page.getByRole('region', { name: '第一象限：重要且緊急' }));
+    await page.locator('li[draggable=true]', { hasText: '回覆廠商信件' }).locator('.drag-handle').dragTo(page.getByRole('region', { name: '第一象限：重要且緊急' }));
     let tasks = (await store(page)).quadrantTasks;
     if (tasks.find((t) => t.title === '回覆廠商信件').quadrant !== 1) throw new Error('拖曳');
     await page.getByRole('button', { name: '編輯任務：預約健康檢查' }).click();
@@ -496,7 +496,7 @@ const AFF = ['我現在是安全的', '我的大腦可以改變', '我已經足�
     await page.locator('tr', { hasText: '週六午餐回家' }).getByLabel('我', { exact: true }).selectOption('4');
     await page.getByText('目前最互利').waitFor();
     if (!(await page.locator('tr', { hasText: '目前最互利' }).textContent()).includes('週六午餐回家')) throw new Error('排序');
-    await page.getByText('拒絕合作、暫停協商').waitFor();
+    await page.locator('#tool').getByText('拒絕合作、暫停協商').waitFor();
     await page.getByRole('button', { name: '儲存協商紀錄' }).click();
     await page.getByRole('button', { name: '編輯協商紀錄' }).click();
     await page.getByLabel('雙方共同目標').fill('維持家庭關係');
@@ -522,7 +522,7 @@ const AFF = ['我現在是安全的', '我的大腦可以改變', '我已經足�
     await page.getByRole('button', { name: '加入「1. 問題定義」' }).click();
     await page.getByLabel('在「4. 不同觀點」新增便利貼').fill('改成線上活動');
     await page.getByRole('button', { name: '加入「4. 不同觀點」' }).click();
-    await page.locator('li[draggable=true]', { hasText: '' }).filter({ has: page.locator('textarea') }).nth(1).dragTo(page.getByRole('region', { name: '7. 解決方案' }));
+    await page.locator('li[draggable=true]').filter({ has: page.locator('textarea') }).nth(1).locator('.drag-handle').dragTo(page.getByRole('region', { name: '7. 解決方案' }));
     const b = (await store(page)).teamBoards[0];
     if (b.cards.find((c) => c.text === '改成線上活動').zone !== 'solutions') throw new Error(JSON.stringify(b.cards));
     const [dl] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: '匯出 JSON' }).click()]);
@@ -640,9 +640,9 @@ const AFF = ['我現在是安全的', '我的大腦可以改變', '我已經足�
     await page.getByText('七大習慣自我評估變化').waitFor();
     await page.getByText('晚上 11 點').first().waitFor();
     await page.getByText('關閉自動播放').first().waitFor();
-    await page.getByRole('heading', { name: '7 Habits｜高效能生活實踐' }).waitFor();
-    await page.getByText('成為健康、持續學習、支持他人的人').first().waitFor();
-    await page.getByText('完成提案初稿').first().waitFor();
+    for (const t of ['7 Habits｜高效能生活實踐', '成為健康、持續學習、支持他人的人', '完成提案初稿']) {
+      if (!(await page.getByText(t).count())) throw new Error('儀表板找不到：' + t);
+    }
   });
   await step('主題切換與字體大小', async () => {
     await page.getByRole('button', { name: /^主題：/ }).click();

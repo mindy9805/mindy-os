@@ -5,7 +5,7 @@
  */
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, X } from 'lucide-react';
+import { GripVertical, Plus, X } from 'lucide-react';
 import { useStore } from '../../store/AppStore';
 import { useToast } from '../ui/Toast';
 import { EmptyState, TextField } from '../ui/basics';
@@ -58,6 +58,7 @@ function Board({ entry }: { entry: CircleEntry }) {
               {entry.items.filter((i) => i.zone === z.id).map((i) => (
                 <li key={i.id} {...draggable(i.id)} className={`cursor-grab rounded-lg bg-surface px-2 py-1.5 text-sm shadow-sm ${entry.actionItemId === i.id ? 'ring-2 ring-accent' : ''}`}>
                   <div className="flex items-start gap-1">
+                    <GripVertical className="drag-handle mt-0.5 h-4 w-4 shrink-0 text-muted" aria-hidden />
                     <span className="flex-1">{i.text}</span>
                     <button className="rounded p-0.5 hover:bg-soft" aria-label={`移除：${i.text}`} onClick={() => save({ ...entry, items: entry.items.filter((x) => x.id !== i.id) })}><X className="h-3.5 w-3.5" aria-hidden /></button>
                   </div>

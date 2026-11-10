@@ -4,7 +4,7 @@
  * ⚠️ 本工具為「個人工作坊」，資料只存在本機；可透過匯出檔與他人分享，不具即時多人協作功能。
  */
 import { useRef, useState } from 'react';
-import { Download, Upload, Plus, X, ArrowLeft, FileText } from 'lucide-react';
+import { Download, Upload, Plus, X, ArrowLeft, FileText, GripVertical } from 'lucide-react';
 import { useStore } from '../../store/AppStore';
 import { useToast } from '../ui/Toast';
 import { EmptyState, TextField } from '../ui/basics';
@@ -66,6 +66,7 @@ function Board({ board, onBack }: { board: TeamBoard; onBack: () => void }) {
                   <label htmlFor={`card-${c.id}`} className="sr-only">便利貼內容</label>
                   <textarea id={`card-${c.id}`} className="w-full resize-none bg-transparent outline-none" rows={2} defaultValue={c.text} onBlur={(e) => e.target.value.trim() && e.target.value !== c.text && save(b.cards.map((x) => (x.id === c.id ? { ...x, text: e.target.value.trim() } : x)))} />
                   <div className="flex items-center gap-1">
+                    <GripVertical className="drag-handle h-4 w-4 shrink-0 text-muted" aria-hidden />
                     <label htmlFor={`cz-${c.id}`} className="sr-only">移動便利貼到</label>
                     <select id={`cz-${c.id}`} className="flex-1 rounded border border-line bg-bg px-1 py-0.5 text-xs" value={c.zone} onChange={(e) => move(c.id, e.target.value as BoardZone)}>
                       {boardZones.map((x) => <option key={x.id} value={x.id}>{x.title}</option>)}

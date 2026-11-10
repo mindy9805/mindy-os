@@ -3,7 +3,7 @@
  * 新增、拖曳（或選單）調整象限、截止日期、完成狀態、提醒備註、編輯刪除、每週任務分布圖。
  */
 import { useState } from 'react';
-import { Pencil, Trash2, Plus, Star } from 'lucide-react';
+import { Pencil, Trash2, Plus, Star, GripVertical } from 'lucide-react';
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { useStore } from '../../store/AppStore';
 import { useToast } from '../ui/Toast';
@@ -114,6 +114,7 @@ export default function QuadrantTool() {
                   return (
                     <li key={t.id} {...draggable(t.id)} className="cursor-grab rounded-xl bg-surface px-3 py-2 text-sm shadow-sm">
                       <div className="flex items-start gap-2">
+                        <GripVertical className="drag-handle mt-1 h-4 w-4 shrink-0 text-muted" aria-hidden />
                         <input type="checkbox" className="mt-1 h-4 w-4 accent-[rgb(var(--accent))]" checked={t.done} aria-label={`完成：${t.title}`} onChange={() => { upsert('quadrantTasks', { ...t, done: !t.done, updatedAt: nowIso() }); if (!t.done) toast('完成一項任務 ✓'); }} />
                         <div className="min-w-0 flex-1">
                           <p className={t.done ? 'text-muted line-through' : ''}>{t.title}</p>
