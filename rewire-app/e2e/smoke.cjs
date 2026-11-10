@@ -472,7 +472,7 @@ const AFF = ['我現在是安全的', '我的大腦可以改變', '我已經足�
     let tasks = (await store(page)).quadrantTasks;
     if (tasks.find((t) => t.title === '回覆廠商信件').quadrant !== 1) throw new Error('拖曳');
     await page.getByRole('button', { name: '編輯任務：預約健康檢查' }).click();
-    await page.getByLabel('編輯任務').fill('預約年度健康檢查');
+    await page.getByLabel('編輯任務', { exact: true }).fill('預約年度健康檢查');
     await page.getByLabel('截止日期（選填）').fill('2026-11-12');
     await page.getByRole('button', { name: '儲存修改' }).click();
     await page.getByLabel('完成：預約年度健康檢查').check();
@@ -522,7 +522,7 @@ const AFF = ['我現在是安全的', '我的大腦可以改變', '我已經足�
     await page.getByRole('button', { name: '加入「1. 問題定義」' }).click();
     await page.getByLabel('在「4. 不同觀點」新增便利貼').fill('改成線上活動');
     await page.getByRole('button', { name: '加入「4. 不同觀點」' }).click();
-    await page.locator('li[draggable=true]').filter({ has: page.locator('textarea') }).nth(1).locator('.drag-handle').dragTo(page.getByRole('region', { name: '7. 解決方案' }));
+    await page.locator('li[draggable=true]').filter({ has: page.locator('textarea') }).nth(1).locator('.drag-handle').dragTo(page.getByRole('region', { name: '7. 解決方案' }), { targetPosition: { x: 12, y: 12 } });
     const b = (await store(page)).teamBoards[0];
     if (b.cards.find((c) => c.text === '改成線上活動').zone !== 'solutions') throw new Error(JSON.stringify(b.cards));
     const [dl] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: '匯出 JSON' }).click()]);
