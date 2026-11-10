@@ -9,7 +9,7 @@ import { Bookmark, BookmarkCheck, CheckCircle2, ChevronLeft, ChevronRight, Clock
 import { chapterMap, chapters } from '../content/chapters';
 import { affirmationMap } from '../content/dailyRewire';
 import { getReferences } from '../content/references';
-import { weakeningHabits, choiceMeta } from '../content/weakeningHabits';
+import { patternHabits } from '../content/breakPattern';
 import { useStore } from '../store/AppStore';
 import { useToast } from '../components/ui/Toast';
 import ChapterDiagram from '../components/diagrams/ChapterDiagram';
@@ -54,7 +54,7 @@ export default function ChapterPage() {
   const next = chapters[idx + 1];
   const progress = data.chapters[chapter.id];
   const notes = data.notes.filter((n) => n.chapterId === chapter.id);
-  const relatedHabits = weakeningHabits.filter((h) => h.chapterIds.includes(chapter.id));
+  const relatedHabits = patternHabits.filter((h) => h.chapterIds.includes(chapter.id));
   const highlightOf = (source: string) => notes.find((n) => n.kind === 'highlight' && n.source === source);
 
   const toggleHighlight = (source: string, content: string) => {
@@ -215,15 +215,15 @@ export default function ChapterPage() {
       </Block>
 
       {relatedHabits.length > 0 && (
-        <Block id="weakening" icon={ShieldCheck} title="日常中的削弱習慣">
-          <p className="-mt-2 mb-4 text-sm text-muted">本章的概念，可以幫助你理解這些看似無害、卻會慢慢削弱紀律與信心的習慣。</p>
+        <Block id="pattern" icon={ShieldCheck} title="打破慣性：相關的日常習慣">
+          <p className="-mt-2 mb-4 text-sm text-muted">本章的概念，可以幫助你理解這些在不知不覺中消耗能量的行為模式，並找到可以實際練習的工具。</p>
           <ul className="grid gap-3 md:grid-cols-2">
             {relatedHabits.map((h) => (
               <li key={h.id}>
-                <Link to={`/habits#h-${h.id}`} className="card-hover block h-full rounded-2xl border border-line bg-surface p-4">
-                  <span className="chip">{choiceMeta[h.kind].slogan}</span>
+                <Link to={`/pattern/${h.id}`} className="card-hover block h-full rounded-2xl border border-line bg-surface p-4">
+                  <span className="chip">Habit 0{h.no} · {h.concept}</span>
                   <span className="mt-2 block font-serif font-bold">{h.title}</span>
-                  <span className="mt-1 block text-sm text-muted">{h.lines[h.lines.length - 1]}</span>
+                  <span className="mt-1 block text-sm text-muted">互動工具：{h.toolTitle}</span>
                 </Link>
               </li>
             ))}

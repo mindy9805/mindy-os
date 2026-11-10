@@ -16,7 +16,7 @@
 | 深度導讀 Learn | `#/learn`、`#/learn/ch1`…`ch9` | 9 章：學習目標、核心概念、深入解釋、生活案例、示意圖、應用、互動練習、反思、3–5 題測驗、摘要、研究來源、對應心智語句、本章筆記 |
 | 知識實驗室 Brain Lab | `#/lab`、`#/lab/<id>` | 神經道路模擬器、認知濾鏡實驗、身份敘事改寫器、自我對話轉換、習慣偵探、習慣養成模擬器、If-Then 產生器、證據檢視卡、七大實踐工具 |
 | 14 天練習 | `#/challenge?day=N` | 進度條、補做／重做、完成勾選、每日紀錄、今日心智語句五步驟、總結、JSON／Markdown 匯出 |
-| 削弱習慣檢視 | `#/habits` | 不知不覺中削弱紀律與信心的習慣：原文、科學視角與限制、溫和提醒、反向練習、本週自我檢視（頻率評分與專注項目）、反向選擇紀錄（選自律／選進步／選自由）；並整合到相關章節、14 天挑戰第 1／14 天、儀表板與搜尋 |
+| 打破慣性 Break the Pattern | `#/pattern`、`#/pattern/<習慣>`、`#/pattern/assessment`、`#/pattern/workshop` | 7 個隱形消耗習慣：每個習慣 10 段學習內容＋專屬互動工具（認可依賴覺察器、舒適圈探索地圖、消費動機檢視器、安靜五分鐘、微承諾追蹤器、成長環境盤點、短期與長期選擇模擬器）、行動實驗；21 題自我覺察評估（非診斷）；七步驟習慣改變工作坊；首頁「你最想調整哪一個習慣？」；14 天打破慣性挑戰（`#/challenge?type=pattern`）；儀表板資料區；與每日七句心智練習整合（舊網址 `#/habits` 自動轉址） |
 | 反思日誌 | `#/journal`、`#/journal?tab=notes` | 日誌新增／編輯／刪除／搜尋／標籤；章節筆記依章節、類型、標籤篩選與匯出 |
 | 學習儀表板 | `#/dashboard` | 章節、測驗、挑戰、Daily Rewire、練習頻率圖、情緒趨勢、最近反思、If-Then 計畫、里程碑（皆依真實資料計算） |
 | 研究來源 | `#/references` | 科學證據檢視卡、完整文獻（附 DOI，無法確認者標示「待查證」） |
@@ -37,7 +37,8 @@ rewire-app/
 │   │   ├── challenge.ts       #   14 天計畫
 │   │   ├── references.ts      #   研究來源與證據檢視卡
 │   │   ├── tools.ts           #   情緒詞彙、口袋句、情境題
-│   │   └── weakeningHabits.ts #   削弱習慣（原文、科學視角、反向練習）
+│   │   ├── breakPattern.ts    #   打破慣性：七個習慣、21 題評估、工作坊、14 天挑戰任務
+│   │   └── legacyHabits.ts    #   舊版自我檢視名稱（僅顯示已保存的舊資料）
 │   ├── store/                 # LocalStorage 資料層（版本、容錯讀取、匯入驗證）
 │   ├── lib/                   # 統計、搜尋、匯出、日期、改寫規則、語音
 │   ├── components/
@@ -46,6 +47,7 @@ rewire-app/
 │   │   ├── tools/             #   七大實踐工具
 │   │   ├── daily/             #   Daily Rewire 卡片、朗讀模式、紀錄表單
 │   │   ├── diagrams/          #   各章 SVG 示意圖
+│   │   ├── pattern/           #   打破慣性：七個工具、挑戰、儀表板資料區
 │   │   ├── notes/             #   筆記編輯與清單
 │   │   └── ui/                #   共用 UI（Toast、確認視窗、表單欄位）
 │   └── pages/                 # 各頁面
@@ -68,7 +70,7 @@ npm run dev          # 開發伺服器 http://localhost:5173
 ```bash
 npm run lint         # ESLint
 npm run typecheck    # TypeScript 型別檢查
-npm test             # 單元測試（資料層、統計、改寫規則）
+npm test             # 單元測試（資料層、統計、改寫規則、打破慣性計算）
 npm run build        # 建置，輸出到上一層的 ../rewire/
 npm run check        # 以上全部
 

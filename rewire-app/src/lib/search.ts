@@ -5,12 +5,12 @@
 import { chapters } from '../content/chapters';
 import { affirmations } from '../content/dailyRewire';
 import { challengeDays } from '../content/challenge';
-import { weakeningHabits } from '../content/weakeningHabits';
+import { patternHabits } from '../content/breakPattern';
 import type { AppData } from '../types';
 
 export interface SearchResult {
   key: string;
-  type: '章節' | '概念' | '每日語句' | '14 天挑戰' | '削弱習慣' | '我的筆記' | '我的日誌';
+  type: '章節' | '概念' | '每日語句' | '14 天挑戰' | '打破慣性' | '我的筆記' | '我的日誌';
   title: string;
   snippet: string;
   to: string;
@@ -59,8 +59,15 @@ const staticDocs: Doc[] = (() => {
   for (const d of challengeDays) {
     docs.push({ key: `day-${d.day}`, type: '14 天挑戰', title: `Day ${d.day}：${d.theme}`, snippet: d.knowledge, to: `/challenge?day=${d.day}`, text: [d.theme, d.knowledge, d.action, d.reflection].join(' ') });
   }
-  for (const h of weakeningHabits) {
-    docs.push({ key: `wh-${h.id}`, type: '削弱習慣', title: h.title, snippet: h.lines.join(''), to: `/habits#h-${h.id}`, text: [h.title, ...h.lines, h.science, h.gentle, ...h.counters].join(' ') });
+  for (const h of patternHabits) {
+    docs.push({
+      key: `bp-${h.id}`,
+      type: '打破慣性',
+      title: `Habit 0${h.no}｜${h.title}`,
+      snippet: h.definition,
+      to: `/pattern/${h.id}`,
+      text: [h.title, h.short, h.concept, h.definition, ...h.behaviors, ...h.situations, ...h.mechanisms.map((m) => `${m.term} ${m.text}`), h.boundary.note, h.neuro, ...h.alternatives, ...h.reflections, h.toolTitle].join(' '),
+    });
   }
   return docs;
 })();

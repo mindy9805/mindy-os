@@ -14,7 +14,7 @@ export const mainNav: NavItem[] = [
   { to: '/learn', label: '深度導讀', en: 'Learn', icon: BookOpen },
   { to: '/lab', label: '知識實驗室', en: 'Brain Lab', icon: FlaskConical },
   { to: '/challenge', label: '14 天練習', en: 'Challenge', icon: CalendarCheck },
-  { to: '/habits', label: '削弱習慣檢視', en: 'Habit Check-up', icon: ShieldCheck },
+  { to: '/pattern', label: '打破慣性', en: 'Break the Pattern', icon: ShieldCheck },
   { to: '/journal', label: '反思日誌', en: 'Journal', icon: NotebookPen },
   { to: '/dashboard', label: '學習儀表板', en: 'Dashboard', icon: LayoutDashboard },
   { to: '/references', label: '研究來源', en: 'References', icon: Library },

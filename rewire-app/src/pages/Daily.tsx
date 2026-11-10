@@ -19,9 +19,12 @@ import { dailyStats } from '../lib/stats';
 import { formatDate, toDateKey, shortDate } from '../lib/date';
 import { downloadText } from '../lib/clipboard';
 import { dailyToMarkdown, stamp } from '../lib/exporters';
+import { getDailyLog } from '../lib/daily';
+import { nowIso } from '../lib/id';
+import { patternHabits } from '../content/breakPattern';
 
 export default function Daily() {
-  const { data, remove } = useStore();
+  const { data, remove, upsert } = useStore();
   const toast = useToast();
   const confirm = useConfirm();
   const [editDate, setEditDate] = useState<string | null>(null);
@@ -33,6 +36,25 @@ export default function Daily() {
   return (
     <div className="space-y-12 motion-safe:animate-fade-up">
       <DailyRewireSection />
+
+      <section aria-labelledby="pick-h" className="rounded-3xl border border-line bg-surface p-5 sm:p-7">
+        <h2 id="pick-h" className="font-serif text-xl font-bold">今天想練習哪一句？</h2>
+        <p className="mt-1 text-sm text-muted">自由選擇一句，今天多留意它。也可以在打破慣性的練習完成後設定。</p>
+        <div className="mt-4 grid gap-2 sm:grid-cols-2">
+          {affirmations.map((a) => {
+            const todayLog = getDailyLog(data, today);
+            const on = todayLog.practiceId === a.id;
+            const related = patternHabits.filter((h) => h.affirmationIds.includes(a.id)).map((h) => h.short);
+            return (
+              <button key={a.id} aria-pressed={on} onClick={() => { upsert('dailyLogs', { ...todayLog, practiceId: on ? 0 : a.id, updatedAt: nowIso() }); toast(on ? '已取消今日練習句' : `今天練習：「${a.text}」`); }}
+                className={`rounded-xl border px-3 py-2 text-left text-sm transition ${on ? 'border-accent bg-soft' : 'border-line bg-bg hover:border-accent/50'}`}>
+                <span className="font-display italic text-sage">{String(a.id).padStart(2, '0')}</span> <strong>{a.text}</strong>{on && <span className="chip ml-2">今日練習句</span>}
+                {related.length > 0 && <span className="mt-0.5 block text-xs text-muted">相關習慣：{related.join('、')}</span>}
+              </button>
+            );
+          })}
+        </div>
+      </section>
 
       <section aria-labelledby="today-h" className="rounded-3xl border border-line bg-surface p-5 sm:p-7">
         <h2 id="today-h" className="font-serif text-xl font-bold">今日心智練習紀錄</h2>

@@ -216,30 +216,197 @@ const AFF = ['我現在是安全的', '我的大腦可以改變', '我已經足�
     await page.locator('a[href^="https://doi.org/"]').first().waitFor();
     await page.getByText('可能過度簡化的說法').first().waitFor();
   });
-  await step('削弱習慣檢視：卡片、科學視角、反向選擇、自我檢視', async () => {
+  await step('打破慣性：首頁焦點卡片（選 1–3 項）', async () => {
+    await page.goto(BASE + '#/');
+    await page.getByRole('heading', { name: '你最想調整哪一個習慣？' }).waitFor();
+    for (const n of ['過度尋求認可', '反覆違背承諾', '缺少獨處思考', '過度依賴便利']) await page.getByRole('button', { name: `選擇「${n}」` }).click();
+    const f = (await store(page)).patternFocus;
+    if (JSON.stringify(f) !== JSON.stringify(['approval', 'promises', 'solitude'])) throw new Error('焦點：' + JSON.stringify(f));
+    await page.getByText('每個微小的選擇，都在塑造未來的自己。').first().waitFor();
     await page.goto(BASE + '#/habits');
-    await page.getByRole('heading', { name: '在不知不覺中削弱你的習慣' }).waitFor();
-    if ((await page.locator('article[id^="h-"]').count()) !== 6) throw new Error('卡片數量');
-    const card = page.locator('#h-convenience');
-    await card.getByRole('button', { name: '科學視角與反向練習' }).click();
-    await card.getByText('習得勤勉').waitFor();
-    await card.getByLabel('今天我做了什麼反向選擇？').fill('自己煮晚餐');
-    await card.getByRole('button', { name: '記錄這個選擇' }).click();
-    for (const h of await page.locator('#audit-h ~ form fieldset').all()) await h.getByRole('button', { name: '偶爾' }).click();
-    await page.getByLabel('這週想先調整哪一個？（只選一個就好）').selectOption('solitude');
-    await page.getByRole('button', { name: '儲存自我檢視' }).click();
-    await page.getByText('合計 6/18').waitFor();
+    await page.waitForURL(/#\/pattern$/);
+  });
+  await step('打破慣性：七個學習頁都有 10 個段落與互動工具', async () => {
+    for (const id of ['approval', 'convenience', 'impress', 'solitude', 'promises', 'environment', 'shortterm']) {
+      await page.goto(BASE + `#/pattern/${id}`);
+      for (const h of ['行為定義', '常見生活情境', '可能的心理機制', '可能產生的長期影響', '健康行為與過度行為的界線', '與神經可塑性的關聯', '可執行的替代行動', '自我反思問題', '行動實驗', '研究證據與適用限制']) {
+        await page.getByRole('heading', { name: h }).first().waitFor({ timeout: 3000 });
+      }
+      await page.locator('#tool').waitFor();
+      await page.locator('a[href^="https://doi.org/"]').first().waitFor();
+    }
+  });
+  await step('Habit 01 認可依賴覺察器：儲存後顯示心智語句並可設為今日練習句', async () => {
+    await page.goto(BASE + '#/pattern/approval');
+    await page.getByLabel('最近的一個決策').fill('答應週末代班');
+    await page.getByLabel('1. 我原本真正想做什麼？').fill('休息');
+    await page.getByRole('button', { name: '儲存覺察紀錄' }).click();
+    await page.getByText('練習完成！帶著這句話繼續今天').waitFor();
+    await page.getByRole('button', { name: '設為今日練習句' }).first().click();
     const s = await store(page);
-    if (s.counterChoices[0].choice !== '自己煮晚餐' || s.habitAudits[0].focusId !== 'solitude') throw new Error('未儲存');
-    await page.getByRole('button', { name: '刪除這個選擇紀錄' }).click();
-    await page.getByRole('dialog').getByRole('button', { name: '刪除' }).click();
-    if ((await store(page)).counterChoices.length !== 0) throw new Error('刪除');
-    await page.getByLabel('今天我做了什麼反向選擇？').last().fill('走路去上班');
-    await page.getByRole('button', { name: '記錄這個選擇' }).last().click();
-    await page.goto(BASE + '#/learn/ch8');
-    await page.getByRole('heading', { name: '日常中的削弱習慣' }).waitFor();
-    await page.getByRole('link', { name: /跟接受平庸的人待在一起/ }).click();
-    await page.waitForURL(/habits/);
+    if (s.patternEntries[0].kind !== 'validation') throw new Error('未儲存');
+    const today = s.dailyLogs.find((l) => l.practiceId === 3);
+    if (!today || today.why !== '提醒我先看事實') throw new Error('今日練習句覆蓋了紀錄 ' + JSON.stringify(s.dailyLogs));
+    await page.getByLabel('完成實驗後，記錄你的觀察與結果').fill('第三天開始比較敢說不');
+    await page.getByRole('button', { name: '記錄完成的行動實驗' }).click();
+    if ((await store(page)).counterChoices.length !== 1) throw new Error('實驗');
+  });
+  await step('Habit 02 舒適圈探索地圖：建立、新增、調整難度、勾選', async () => {
+    await page.goto(BASE + '#/pattern/convenience');
+    await page.getByLabel('一件想嘗試、但一直逃避的事').fill('開始學游泳');
+    await page.getByRole('button', { name: '建立探索地圖' }).click();
+    await page.getByLabel('新增步驟').first().fill('查詢附近泳池');
+    await page.getByRole('button', { name: '加入步驟' }).first().click();
+    await page.getByRole('button', { name: '調整為較困難的階段' }).first().click();
+    await page.getByLabel('完成：查詢附近泳池').check();
+    const m = (await store(page)).patternEntries.find((e) => e.kind === 'comfort');
+    if (m.steps.length !== 4 || !m.steps.find((x) => x.text === '查詢附近泳池').done || m.steps[0].level !== 2) throw new Error(JSON.stringify(m.steps));
+  });
+  await step('Habit 03 消費動機檢視器：反思結果、冷靜期、決定', async () => {
+    await page.goto(BASE + '#/pattern/impress');
+    await page.getByLabel('想購買的物品').fill('新款耳機');
+    await page.getByLabel('預估價格（元）').fill('3600');
+    await page.getByLabel('預估每月使用次數').fill('20');
+    await page.getByRole('button', { name: '想被看見或留下好印象' }).click();
+    await page.getByRole('button', { name: '產生反思結果' }).click();
+    await page.getByText('每次使用成本約 15 元').waitFor();
+    await page.getByLabel('自訂冷靜期').selectOption('7');
+    await page.getByRole('button', { name: '儲存檢視紀錄' }).click();
+    await page.getByText('冷靜期中').waitFor();
+    await page.getByRole('button', { name: '決定不買' }).click();
+    const e = (await store(page)).patternEntries.find((x) => x.kind === 'spending');
+    if (e.decision !== 'skipped' || e.coolingDays !== 7) throw new Error(JSON.stringify(e));
+  });
+  await step('Habit 04 安靜五分鐘：自訂時間、關閉動畫、反思儲存', async () => {
+    await page.goto(BASE + '#/pattern/solitude');
+    await page.getByLabel('練習時間（分鐘）').fill('1');
+    await page.getByLabel('顯示呼吸動畫').uncheck();
+    await page.getByRole('button', { name: '開始安靜' }).click();
+    await page.waitForTimeout(2200);
+    await page.getByRole('button', { name: '結束並反思' }).click();
+    await page.getByLabel('我現在真正需要什麼？').fill('早點睡');
+    await page.getByRole('button', { name: '儲存這次安靜練習' }).click();
+    const q = (await store(page)).patternEntries.find((x) => x.kind === 'quiet');
+    if (!q || q.seconds < 1 || q.need !== '早點睡') throw new Error(JSON.stringify(q));
+  });
+  await step('Habit 05 微承諾追蹤器：建立、完成、中斷原因、暫停、七天回顧', async () => {
+    await page.goto(BASE + '#/pattern/promises');
+    await page.getByLabel(/每日微承諾/).fill('早餐後閱讀兩頁書。');
+    await page.getByLabel('具體執行情境').fill('吃完早餐');
+    await page.getByLabel('備用方案').fill('只讀一段');
+    await page.getByRole('button', { name: '建立微承諾' }).click();
+    await page.getByRole('button', { name: '今天完成了' }).click();
+    if ((await store(page)).commitmentLogs[0]?.status !== 'done') throw new Error('完成');
+    await page.getByRole('button', { name: '記錄中斷原因' }).click();
+    await page.getByLabel('中斷原因').fill('加班');
+    await page.getByRole('button', { name: '儲存', exact: true }).click();
+    const logs = (await store(page)).commitmentLogs;
+    if (logs.length !== 1 || logs[0].status !== 'missed' || logs[0].reason !== '加班') throw new Error('同日應只有一筆 ' + JSON.stringify(logs));
+    await page.getByRole('button', { name: '今天完成了' }).click();
+    await page.getByLabel('最近七天執行情況').waitFor();
+    await page.getByRole('button', { name: '暫停這個微承諾' }).click();
+    if ((await store(page)).microCommitments[0].active) throw new Error('暫停');
+    await page.getByRole('button', { name: '恢復這個微承諾' }).click();
+  });
+  await step('Habit 06 成長環境盤點：反思為主、不替使用者決定', async () => {
+    await page.goto(BASE + '#/pattern/environment');
+    await page.getByLabel('想盤點的環境或關係（可用代稱）').fill('工作團隊');
+    const sets = await page.locator('#tool fieldset').all();
+    const picks = ['非常符合', '大致符合', '不太符合', '大致符合', '一半一半', '非常不符合'];
+    for (let i = 0; i < 6; i++) await sets[i].getByRole('button', { name: picks[i], exact: true }).click();
+    await page.getByText('不會替你決定是否調整或結束任何關係').waitFor();
+    await page.getByRole('button', { name: '儲存盤點' }).click();
+    if (!(await store(page)).patternEntries.some((x) => x.kind === 'environment' && x.label === '工作團隊')) throw new Error('未儲存');
+  });
+  await step('Habit 07 短期與長期選擇模擬器：比較表', async () => {
+    await page.goto(BASE + '#/pattern/shortterm');
+    await page.getByLabel('當下想做的事').fill('繼續看影片一小時');
+    await page.getByLabel('長期希望達成的目標').fill('每天睡滿 7 小時');
+    await page.getByLabel('是否有折衷方案？').fill('先完成睡前準備再看一集');
+    await page.getByRole('button', { name: '產生比較表' }).click();
+    if ((await page.locator('table tbody tr').count()) !== 3) throw new Error('比較表');
+    await page.getByRole('button', { name: '儲存這次比較' }).click();
+  });
+  await step('21 題自我評估：作答、優先項目、結果與建議工具', async () => {
+    await page.goto(BASE + '#/pattern/assessment');
+    if ((await page.locator('form fieldset input[type=radio]').count()) !== 105) throw new Error('題數');
+    const qs = await page.locator('form section fieldset').all();
+    if (qs.length !== 21) throw new Error('fieldset ' + qs.length);
+    for (let i = 0; i < 21; i++) await qs[i].locator('label').nth(i % 5).click();
+    await page.getByRole('button', { name: '過度依賴便利' }).click();
+    await page.getByRole('button', { name: '查看結果並儲存' }).click();
+    await page.getByRole('heading', { name: '評估結果' }).waitFor();
+    await page.getByText('建議練習工具').waitFor();
+    const s = await store(page);
+    if (s.patternAssessments.length !== 1 || JSON.stringify(s.patternFocus) !== '["convenience"]') throw new Error('評估');
+    await page.getByText('不是醫學或心理診斷').first().waitFor();
+  });
+  await step('習慣改變工作坊：七步驟、建立 If-Then 與微承諾、回顧', async () => {
+    await page.goto(BASE + '#/pattern/workshop');
+    await page.getByLabel('想處理的習慣').selectOption('shortterm');
+    await page.getByRole('button', { name: '開始新的工作坊' }).click();
+    await page.getByLabel(/我最常重複的行為/).fill('睡前看影片到兩點');
+    await page.getByRole('button', { name: '下一步' }).click();
+    await page.getByLabel('通常發生的時間').fill('晚上 11 點');
+    await page.getByLabel('當時的情緒').fill('疲倦');
+    await page.getByLabel('環境提示').fill('躺上床');
+    await page.getByRole('button', { name: '下一步' }).click();
+    await page.getByLabel('舊行為帶來的短期好處').fill('放鬆');
+    await page.getByRole('button', { name: '下一步' }).click();
+    await page.getByLabel(/我的替代行動/).fill('關閉自動播放');
+    await page.getByRole('button', { name: '下一步' }).click();
+    await page.getByLabel('如果（情境）').fill('晚上 11 點躺上床');
+    await page.getByLabel('我就（行動）').fill('把手機放到書桌');
+    await page.getByRole('button', { name: '建立 If-Then 計畫' }).click();
+    await page.getByRole('button', { name: '同時加入每日微承諾' }).click();
+    await page.getByRole('button', { name: '下一步' }).click();
+    await page.getByRole('link', { name: '開始今日練習' }).waitFor();
+    await page.getByRole('button', { name: '下一步' }).click();
+    await page.getByLabel(/這一週，我觀察到什麼/).fill('前兩天有做到');
+    await page.getByRole('button', { name: '降低難度' }).click();
+    await page.getByRole('button', { name: '完成本次回顧' }).click();
+    const s = await store(page);
+    const w = s.workshops[0];
+    if (w.step !== 7 || !w.reviewedAt || w.cue !== '躺上床' || !w.planId) throw new Error(JSON.stringify(w));
+    if (!s.plans.some((p) => p.id === w.planId) || s.microCommitments.length !== 2) throw new Error('If-Then / 微承諾');
+    await page.getByRole('button', { name: '回到工作坊列表' }).click();
+    await page.getByRole('button', { name: '繼續' }).waitFor();
+  });
+  await step('14 天打破慣性挑戰：開始、完成、切換、暫停、保留進度、與原挑戰分開', async () => {
+    await page.goto(BASE + '#/challenge?type=pattern');
+    await page.getByLabel('習慣', { exact: true }).selectOption('promises');
+    await page.getByRole('button', { name: '開始挑戰' }).click();
+    await page.getByText('Break the Pattern · Day 1 / 14').waitFor();
+    await page.getByRole('heading', { name: '今日行動' }).waitFor();
+    await page.getByText('今日心智語句').waitFor();
+    await page.getByRole('button', { name: '出現一次' }).click();
+    await page.getByLabel('完成紀錄').fill('建立了第一個微承諾');
+    await page.getByRole('button', { name: '儲存並標記完成' }).click();
+    await page.getByRole('button', { name: '輕量版' }).click();
+    await page.getByText(/輕量版：/).first().waitFor();
+    await page.getByLabel('習慣', { exact: true }).selectOption('solitude');
+    await page.getByRole('button', { name: '切換到這個挑戰' }).click();
+    await page.getByRole('button', { name: '暫停挑戰' }).click();
+    let s = await store(page);
+    if (s.patternChallenge.status !== 'paused' || s.patternChallenge.activeHabitId !== 'solitude' || s.patternChallenge.level !== 'gentle') throw new Error(JSON.stringify(s.patternChallenge));
+    if (!s.patternChallenge.progress.promises['1'].completed || s.patternChallenge.progress.promises['1'].oldPattern !== 'once') throw new Error('進度遺失');
+    if (s.challenge['1']) throw new Error('影響了原本的 14 天挑戰');
+    await page.reload();
+    await page.getByRole('button', { name: '恢復挑戰' }).first().click();
+    await page.getByLabel('習慣', { exact: true }).selectOption('promises');
+    await page.getByRole('button', { name: '切換到這個挑戰' }).click();
+    await page.getByRole('button', { name: '第 1 天（已完成）' }).waitFor();
+    await page.getByRole('tab', { name: '神經可塑性練習' }).click();
+    await page.getByRole('heading', { name: '找出最想改變的習慣' }).waitFor();
+  });
+  await step('Daily：自由選擇今日練習句、卡片顯示相關習慣', async () => {
+    await page.goto(BASE + '#/daily');
+    await page.locator('section[aria-labelledby="pick-h"]').getByRole('button', { name: /今天是新的機會/ }).click();
+    const l = (await store(page)).dailyLogs[0];
+    if (l.practiceId !== 7 || l.why !== '提醒我先看事實') throw new Error(JSON.stringify(l));
+    const card = page.locator('article').filter({ hasText: '今天是新的機會' }).first();
+    await card.getByRole('button', { name: '反思與行動' }).click();
+    await card.getByRole('link', { name: '打破慣性：反覆違背承諾' }).waitFor();
   });
   await step('14 天挑戰：完成、取消、紀錄保留於重新整理後', async () => {
     await page.goto(BASE + '#/challenge?day=3');
@@ -298,8 +465,11 @@ const AFF = ['我現在是安全的', '我的大腦可以改變', '我已經足�
     await page.locator('.recharts-bar').first().waitFor();
     if ((await page.locator('.recharts-bar-rectangle path').count()) < 1) throw new Error('長條圖沒有資料');
     await page.getByText('踏出第一步').waitFor();
-    await page.getByText('誠實面對自己').waitFor();
-    await page.getByText('累計反向選擇 1 次').waitFor();
+    await page.getByText('看見自己的模式').waitFor();
+    await page.getByRole('heading', { name: 'Break the Pattern｜打破慣性' }).waitFor();
+    await page.getByText('七大習慣自我評估變化').waitFor();
+    await page.getByText('晚上 11 點').first().waitFor();
+    await page.getByText('關閉自動播放').first().waitFor();
   });
   await step('主題切換與字體大小', async () => {
     await page.getByRole('button', { name: /^主題：/ }).click();
@@ -353,7 +523,7 @@ const AFF = ['我現在是安全的', '我的大腦可以改變', '我已經足�
   const m = await mctx.newPage();
   m.on('pageerror', (e) => errors.push('mobile: ' + e.message));
   await step('手機版：所有頁面無橫向捲動', async () => {
-    const routes = ['', 'daily', 'learn', 'learn/ch1', 'learn/ch2', 'learn/ch6', 'learn/ch7', 'learn/ch9', 'lab', 'lab/habit-curve', 'challenge', 'journal', 'journal?tab=notes', 'dashboard', 'references', 'data', 'daily/read', 'habits'];
+    const routes = ['', 'daily', 'learn', 'learn/ch1', 'learn/ch2', 'learn/ch6', 'learn/ch7', 'learn/ch9', 'lab', 'lab/habit-curve', 'challenge', 'journal', 'journal?tab=notes', 'dashboard', 'references', 'data', 'daily/read', 'pattern', 'pattern/approval', 'pattern/impress', 'pattern/promises', 'pattern/shortterm', 'pattern/assessment', 'pattern/workshop', 'challenge?type=pattern'];
     const bad = [];
     for (const r of routes) {
       await m.goto(BASE + '#/' + r);
@@ -373,7 +543,7 @@ const AFF = ['我現在是安全的', '我的大腦可以改變', '我已經足�
     await m.waitForURL(/challenge/);
   });
   if (process.env.SHOT_DIR) {
-    for (const [r, n] of [['habits', 'm-habits'], ['', 'm-home'], ['daily/read', 'm-read'], ['learn/ch1', 'm-ch1'], ['challenge', 'm-challenge']]) {
+    for (const [r, n] of [['pattern', 'm-pattern'], ['pattern/promises', 'm-promises'], ['challenge?type=pattern', 'm-pchallenge'], ['dashboard', 'm-dash'], ['', 'm-home'], ['daily/read', 'm-read'], ['learn/ch1', 'm-ch1'], ['challenge', 'm-challenge']]) {
       await m.goto(BASE + '#/' + r); await m.waitForTimeout(400);
       await m.screenshot({ path: `${process.env.SHOT_DIR}/${n}.png` });
     }

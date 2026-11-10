@@ -18,10 +18,11 @@ import { nowIso } from '../lib/id';
 import { downloadText } from '../lib/clipboard';
 import { challengeToMarkdown, stamp } from '../lib/exporters';
 import type { ChallengeDayRecord } from '../types';
+import PatternChallenge from '../components/pattern/PatternChallenge';
 
 const emptyRecord: ChallengeDayRecord = { completed: false, note: '', affirmationReflection: '', microActionDone: false, feeling: '' };
 
-export default function Challenge() {
+function NeuroChallenge() {
   const { data, update } = useStore();
   const toast = useToast();
   const [params, setParams] = useSearchParams();
@@ -65,8 +66,7 @@ export default function Challenge() {
   const goDay = (d: number) => setParams({ day: String(d) });
 
   return (
-    <div className="motion-safe:animate-fade-up">
-      <SectionTitle eyebrow="14-Day Challenge" title="14 天神經可塑性練習" desc="每天一個小主題、一個具體行動。不需要連續，也可以隨時補做或重新練習——重要的是持續回來。" />
+    <div>
       <ProgressBar label="挑戰完成進度" value={done} max={14} />
 
       <nav aria-label="選擇天數" className="mt-5">
@@ -97,7 +97,7 @@ export default function Challenge() {
         {(day === 1 || day === 14) && (
           <p className="mt-3 rounded-xl bg-apricot/25 px-3 py-2 text-sm">
             {day === 1 ? '不確定從哪個習慣開始？' : '想規劃下一階段？'}先做一次
-            <Link to="/habits" className="mx-1 text-accent underline">削弱習慣自我檢視</Link>
+            <Link to="/pattern/assessment" className="mx-1 text-accent underline">七大習慣自我覺察評估</Link>
             ，找出最想調整的一項。
           </p>
         )}
@@ -176,6 +176,29 @@ export default function Challenge() {
           </button>
         </div>
       </section>
+    </div>
+  );
+}
+
+/**
+ * 14 天挑戰頁：兩種挑戰類型（完成狀態分開儲存）
+ * - 14 天神經可塑性練習（原有內容）
+ * - 14 天打破慣性挑戰（Break the Pattern，依所選習慣產生任務）
+ */
+export default function Challenge() {
+  const [params, setParams] = useSearchParams();
+  const type = params.get('type') === 'pattern' ? 'pattern' : 'neuro';
+  return (
+    <div className="motion-safe:animate-fade-up">
+      <SectionTitle eyebrow="14-Day Challenge" title="14 天練習" desc="每天一個小主題、一個具體行動。不需要連續，也可以隨時補做、重新練習或暫停——重要的是持續回來。" />
+      <div role="tablist" aria-label="挑戰類型" className="mb-6 inline-flex flex-wrap rounded-full border border-line bg-surface p-1">
+        {([['neuro', '神經可塑性練習'], ['pattern', '打破慣性挑戰']] as const).map(([t, label]) => (
+          <button key={t} role="tab" aria-selected={type === t} className={`rounded-full px-4 py-2 text-sm ${type === t ? 'bg-accent text-onaccent' : 'text-ink'}`} onClick={() => setParams(t === 'pattern' ? { type: 'pattern' } : {})}>
+            {label}
+          </button>
+        ))}
+      </div>
+      <div role="tabpanel">{type === 'pattern' ? <PatternChallenge /> : <NeuroChallenge />}</div>
     </div>
   );
 }

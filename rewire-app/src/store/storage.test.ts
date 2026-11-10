@@ -27,6 +27,22 @@ describe('normalize', () => {
   });
 });
 
+describe('Break the Pattern 資料', () => {
+  it('焦點習慣最多 3 項且只接受有效 id', () => {
+    expect(normalize({ patternFocus: ['approval', 'x', 'approval', 'impress', 'solitude', 'promises'] }).patternFocus).toEqual(['approval', 'impress', 'solitude']);
+  });
+  it('14 天打破慣性挑戰：保留各習慣進度並過濾無效天數', () => {
+    const d = normalize({ patternChallenge: { activeHabitId: 'promises', status: 'paused', level: 'gentle', progress: { promises: { '2': { completed: true, oldPattern: 'once' }, '20': {} }, bad: {} } } });
+    expect(d.patternChallenge.status).toBe('paused');
+    expect(d.patternChallenge.level).toBe('gentle');
+    expect(Object.keys(d.patternChallenge.progress.promises!)).toEqual(['2']);
+    expect(d.patternChallenge.progress.promises!['2'].oldPattern).toBe('once');
+  });
+  it('工具紀錄只保留已知類型', () => {
+    expect(normalize({ patternEntries: [{ id: 'a', kind: 'quiet' }, { id: 'b', kind: 'hack' }] }).patternEntries).toHaveLength(1);
+  });
+});
+
 describe('validateBackup', () => {
   it('接受本網站匯出的備份', () => {
     const data = createEmptyData();

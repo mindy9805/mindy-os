@@ -29,6 +29,8 @@ export default function DailyLogForm({ date = toDateKey(), markCompleted = false
       id: current?.id ?? form.id,
       createdAt: current?.createdAt ?? form.createdAt,
       completedReading: form.completedReading || markCompleted || !!current?.completedReading,
+      // 保留其他頁面（例如打破慣性練習後）設定的「今日練習句」
+      practiceId: current?.practiceId ?? form.practiceId ?? 0,
       updatedAt: nowIso(),
     };
     upsert('dailyLogs', saved);

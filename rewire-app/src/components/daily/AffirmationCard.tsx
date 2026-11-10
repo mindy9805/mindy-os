@@ -11,6 +11,7 @@ import { useStore } from '../../store/AppStore';
 import { useToast } from '../ui/Toast';
 import { copyText } from '../../lib/clipboard';
 import { chapterMap } from '../../content/chapters';
+import { patternHabits } from '../../content/breakPattern';
 
 export default function AffirmationCard({ a, defaultOpen = false, compact = false }: { a: Affirmation; defaultOpen?: boolean; compact?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
@@ -74,6 +75,9 @@ export default function AffirmationCard({ a, defaultOpen = false, compact = fals
               <p className="font-medium text-accent">對應學習主題</p>
               <p className="text-muted">{a.topics}</p>
               <div className="mt-1 flex flex-wrap gap-1.5">
+                {patternHabits.filter((h) => h.affirmationIds.includes(a.id)).map((h) => (
+                  <Link key={h.id} to={`/pattern/${h.id}`} className="chip hover:bg-sage/40">打破慣性：{h.short}</Link>
+                ))}
                 {a.chapterIds.map((id) => (
                   <Link key={id} to={`/learn/${id}`} className="chip hover:bg-sage/40">
                     <BookOpen className="mr-1 h-3 w-3" aria-hidden />第 {chapterMap[id].number} 章

@@ -5,7 +5,8 @@ import { chapters } from '../content/chapters';
 import { useStore } from '../store/AppStore';
 import { chapterStats, challengeStats, dailyStats } from '../lib/stats';
 import DailyRewireSection from '../components/daily/DailyRewireSection';
-import { weakeningHabits, WEAKENING_TITLE, WEAKENING_INTRO, WEAKENING_CLOSING } from '../content/weakeningHabits';
+import { PATTERN_MODULE, PATTERN_SUBTITLE, PATTERN_TITLE } from '../content/breakPattern';
+import { FocusPicker, PatternClosing } from '../components/pattern/shared';
 import { ProgressBar } from '../components/ui/basics';
 
 const paths = [
@@ -66,24 +67,16 @@ export default function Overview() {
 
       <DailyRewireSection />
 
-      {/* 削弱習慣預覽 */}
-      <section aria-labelledby="weak-h" className="rounded-3xl border border-line bg-surface p-5 sm:p-8">
-        <p className="font-display text-xs uppercase tracking-[0.25em] text-accent">Habit Check-up · 削弱習慣檢視</p>
-        <h2 id="weak-h" className="mt-2 font-serif text-2xl font-bold sm:text-3xl">{WEAKENING_TITLE}</h2>
-        <p className="mt-2 text-muted">{WEAKENING_INTRO.join('')}</p>
-        <ol className="mt-5 grid gap-2 sm:grid-cols-2">
-          {weakeningHabits.map((h, i) => (
-            <li key={h.id}>
-              <Link to={`/habits#h-${h.id}`} className="flex items-center gap-3 rounded-xl bg-soft/50 px-4 py-3 text-sm hover:bg-soft">
-                <span className="font-display text-lg italic text-sage">{i + 1}</span>{h.title}
-              </Link>
-            </li>
-          ))}
-        </ol>
-        <ul className="mt-5 flex flex-wrap gap-2">
-          {WEAKENING_CLOSING.choices.map((c) => <li key={c} className="chip px-3 py-1 text-sm">{c}</li>)}
-        </ul>
-        <Link to="/habits" className="btn-primary mt-5">做一次自我檢視 <ArrowRight className="h-4 w-4" aria-hidden /></Link>
+      {/* Break the Pattern：你最想調整哪一個習慣？ */}
+      <section aria-labelledby="bp-h" className="rounded-3xl border border-line bg-surface p-5 sm:p-8">
+        <p className="font-display text-xs uppercase tracking-[0.25em] text-accent">{PATTERN_MODULE}</p>
+        <h2 id="bp-h" className="mt-2 font-serif text-2xl font-bold sm:text-3xl">{PATTERN_TITLE}</h2>
+        <p className="mt-2 text-muted">{PATTERN_SUBTITLE}</p>
+        <div className="mt-6"><FocusPicker headingLevel={3} /></div>
+        <div className="mt-5 flex flex-wrap gap-2">
+          <Link to="/pattern/assessment" className="btn-primary">做 21 題自我覺察評估 <ArrowRight className="h-4 w-4" aria-hidden /></Link>
+          <Link to="/pattern" className="btn-secondary">認識七個習慣</Link>
+        </div>
       </section>
 
       {/* 學習路徑 */}
@@ -115,6 +108,8 @@ export default function Overview() {
           ))}
         </div>
       </section>
+
+      <PatternClosing />
 
       <p className="rounded-2xl bg-soft/60 p-4 text-xs leading-relaxed text-muted">
         本站以 Nicole Vignola《Rewire》為學習主軸，所有內容為重新組織的原創解說，並對照原始研究標示證據與限制。本站練習適用於自我覺察與一般生活調適，不能取代專業心理或醫療協助；如有需要，請撥打 1925 安心專線（24 小時）。

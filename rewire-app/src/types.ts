@@ -272,6 +272,8 @@ export interface DailyLog {
   action: string;
   mood: number; // 1–5，0 代表未填
   moodWords: string;
+  /** 使用者自行選擇「今天想練習的句子」（1–7），0 代表未選 */
+  practiceId?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -284,6 +286,145 @@ export interface HabitAudit {
   focusId: string; // 本週想調整的習慣 id，'' 代表未選
   note: string;
   createdAt: string;
+}
+
+/* ========== Break the Pattern｜打破慣性 ========== */
+
+/** 七個習慣的 id（沿用先前版本的 id，舊資料可直接相容） */
+export type PatternHabitId = 'approval' | 'convenience' | 'impress' | 'solitude' | 'promises' | 'environment' | 'shortterm';
+
+/** 21 題自我覺察評估（1 幾乎沒有 ～ 5 幾乎總是） */
+export interface PatternAssessment {
+  id: string;
+  date: string;
+  answers: Record<string, number>;
+  /** 使用者優先希望改善的習慣（1–3 項） */
+  priorityIds: PatternHabitId[];
+  createdAt: string;
+}
+
+/** 七個互動工具的紀錄（以 kind 區分的聯合型別） */
+interface PatternEntryBase {
+  id: string;
+  habitId: PatternHabitId;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface ValidationEntry extends PatternEntryBase {
+  kind: 'validation';
+  decision: string;
+  wanted: string;
+  worry: string;
+  values: string;
+  without: string;
+  balance: string;
+}
+export interface ComfortMapEntry extends PatternEntryBase {
+  kind: 'comfort';
+  task: string;
+  steps: { id: string; text: string; level: 1 | 2 | 3; done: boolean }[];
+}
+export interface SpendingEntry extends PatternEntryBase {
+  kind: 'spending';
+  item: string;
+  price: number;
+  reasons: string[];
+  reasonNote: string;
+  usesPerMonth: number;
+  budget: 'yes' | 'no' | 'unsure';
+  alternative: string;
+  coolingDays: number;
+  coolUntil: string; // YYYY-MM-DD，冷靜期結束日
+  decision: 'pending' | 'bought' | 'skipped' | 'postponed';
+}
+export interface QuietEntry extends PatternEntryBase {
+  kind: 'quiet';
+  seconds: number;
+  thoughts: string;
+  feelings: string;
+  need: string;
+  organize: string;
+}
+export interface EnvironmentEntry extends PatternEntryBase {
+  kind: 'environment';
+  label: string;
+  ratings: Record<string, number>;
+  note: string;
+}
+export interface ChoiceSimEntry extends PatternEntryBase {
+  kind: 'choice';
+  want: string;
+  benefit: string;
+  cost: string;
+  goal: string;
+  compromise: string;
+  next: string;
+}
+export type PatternEntry = ValidationEntry | ComfortMapEntry | SpendingEntry | QuietEntry | EnvironmentEntry | ChoiceSimEntry;
+
+/** 微承諾 */
+export interface MicroCommitment {
+  id: string;
+  habitId: PatternHabitId | 'general';
+  text: string;
+  situation: string;
+  level: 1 | 2 | 3; // 1 輕鬆、2 適中、3 標準
+  backup: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+/** 微承諾每日紀錄（同一承諾同一天一筆） */
+export interface CommitmentLog {
+  id: string;
+  commitmentId: string;
+  date: string;
+  status: 'done' | 'missed';
+  reason: string;
+  createdAt: string;
+}
+
+/** 習慣改變工作坊（七個步驟） */
+export interface Workshop {
+  id: string;
+  habitId: PatternHabitId;
+  step: number; // 目前停留的步驟 1–7
+  pattern: string;
+  time: string;
+  emotion: string;
+  cue: string;
+  shortGain: string;
+  longCost: string;
+  alternative: string;
+  ifSituation: string;
+  ifAction: string;
+  ifBackup: string;
+  planId: string;
+  dailyNote: string;
+  reviewNote: string;
+  adjustments: string[];
+  reviewedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** 14 天打破慣性挑戰：每日紀錄 */
+export interface PatternDayRecord {
+  completed: boolean;
+  completedAt?: string;
+  note: string;
+  reflection: string;
+  /** 今天舊模式出現的情況 */
+  oldPattern: '' | 'none' | 'once' | 'many';
+  usedAlternative: boolean;
+  updatedAt?: string;
+}
+export interface PatternChallengeState {
+  activeHabitId: PatternHabitId | '';
+  status: 'none' | 'active' | 'paused';
+  level: 'gentle' | 'standard';
+  /** 每個習慣各自保存進度，切換挑戰不會遺失 */
+  progress: Partial<Record<PatternHabitId, Record<string, PatternDayRecord>>>;
 }
 
 /** 反向選擇紀錄：一次「選自律、選進步、選自由」的具體小選擇 */
@@ -315,7 +456,16 @@ export interface AppData {
   dailyLogs: DailyLog[];
   dailyFavorites: number[];
   habitAudits: HabitAudit[];
+  /** 行動實驗／反向選擇紀錄 */
   counterChoices: CounterChoice[];
+  /** 使用者目前最想調整的習慣（1–3 項） */
+  patternFocus: PatternHabitId[];
+  patternAssessments: PatternAssessment[];
+  patternEntries: PatternEntry[];
+  microCommitments: MicroCommitment[];
+  commitmentLogs: CommitmentLog[];
+  workshops: Workshop[];
+  patternChallenge: PatternChallengeState;
   /** 神經道路模擬器累積次數（概念示意） */
   neuralReps: number;
 }
@@ -335,4 +485,9 @@ export type CollectionKey =
   | 'selfTalk'
   | 'dailyLogs'
   | 'habitAudits'
-  | 'counterChoices';
+  | 'counterChoices'
+  | 'patternAssessments'
+  | 'patternEntries'
+  | 'microCommitments'
+  | 'commitmentLogs'
+  | 'workshops';

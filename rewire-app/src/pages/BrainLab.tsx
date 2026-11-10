@@ -5,6 +5,7 @@ import { SectionTitle } from '../components/ui/basics';
 import InteractiveBlock, { INTERACTIVE_META } from '../components/interactive/InteractiveBlock';
 import ToolCards, { TOOLS } from '../components/tools/ToolCards';
 import { chapters } from '../content/chapters';
+import { patternHabits } from '../content/breakPattern';
 import type { InteractiveKind } from '../types';
 
 const LABS: InteractiveKind[] = ['neural-path', 'cognitive-filter', 'identity-rewriter', 'self-talk', 'habit-detective', 'habit-curve', 'if-then', 'evidence'];
@@ -41,11 +42,20 @@ export default function BrainLab() {
           );
         })}
       </div>
-      <Link to="/habits" className="card-hover mt-3 block rounded-2xl border border-accent/40 bg-soft/50 p-5">
-        <span className="chip">選自律・選進步・選自由</span>
-        <p className="mt-2 font-serif text-lg font-bold">削弱習慣自我檢視</p>
-        <p className="mt-1 text-sm text-muted">檢視不知不覺中削弱紀律與信心的習慣，並記錄每一個反向選擇。</p>
-      </Link>
+      <h2 className="mb-3 mt-12 text-xl font-bold">打破慣性：七個習慣工具</h2>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {patternHabits.map((h) => (
+          <Link key={h.id} to={`/pattern/${h.id}#tool`} className="card-hover rounded-2xl border border-line bg-surface p-5">
+            <span className="chip">Habit 0{h.no} · {h.short}</span>
+            <p className="mt-2 font-serif text-lg font-bold">{h.toolTitle}</p>
+          </Link>
+        ))}
+        <Link to="/pattern/workshop" className="card-hover rounded-2xl border border-accent/40 bg-soft/50 p-5">
+          <span className="chip">七步驟</span>
+          <p className="mt-2 font-serif text-lg font-bold">習慣改變工作坊</p>
+          <p className="mt-1 text-sm text-muted">從察覺模式到反思調整，設計屬於你的改變計畫。</p>
+        </Link>
+      </div>
       <h2 className="mb-3 mt-12 text-xl font-bold">七個神經可塑性實踐工具</h2>
       <ToolCards initial={tool?.id} />
     </div>

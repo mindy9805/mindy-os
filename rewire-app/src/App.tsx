@@ -2,7 +2,7 @@
  * 路由與全域 Provider
  * 使用 HashRouter（網址形如 /#/learn/ch1），GitHub Pages 不需額外設定即可支援重新整理與深層連結。
  */
-import { HashRouter, Route, Routes } from 'react-router-dom';
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AppStoreProvider } from './store/AppStore';
 import { ToastProvider } from './components/ui/Toast';
 import { ConfirmProvider } from './components/ui/Confirm';
@@ -18,7 +18,10 @@ import Dashboard from './pages/Dashboard';
 import References from './pages/References';
 import DataPage from './pages/DataPage';
 import Daily from './pages/Daily';
-import Habits from './pages/Habits';
+import PatternHub from './pages/PatternHub';
+import PatternHabitPage from './pages/PatternHabitPage';
+import PatternAssessment from './pages/PatternAssessment';
+import PatternWorkshop from './pages/PatternWorkshop';
 import ReadingMode from './components/daily/ReadingMode';
 import NotFound from './pages/NotFound';
 
@@ -40,7 +43,12 @@ export default function App() {
                 <Route path="lab/:toolId" element={<BrainLab />} />
                 <Route path="challenge" element={<Challenge />} />
                 <Route path="daily" element={<Daily />} />
-                <Route path="habits" element={<Habits />} />
+                {/* Break the Pattern｜打破慣性（舊網址 /habits 自動轉址） */}
+                <Route path="pattern" element={<PatternHub />} />
+                <Route path="pattern/assessment" element={<PatternAssessment />} />
+                <Route path="pattern/workshop" element={<PatternWorkshop />} />
+                <Route path="pattern/:habitId" element={<PatternHabitPage />} />
+                <Route path="habits" element={<Navigate to="/pattern" replace />} />
                 <Route path="journal" element={<Journal />} />
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="references" element={<References />} />

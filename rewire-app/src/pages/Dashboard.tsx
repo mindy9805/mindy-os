@@ -6,8 +6,8 @@ import { Link } from 'react-router-dom';
 import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { BookOpen, ListChecks, CalendarCheck, Sparkles, Award, Lock } from 'lucide-react';
 import { useStore } from '../store/AppStore';
-import { chapterStats, challengeStats, counterChoiceStats, dailyStats, milestones, moodTrend, practiceFrequency } from '../lib/stats';
-import { choiceMeta, weakeningMap, type ChoiceKind } from '../content/weakeningHabits';
+import { chapterStats, challengeStats, dailyStats, milestones, moodTrend, practiceFrequency } from '../lib/stats';
+import PatternDashboard from '../components/pattern/PatternDashboard';
 import { Card, EmptyState, SectionTitle, MOODS } from '../components/ui/basics';
 import { affirmationMap } from '../content/dailyRewire';
 import { chapterLabel } from '../content/chapters';
@@ -37,7 +37,6 @@ export default function Dashboard() {
   const mood = moodTrend(data);
   const moodWeek = moodTrend(data, 7);
   const ms = milestones(data);
-  const cc = counterChoiceStats(data);
   const recent = [
     ...data.journal.map((j) => ({ id: j.id, at: j.updatedAt, title: j.title || '反思日誌', text: j.content, where: '日誌' })),
     ...data.notes.filter((n) => n.kind === 'reflection').map((n) => ({ id: n.id, at: n.updatedAt, title: n.source || '個人反思', text: n.content, where: chapterLabel(n.chapterId) })),
@@ -101,7 +100,7 @@ export default function Dashboard() {
         <Card>
           <h2 className="font-serif text-lg font-bold">習慣練習頻率（近 14 天）</h2>
           {freq.total === 0 ? (
-            <div className="mt-4"><EmptyState title="還沒有練習紀錄" desc="使用習慣偵探、情緒命名、呼吸練習或完成挑戰後，這裡會顯示每天的練習次數。" /></div>
+            <div className="mt-4"><EmptyState title="還沒有練習紀錄" desc="使用習慣偵探、情緒命名、呼吸練習、打破慣性工具或完成挑戰後，這裡會顯示每天的練習次數。" /></div>
           ) : (
             <div className="mt-3 h-64">
               <ResponsiveContainer>
@@ -116,7 +115,7 @@ export default function Dashboard() {
                   <Bar dataKey="呼吸練習" stackId="a" fill="#E8CCB2" isAnimationActive={false} />
                   <Bar dataKey="每日語句" stackId="a" fill="#7E9C8C" isAnimationActive={false} />
                   <Bar dataKey="挑戰" stackId="a" fill="#C9A88A" isAnimationActive={false} />
-                  <Bar dataKey="反向選擇" stackId="a" fill="#5E7F70" isAnimationActive={false} />
+                  <Bar dataKey="打破慣性" stackId="a" fill="#5E7F70" isAnimationActive={false} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -145,32 +144,7 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      <Card>
-        <h2 className="font-serif text-lg font-bold">削弱習慣與反向選擇</h2>
-        {cc.total === 0 && !cc.latestAudit ? (
-          <div className="mt-4"><EmptyState title="還沒有自我檢視或反向選擇" action={<Link to="/habits" className="btn-secondary btn-sm">開始自我檢視</Link>} /></div>
-        ) : (
-          <div className="mt-4 grid gap-5 md:grid-cols-2">
-            <div>
-              <p className="text-xs text-muted">累計反向選擇 {cc.total} 次</p>
-              <ul className="mt-2 grid grid-cols-3 gap-2">
-                {(Object.keys(choiceMeta) as ChoiceKind[]).map((k) => (
-                  <li key={k} className="rounded-xl bg-soft/60 p-3 text-center text-sm"><span className="block text-xs text-muted">選{k}</span><span className="font-display text-xl font-bold">{cc.byKind[k]}</span></li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <p className="text-xs text-muted">最近一次自我檢視</p>
-              {cc.latestAudit ? (
-                <div className="mt-1 rounded-xl bg-soft/60 p-3 text-sm">
-                  <p className="text-xs text-muted">{formatDate(cc.latestAudit.date)}</p>
-                  <p>本週專注：{cc.latestAudit.focusId && weakeningMap[cc.latestAudit.focusId] ? weakeningMap[cc.latestAudit.focusId].title : '未選擇'}</p>
-                </div>
-              ) : <p className="mt-1 text-sm text-muted">尚未做過自我檢視</p>}
-            </div>
-          </div>
-        )}
-      </Card>
+      <PatternDashboard />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>

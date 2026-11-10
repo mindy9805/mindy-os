@@ -105,6 +105,7 @@ export default function ReadingMode() {
         {!done ? (
           <div key={step} className="max-w-2xl motion-safe:animate-fade-up">
             <p className="font-display text-lg italic text-sage">{String(a.id).padStart(2, '0')}｜{a.theme}</p>
+            {getDailyLog(data).practiceId === a.id && <p className="mt-2"><span className="chip">✦ 你今天選擇練習的句子</span></p>}
             <h1 ref={heading} tabIndex={-1} className="mt-4 font-serif text-4xl font-bold leading-tight text-ink outline-none sm:text-5xl md:text-6xl">
               {a.text}
             </h1>
